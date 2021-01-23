@@ -1,17 +1,14 @@
 ## Android SDK for hCaptcha
 
 ![CI](https://github.com/hCaptcha/hcaptcha-android-sdk/workflows/Android%20SDK%20CI/badge.svg)
-![Publish](https://github.com/hCaptcha/hcaptcha-android-sdk/workflows/Android%20SDK%20Publish/badge.svg)
+[![Release](https://jitpack.io/v/hCaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hCaptcha/hcaptcha-android-sdk)
 
-###### [Installation](#installation)  | [Basic usage](#basic-usage) | [Example](#display-a-hcaptcha-challenge)  | [Customization](#config-params) | [Error handling](#error-handling) | [Testing](#testing) | [Publishing](#publishing)
+###### [Installation](#installation) | [Basic usage](#basic-usage) | [Example](#display-a-hcaptcha-challenge) | [Customization](#config-params) | [Error handling](#error-handling) | [Testing](#testing) | [Publishing](#publishing)
 
 This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com), and is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
 
-**NOTE:** This software is in beta, and the repo is currently a preview release. We expect to tag 1.0 in the next few days.
 
 ### Installation
-
-1. Via JitPack (*recommended*) 
 
 <pre>
 // Register JitPack Repository inside the root build.gradle file
@@ -20,31 +17,11 @@ repositories {
 }
 // Add hCaptcha sdk dependency inside the app's build.gradle file
 dependencies {
-    <b>implementation 'com.github.hCaptcha:hcaptcha-android-sdk:1.0.0'</b>
+    <b>implementation 'com.github.hcaptcha:hcaptcha-android-sdk:x.y.z'</b>
 }
 </pre>
 
-2. Or via GitHub Maven Repo (cumbersome)
-
-<pre>
-// Register Github Repository inside the root build.gradle file
-repositories {
-    <b>maven {
-        url = uri("https://maven.pkg.github.com/hCaptcha/hcaptcha-android-sdk")
-        credentials {
-            username = project.findProperty("github.user") ?: System.getenv("GITHUB_USER")
-            password = project.findProperty("github.token") ?: System.getenv("GITHUB_TOKEN")
-        }
-    }</b>
-}
-// Add hCaptcha sdk dependency inside the app's build.gradle file
-dependencies {
-    <b>implementation 'com.hcaptcha:sdk:1.0.0'</b>
-}
-</pre>
-
-*NOTE: To authenticate against the github repo you need to generate a [Github Developer Token](https://docs.github.com/en/github/authenticating-to-github/creating-a-personal-access-token) with `read:packages` access and set gradle properties (`github.user` and `github.token`) or environment variables (`GITHUB_USER` and `GITHUB_TOKEN`).*
-
+*Note: replace `x.y.z` with one from [Release](https://github.com/hCaptcha/hcaptcha-android-sdk/releases) (e.g. `1.0.0`).*
 
 ### Example app
 
@@ -143,8 +120,8 @@ You can manually test before pushing by running both unit tests and instrumented
 
 #### Publishing
 To publish a new version follow the next steps:
-1. Bump the version number `android.defaultConfig.versionName` in the `sdk/build.gradle` file 
-2. Update *Readme Installation* section with the new version
-3. Create a [Github Release](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release) with version from step 1 **without** a prefix such as `v` (e.g. `1.0.3`)
-   * `publish` workflow will be triggered which will: build, test and deploy the package to the [Github Repo](https://github.com/orgs/hCaptcha/packages?repo_name=hcaptcha-android-sdk) 
-   * JitPack process will be triggered upon first installation of the new package version
+1. Bump versions in the `sdk/build.gradle` file:
+   * `android.defaultConfig.versionCode`: increment by **1** (next integer)
+   * `android.defaultConfig.versionName`: [Semantic Versioning](https://semver.org)
+2. Create a [Github Release](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release) with the **SAME** version from step 1 (**without** a prefix such as `v`)
+   * JitPack's automatic process will be triggered upon first installation of the new package version

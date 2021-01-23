@@ -16,7 +16,7 @@ android {
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "1.0.0"
+        versionName "1.0.0-alpha"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -72,15 +72,6 @@ task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
 project.afterEvaluate {
     publishing {
         repositories {
-            maven {
-                name = "GitHubPackages"
-                url = uri("https://maven.pkg.github.com/hCaptcha/hcaptcha-android-sdk")
-                credentials {
-                    username = project.findProperty("github.user") ?: System.getenv("GITHUB_ACTOR")
-                    password = project.findProperty("github.key") ?: System.getenv("GITHUB_TOKEN")
-                }
-            }
-//            mavenLocal {}
         }
 
         publications {
