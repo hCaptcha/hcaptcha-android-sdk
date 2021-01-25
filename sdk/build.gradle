@@ -12,11 +12,11 @@ android {
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
-        versionCode 1
+        versionCode 2
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "1.0.0-alpha"
+        versionName "1.0.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
