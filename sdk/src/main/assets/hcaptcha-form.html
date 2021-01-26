@@ -14,6 +14,10 @@
         #hcaptcha-container {
             margin-top: 5px;
         }
+        /* overwrite hCaptcha iframe overlay which adds a #FFF background with opacity 0.05 */
+        div > div:nth-child(2) {
+            opacity: 0 !important;
+        }
     </style>
 </head>
 <body>
