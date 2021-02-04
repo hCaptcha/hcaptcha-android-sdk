@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -79,7 +80,14 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         assert getArguments() != null;
-        hCaptchaDialogListener = getArguments().getParcelable(KEY_LISTENER);
+        try {
+            hCaptchaDialogListener = getArguments().getParcelable(KEY_LISTENER);
+        } catch (BadParcelableException e) {
+            // Happens when fragment tries to reconstruct because the activity was killed
+            // And thus there is no way of communicating back
+            dismiss();
+            return;
+        }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this);
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
