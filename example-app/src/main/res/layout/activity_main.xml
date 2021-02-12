@@ -16,21 +16,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="HCaptcha&#10;(invisible)"
-            android:textSize="12dp"
+            android:textSize="12sp"
             android:onClick="onClickHCaptchaInvisible" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="HCaptcha&#10;(compact)"
-            android:textSize="12dp"
+            android:textSize="12sp"
             android:onClick="onClickHCaptchaCompact" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="HCaptcha&#10;(normal)"
-            android:textSize="12dp"
+            android:textSize="12sp"
             android:onClick="onClickHCaptchaNormal" />
 
     </LinearLayout>
