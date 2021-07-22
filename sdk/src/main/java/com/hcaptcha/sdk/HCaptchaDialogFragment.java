@@ -9,9 +9,7 @@ import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.webkit.*;
 import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
@@ -95,7 +93,9 @@ public class HCaptchaDialogFragment extends DialogFragment implements
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final Boolean loading = hCaptchaJsInterface.getHCaptchaConfig().getLoading();
         rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+        rootView.setVisibility(loading ? View.VISIBLE : View.GONE);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         webView = rootView.findViewById(R.id.webView);
         setupWebView(webView);
@@ -121,7 +121,13 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         super.onStart();
         final Dialog dialog = getDialog();
         if (dialog != null) {
-            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            final Window window = dialog.getWindow();
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            final Boolean loading = hCaptchaJsInterface.getHCaptchaConfig().getLoading();
+            if (!loading) {
+                // Remove dialog shadow to appear completely invisible
+                window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            }
         }
     }
 

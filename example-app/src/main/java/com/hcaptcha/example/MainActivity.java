@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 .siteKey(YOUR_API_SITE_KEY)
                 .apiEndpoint("https://hcaptcha.com/1/api.js")
                 .size(hCaptchaSize)
+                .loading(true)
                 .build();
         HCaptcha.getClient(this).verifyWithHCaptcha(config)
                 .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {

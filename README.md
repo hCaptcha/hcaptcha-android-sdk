@@ -68,6 +68,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
                 .apiEndpoint("https://hcaptcha.com/1/api.js")
                 .locale("ro")
                 .size(HCaptchaSize.INVISIBLE)
+                .loading(false)
                 .theme(HCaptchaTheme.DARK)
                 .build();
 HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
@@ -89,6 +90,7 @@ HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
 |`reportapi`|String|No|-|See Enterprise docs.|
 |`assethost`|String|No|-|See Enterprise docs.|
 |`imghost`|String|No|-|See Enterprise docs.|
+|`loading`|Boolean|No|True|Show or hide the loading dialog.|
 
 #### Error handling
 
