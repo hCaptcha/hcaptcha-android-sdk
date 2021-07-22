@@ -9,9 +9,7 @@ import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.webkit.*;
 import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
@@ -48,6 +46,8 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     private HCaptchaJSInterface hCaptchaJsInterface;
+
+    private boolean showLoader;
 
     private HCaptchaDialogListener hCaptchaDialogListener;
 
@@ -90,6 +90,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this);
+        this.showLoader = hCaptchaConfig.getLoading();
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
     }
 
@@ -97,6 +98,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
+        loadingContainer.setVisibility(showLoader ? View.VISIBLE : View.GONE);
         webView = rootView.findViewById(R.id.webView);
         setupWebView(webView);
         return rootView;
@@ -121,7 +123,12 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         super.onStart();
         final Dialog dialog = getDialog();
         if (dialog != null) {
-            getDialog().getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            final Window window = dialog.getWindow();
+            window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            if (!showLoader) {
+                // Remove dialog shadow to appear completely invisible
+                window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            }
         }
     }
 
@@ -155,7 +162,15 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         handler.post(new Runnable() {
             @Override
             public void run() {
-                loadingContainer.animate().alpha(0.0f).setDuration(200);
+                if (showLoader) {
+                    loadingContainer.animate().alpha(0.0f).setDuration(200);
+                } else {
+                    // Add back dialog shadow in case the checkbox or challenge is shown
+                    final Dialog dialog = getDialog();
+                    if (dialog != null) {
+                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    }
+                }
             }
         });
     }

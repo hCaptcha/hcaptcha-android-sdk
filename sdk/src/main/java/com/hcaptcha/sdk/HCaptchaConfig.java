@@ -29,6 +29,12 @@ public class HCaptchaConfig implements Serializable {
     private Boolean sentry = true;
 
     /**
+     * Show / Hide loading dialog.
+     */
+    @Builder.Default
+    private Boolean loading = true;
+
+    /**
      * Custom supplied challenge data.
      */
     private String rqdata;
