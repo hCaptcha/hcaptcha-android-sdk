@@ -9,7 +9,8 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '1.8'
+      - run: chmod +x ./gradlew
       - name: Assemble & Test
-        run: gradle build --stacktrace
+        run: ./gradlew build --stacktrace
       - name: JitPack Test
-        run: gradle publishReleasePublicationToMavenLocal
+        run: ./gradlew publishReleasePublicationToMavenLocal
