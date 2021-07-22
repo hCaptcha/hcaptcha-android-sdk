@@ -47,6 +47,8 @@ public class HCaptchaDialogFragment extends DialogFragment implements
 
     private HCaptchaJSInterface hCaptchaJsInterface;
 
+    private boolean showLoader;
+
     private HCaptchaDialogListener hCaptchaDialogListener;
 
     private View rootView;
@@ -88,15 +90,15 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this);
+        this.showLoader = hCaptchaConfig.getLoading();
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        final Boolean loading = hCaptchaJsInterface.getHCaptchaConfig().getLoading();
         rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
-        rootView.setVisibility(loading ? View.VISIBLE : View.GONE);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
+        loadingContainer.setVisibility(showLoader ? View.VISIBLE : View.GONE);
         webView = rootView.findViewById(R.id.webView);
         setupWebView(webView);
         return rootView;
@@ -123,8 +125,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         if (dialog != null) {
             final Window window = dialog.getWindow();
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            final Boolean loading = hCaptchaJsInterface.getHCaptchaConfig().getLoading();
-            if (!loading) {
+            if (!showLoader) {
                 // Remove dialog shadow to appear completely invisible
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             }
@@ -161,7 +162,15 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         handler.post(new Runnable() {
             @Override
             public void run() {
-                loadingContainer.animate().alpha(0.0f).setDuration(200);
+                if (showLoader) {
+                    loadingContainer.animate().alpha(0.0f).setDuration(200);
+                } else {
+                    // Add back dialog shadow in case the checkbox or challenge is shown
+                    final Dialog dialog = getDialog();
+                    if (dialog != null) {
+                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    }
+                }
             }
         });
     }
