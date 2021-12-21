@@ -125,7 +125,7 @@
         var assethost = bridgeConfig.assethost;
         var imghost = bridgeConfig.imghost;
         var reportapi = bridgeConfig.reportapi;
-        var host = siteKey + '.android-sdk.hcaptcha.com';
+        var host = bridgeConfig.host || siteKey + '.android-sdk.hcaptcha.com';
         var scriptSrc = apiEndpoint + '?render=explicit&onload=' + onHcaptchaLoaded.name;
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'recaptchacompat', 'off');
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'hl', locale);
