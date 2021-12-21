@@ -44,7 +44,7 @@ public class HCaptchaConfig implements Serializable {
      * Default: https://js.hcaptcha.com/1/api.js (Override only if using first-party hosting feature.)
      */
     @Builder.Default
-    private String apiEndpoint = "https://hcaptcha.com/1/api.js";
+    private String apiEndpoint = "https://js.hcaptcha.com/1/api.js";
 
     /**
      * Point hCaptcha JS Ajax Requests to alternative API Endpoint.
