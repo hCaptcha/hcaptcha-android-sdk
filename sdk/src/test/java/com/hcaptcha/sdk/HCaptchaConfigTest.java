@@ -26,7 +26,7 @@ public class HCaptchaConfigTest {
         assertEquals(HCaptchaSize.INVISIBLE, config.getSize());
         assertEquals(HCaptchaTheme.LIGHT, config.getTheme());
         assertEquals(Locale.getDefault().getLanguage(), config.getLocale());
-        assertEquals("https://hcaptcha.com/1/api.js", config.getApiEndpoint());
+        assertEquals("https://js.hcaptcha.com/1/api.js", config.getApiEndpoint());
         assertNull(config.getRqdata());
     }
 
