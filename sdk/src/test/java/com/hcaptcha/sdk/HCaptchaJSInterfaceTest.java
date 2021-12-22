@@ -65,7 +65,7 @@ public class HCaptchaJSInterfaceTest {
                 .rqdata("custom rqdata")
                 .build();
         final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null);
-        assertEquals("{\"siteKey\":\"0000-1111-2222-3333\",\"sentry\":true,\"loading\":true,\"rqdata\":\"custom rqdata\",\"apiEndpoint\":\"https://hcaptcha.com/1/api.js\",\"endpoint\":null,\"reportapi\":null,\"assethost\":null,\"imghost\":null,\"locale\":\"ro\",\"size\":\"normal\",\"theme\":\"dark\"}",
+        assertEquals("{\"siteKey\":\"0000-1111-2222-3333\",\"sentry\":true,\"loading\":true,\"rqdata\":\"custom rqdata\",\"apiEndpoint\":\"https://js.hcaptcha.com/1/api.js\",\"endpoint\":null,\"reportapi\":null,\"assethost\":null,\"imghost\":null,\"locale\":\"ro\",\"size\":\"normal\",\"theme\":\"dark\"}",
                 HCaptchaJsInterface.getConfig());
     }
 
