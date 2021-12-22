@@ -24,7 +24,7 @@ public class HCaptchaDialogFragmentTest {
     public FragmentScenario<HCaptchaDialogFragment> getTestScenario() {
         final HCaptchaConfig hCaptchaConfig = HCaptchaConfig.builder()
                 .siteKey("10000000-ffff-ffff-ffff-000000000001")
-                .endpoint("https://hcaptcha.com/1/api.js")
+                .endpoint("https://js.hcaptcha.com/1/api.js")
                 .locale("en")
                 .size(HCaptchaSize.INVISIBLE)
                 .theme(HCaptchaTheme.LIGHT)
