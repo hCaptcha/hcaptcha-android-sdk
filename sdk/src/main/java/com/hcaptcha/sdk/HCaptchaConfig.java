@@ -41,32 +41,32 @@ public class HCaptchaConfig implements Serializable {
 
     /**
      * The url of api.js
-     * Default: https://hcaptcha.com/1/api.js
+     * Default: https://js.hcaptcha.com/1/api.js (Override only if using first-party hosting feature.)
      */
     @Builder.Default
-    private String apiEndpoint = "https://hcaptcha.com/1/api.js";
+    private String apiEndpoint = "https://js.hcaptcha.com/1/api.js";
 
     /**
      * Point hCaptcha JS Ajax Requests to alternative API Endpoint.
-     * Default: https://hcaptcha.com
+     * Default: https://api.hcaptcha.com (Override only if using first-party hosting feature.)
      */
     private String endpoint;
 
     /**
      * Point hCaptcha Bug Reporting Request to alternative API Endpoint.
-     * Default: https://accounts.hcaptcha.com
+     * Default: https://accounts.hcaptcha.com (Override only if using first-party hosting feature.)
      */
     private String reportapi;
 
     /**
      * Points loaded hCaptcha assets to a user defined asset location, used for proxies.
-     * Default: https://assets.hcaptcha.com
+     * Default: https://newassets.hcaptcha.com (Override only if using first-party hosting feature.)
      */
     private String assethost;
 
     /**
      * Points loaded hCaptcha challenge images to a user defined image location, used for proxies.
-     * Default: https://imgs.hcaptcha.com
+     * Default: https://imgs.hcaptcha.com (Override only if using first-party hosting feature.)
      */
     private String imghost;
 

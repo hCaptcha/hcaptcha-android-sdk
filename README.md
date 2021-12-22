@@ -65,7 +65,7 @@ You can also customize the look and feel, language, endpoint, etc. by passing a 
 ```java
 final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(YOUR_API_SITE_KEY)
-                .apiEndpoint("https://hcaptcha.com/1/api.js")
+                .apiEndpoint("https://js.hcaptcha.com/1/api.js")
                 .locale("ro")
                 .size(HCaptchaSize.INVISIBLE)
                 .loading(false)

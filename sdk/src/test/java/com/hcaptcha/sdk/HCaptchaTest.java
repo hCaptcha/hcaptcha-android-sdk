@@ -46,7 +46,7 @@ public class HCaptchaTest {
         assertEquals(HCaptchaTheme.LIGHT, config.getTheme());
         assertNull(config.getRqdata());
         assertEquals(locale, config.getLocale());
-        assertEquals("https://hcaptcha.com/1/api.js", config.getApiEndpoint());
+        assertEquals("https://js.hcaptcha.com/1/api.js", config.getApiEndpoint());
     }
 
 }
