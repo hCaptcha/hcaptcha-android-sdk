@@ -33,6 +33,11 @@ public enum HCaptchaError implements Serializable {
     RATE_LIMITED(31, "Rate Limited"),
 
     /**
+     * Invalid custom theme
+     */
+    INVALID_CUSTOM_THEME(32, "Invalid custom theme"),
+
+    /**
      * Generic error for unknown situations - should never happen.
      */
     ERROR(29, "Unknown error");

@@ -58,11 +58,27 @@
     };
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
 
+    function getTheme(bridgeConfig) {
+        var theme = bridgeConfig.theme;
+        var customTheme = bridgeConfig.customTheme;
+
+        if (customTheme) {
+            try {
+                return JSON.parse(customTheme);
+            } catch (e) {
+                console.error(e);
+                BridgeObject.onError(32);
+            }
+        }
+
+        return theme;
+    }
+
     function getRenderConfig() {
         return {
             sitekey: bridgeConfig.siteKey,
             size: bridgeConfig.size,
-            theme: bridgeConfig.theme,
+            theme: getTheme(bridgeConfig),
             'callback': function callback(token) {
                 return BridgeObject.onPass(token);
             },
@@ -135,6 +151,9 @@
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'assethost', assethost);
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'imghost', imghost);
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'reportapi', reportapi);
+        if (bridgeConfig.customTheme) {
+            scriptSrc = addQueryParamIfDefined(scriptSrc, 'custom', 'true');
+        }
         var script = document.createElement('script');
         script.async = true;
         script.src = scriptSrc;
