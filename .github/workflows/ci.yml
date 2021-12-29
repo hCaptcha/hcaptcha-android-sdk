@@ -11,5 +11,9 @@ jobs:
           java-version: '1.8'
       - name: Assemble & Test
         run: ./gradlew build --stacktrace
+      - name: HTML ES5 test
+        run: |
+          npm install -g jshint
+          jshint --extract=always sdk/src/main/assets/hcaptcha-form.html
       - name: JitPack Test
         run: ./gradlew publishReleasePublicationToMavenLocal
