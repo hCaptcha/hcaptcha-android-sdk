@@ -49,9 +49,10 @@ public class HCaptchaJSInterfaceTest {
                 .assethost("https://example.com/assethost")
                 .imghost("https://example.com/imghost")
                 .reportapi("https://example.com/reportapi")
+                .host("custom-host")
                 .build();
         final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null);
-        assertEquals("{\"siteKey\":\"0000-1111-2222-3333\",\"sentry\":true,\"loading\":true,\"rqdata\":\"custom rqdata\",\"apiEndpoint\":\"127.0.0.1/api.js\",\"endpoint\":\"https://example.com/endpoint\",\"reportapi\":\"https://example.com/reportapi\",\"assethost\":\"https://example.com/assethost\",\"imghost\":\"https://example.com/imghost\",\"locale\":\"ro\",\"size\":\"normal\",\"theme\":\"dark\"}",
+        assertEquals("{\"siteKey\":\"0000-1111-2222-3333\",\"sentry\":true,\"loading\":true,\"rqdata\":\"custom rqdata\",\"apiEndpoint\":\"127.0.0.1/api.js\",\"endpoint\":\"https://example.com/endpoint\",\"reportapi\":\"https://example.com/reportapi\",\"assethost\":\"https://example.com/assethost\",\"imghost\":\"https://example.com/imghost\",\"locale\":\"ro\",\"size\":\"normal\",\"theme\":\"dark\",\"host\":\"custom-host\"}",
                 HCaptchaJsInterface.getConfig());
     }
 
@@ -65,7 +66,7 @@ public class HCaptchaJSInterfaceTest {
                 .rqdata("custom rqdata")
                 .build();
         final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null);
-        assertEquals("{\"siteKey\":\"0000-1111-2222-3333\",\"sentry\":true,\"loading\":true,\"rqdata\":\"custom rqdata\",\"apiEndpoint\":\"https://js.hcaptcha.com/1/api.js\",\"endpoint\":null,\"reportapi\":null,\"assethost\":null,\"imghost\":null,\"locale\":\"ro\",\"size\":\"normal\",\"theme\":\"dark\"}",
+        assertEquals("{\"siteKey\":\"0000-1111-2222-3333\",\"sentry\":true,\"loading\":true,\"rqdata\":\"custom rqdata\",\"apiEndpoint\":\"https://js.hcaptcha.com/1/api.js\",\"endpoint\":null,\"reportapi\":null,\"assethost\":null,\"imghost\":null,\"locale\":\"ro\",\"size\":\"normal\",\"theme\":\"dark\",\"host\":null}",
                 HCaptchaJsInterface.getConfig());
     }
 
