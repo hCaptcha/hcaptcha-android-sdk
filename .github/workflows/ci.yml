@@ -9,7 +9,12 @@ jobs:
       - uses: actions/setup-java@v1
         with:
           java-version: '1.8'
+          cache: 'gradle'
       - name: Assemble & Test
         run: ./gradlew build --stacktrace
+      - name: HTML ES5 test
+        run: |
+          npm install -g jshint
+          jshint --extract=always sdk/src/main/assets/hcaptcha-form.html
       - name: JitPack Test
         run: ./gradlew publishReleasePublicationToMavenLocal

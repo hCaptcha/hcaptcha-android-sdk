@@ -94,4 +94,10 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     private String host = null;
+
+    /**
+     * Custom theme JSON string
+     */
+    @Builder.Default
+    private String customTheme = null;
 }

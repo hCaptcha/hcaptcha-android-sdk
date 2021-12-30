@@ -27,6 +27,7 @@ public class HCaptchaConfigTest {
         assertEquals(HCaptchaTheme.LIGHT, config.getTheme());
         assertEquals(Locale.getDefault().getLanguage(), config.getLocale());
         assertEquals("https://js.hcaptcha.com/1/api.js", config.getApiEndpoint());
+        assertEquals(null, config.getCustomTheme());
         assertNull(config.getRqdata());
     }
 
@@ -38,6 +39,10 @@ public class HCaptchaConfigTest {
         final String customEndpoint = "https://local/api.js";
         final String customLocale = "ro";
         final Boolean sentry = false;
+        final String customTheme = "{ \"palette\": {"
+            + "\"mode\": \"light\", \"primary\": { \"main\": \"#F16622\" },"
+            + "\"warn\": {  \"main\": \"#F16622\" },"
+            + "\"text\": { \"heading\": \"#F16622\", \"body\": \"#F16622\" } } }";
 
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(MOCK_SITE_KEY)
@@ -47,6 +52,7 @@ public class HCaptchaConfigTest {
                 .sentry(sentry)
                 .theme(hCaptchaTheme)
                 .size(hCaptchaSize)
+                .customTheme(customTheme)
                 .build();
         assertEquals(MOCK_SITE_KEY, config.getSiteKey());
         assertEquals(sentry, config.getSentry());
@@ -55,7 +61,7 @@ public class HCaptchaConfigTest {
         assertEquals(customLocale, config.getLocale());
         assertEquals(customRqdata, config.getRqdata());
         assertEquals(customEndpoint, config.getApiEndpoint());
-        assertEquals(customLocale, config.getLocale());
+        assertEquals(customTheme, config.getCustomTheme());
     }
 
 
