@@ -90,7 +90,7 @@ HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
 |`reportapi`|String|No|-|See Enterprise docs.|
 |`assethost`|String|No|-|See Enterprise docs.|
 |`imghost`|String|No|-|See Enterprise docs.|
-|`customTheme`|String|No|-|See Enterprise docs.|
+|`customTheme`|Stringified JSON|No|-|See Enterprise docs.|
 |`host`|String|No|-|See Enterprise docs.|
 |`loading`|Boolean|No|True|Show or hide the loading dialog.|
 
