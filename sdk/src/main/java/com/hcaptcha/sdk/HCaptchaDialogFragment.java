@@ -1,5 +1,7 @@
 package com.hcaptcha.sdk;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
@@ -19,6 +21,7 @@ import com.hcaptcha.sdk.tasks.OnLoadedListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
 import static com.hcaptcha.sdk.HCaptchaJSInterface.JS_INTERFACE_TAG;
+
 
 /**
  * HCaptcha Dialog Fragment Class
@@ -163,7 +166,14 @@ public class HCaptchaDialogFragment extends DialogFragment implements
             @Override
             public void run() {
                 if (showLoader) {
-                    loadingContainer.animate().alpha(0.0f).setDuration(200);
+                    loadingContainer.animate().alpha(0.0f).setDuration(200)
+                            .setListener(
+                                    new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            loadingContainer.setVisibility(View.GONE);
+                                        }
+                                    });
                 } else {
                     // Add back dialog shadow in case the checkbox or challenge is shown
                     final Dialog dialog = getDialog();

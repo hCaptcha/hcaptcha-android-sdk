@@ -1,0 +1,38 @@
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no"/>
+</head>
+<body>
+    <div id="hcaptcha-container"></div>
+
+    <input id="input-text" />
+
+    <button id="on-error" onclick="onError()">Error</button>
+    <button id="on-pass" onclick="onPass()">Pass</button>
+
+    <script type="text/javascript">
+        var BridgeObject = window.JSInterface;
+        var bridgeConfig = JSON.parse(BridgeObject.getConfig());
+
+        function onHcaptchaLoaded() {
+            try {
+                BridgeObject.onLoaded();
+            } catch (e) {
+                BridgeObject.onError(29);
+            }
+        }
+
+        function onPass() {
+            const token = document.getElementById("input-text").value;
+            BridgeObject.onPass(token);
+        }
+
+        function onError() {
+            const errorCode = parseInt(document.getElementById("input-text").value);
+            BridgeObject.onError(errorCode);
+        }
+
+        onHcaptchaLoaded();
+    </script>
+</body>
+</html>
