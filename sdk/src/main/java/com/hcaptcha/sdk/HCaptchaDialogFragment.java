@@ -20,8 +20,6 @@ import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnLoadedListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
-import static com.hcaptcha.sdk.HCaptchaJSInterface.JS_INTERFACE_TAG;
-
 
 /**
  * HCaptcha Dialog Fragment Class
@@ -53,6 +51,8 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     private boolean showLoader;
 
     private HCaptchaDialogListener hCaptchaDialogListener;
+
+    private HCaptchaDebugInfo hCaptchaDebugInfo;
 
     private View rootView;
 
@@ -93,6 +93,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this);
+        this.hCaptchaDebugInfo = new HCaptchaDebugInfo(getContext());
         this.showLoader = hCaptchaConfig.getLoading();
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
     }
@@ -114,7 +115,8 @@ public class HCaptchaDialogFragment extends DialogFragment implements
             // Since web view is attached to main activity
             // it will leak until the activity is closed and not upon dialog dismiss
             // To properly clean up upon dialog destroy: remove all views and destroy webview to prevent leaking
-            webView.removeJavascriptInterface(JS_INTERFACE_TAG);
+            webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
+            webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);
             ((ViewGroup) rootView).removeAllViews();
             webView.destroy();
             webView = null;
@@ -149,7 +151,8 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         settings.setLoadWithOverviewMode(true);
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
-        webView.addJavascriptInterface(hCaptchaJsInterface, JS_INTERFACE_TAG);
+        webView.addJavascriptInterface(hCaptchaJsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
+        webView.addJavascriptInterface(hCaptchaDebugInfo, HCaptchaDebugInfo.JS_INTERFACE_TAG);
         webView.loadUrl("file:///android_asset/hcaptcha-form.html");
     }
 

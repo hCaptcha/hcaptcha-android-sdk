@@ -11,6 +11,7 @@
     <button id="on-pass" onclick="onPass()">Pass</button>
 
     <script type="text/javascript">
+        var DI = window.JSDI.getDebugInfo();
         var BridgeObject = window.JSInterface;
         var bridgeConfig = JSON.parse(BridgeObject.getConfig());
 
