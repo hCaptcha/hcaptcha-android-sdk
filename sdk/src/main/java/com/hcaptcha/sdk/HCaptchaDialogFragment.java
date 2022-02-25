@@ -50,6 +50,8 @@ public class HCaptchaDialogFragment extends DialogFragment implements
 
     private boolean showLoader;
 
+    private boolean resetOnTimeout;
+
     private HCaptchaDialogListener hCaptchaDialogListener;
 
     private HCaptchaDebugInfo hCaptchaDebugInfo;
@@ -92,6 +94,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
             return;
         }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
+        this.resetOnTimeout = hCaptchaConfig.getResetOnTimeout();
         this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this);
         this.hCaptchaDebugInfo = new HCaptchaDebugInfo(getContext());
         this.showLoader = hCaptchaConfig.getLoading();
@@ -190,13 +193,19 @@ public class HCaptchaDialogFragment extends DialogFragment implements
 
     @Override
     public void onFailure(@NonNull final HCaptchaException hCaptchaException) {
-        if (isAdded()) {
+        final boolean silentRetry = this.resetOnTimeout && hCaptchaException.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+        if (isAdded() && !silentRetry) {
             dismiss();
         }
         handler.post(new Runnable() {
             @Override
             public void run() {
-                hCaptchaDialogListener.onFailure(hCaptchaException);
+                if (silentRetry) {
+                    // Re-open the challenge
+                    webView.loadUrl("javascript:resetAndExecute();");
+                } else {
+                    hCaptchaDialogListener.onFailure(hCaptchaException);
+                }
             }
         });
     }
