@@ -69,6 +69,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
                 .locale("ro")
                 .size(HCaptchaSize.INVISIBLE)
                 .loading(false)
+                .resetOnTimeout(true)
                 .theme(HCaptchaTheme.DARK)
                 .build();
 HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
@@ -83,6 +84,7 @@ HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
 |`size`|Enum|No|INVISIBLE|This specifies the "size" of the checkbox component. By default, the checkbox is invisible and the challenge is shown automatically.|
 |`theme`|Enum|No|LIGHT|hCaptcha supports light, dark, and contrast themes.|
 |`locale`|String (ISO 639-2 code)|No|AUTO|You can enforce a specific language or let hCaptcha auto-detect the local language based on user's device.|
+|`resetOnTimeout`|Boolean|False|Automatically reload to fetch new challenge if user does not submit challenge. (Matches iOS SDK behavior.)|
 |`sentry`|Boolean|No|True|See Enterprise docs.|
 |`rqdata`|String|No|-|See Enterprise docs.|
 |`apiEndpoint`|String|No|-|See Enterprise docs.|
