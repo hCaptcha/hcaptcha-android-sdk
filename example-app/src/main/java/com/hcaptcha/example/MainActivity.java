@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
         this.tokenTextView = findViewById(R.id.tokenTextView);
         this.errorTextView = findViewById(R.id.errorTextView);
         // For debugging purposes only
-        // WebView.setWebContentsDebuggingEnabled(true);
+        // android.webkit.WebView.setWebContentsDebuggingEnabled(true);
     }
 
     private void setTokenTextView(final String text) {

@@ -58,6 +58,27 @@
         }
     };
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
+    var hCaptchaID = null;
+
+    function execute(bridgeConfig, renderConfig) {
+        var rqdata = bridgeConfig.rqdata;
+        if (rqdata) {
+            hcaptcha.setData(hCaptchaID, {
+                rqdata: rqdata
+            });
+        }
+
+        if (renderConfig.size === 'invisible') {
+            hcaptcha.execute(hCaptchaID);
+        } else {
+            BridgeObject.onLoaded();
+        }
+    }
+
+    function resetAndExecute() {
+        hcaptcha.reset();
+        execute(bridgeConfig, getRenderConfig());
+    }
 
     function getTheme(bridgeConfig) {
         var theme = bridgeConfig.theme;
@@ -80,7 +101,7 @@
             sitekey: bridgeConfig.siteKey,
             size: bridgeConfig.size,
             theme: getTheme(bridgeConfig),
-            'callback': function callback(token) {
+            callback: function callback(token) {
                 return BridgeObject.onPass(token);
             },
             'expired-callback': function expiredCallback() {
@@ -104,20 +125,9 @@
     function onHcaptchaLoaded() {
         try {
             var renderConfig = getRenderConfig();
-            var rqdata = bridgeConfig.rqdata;
-            var hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
+            hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
 
-            if (rqdata) {
-                hcaptcha.setData(hCaptchaID, {
-                    rqdata: rqdata
-                });
-            }
-
-            if (renderConfig.size === 'invisible') {
-                hcaptcha.execute(hCaptchaID);
-            } else {
-                BridgeObject.onLoaded();
-            }
+            execute(bridgeConfig, renderConfig);
         } catch (e) {
             console.error(e);
             BridgeObject.onError(29);

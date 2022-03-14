@@ -100,4 +100,10 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     private String customTheme = null;
+
+    /**
+     * Reset hCaptcha on timeout
+     */
+    @Builder.Default
+    private Boolean resetOnTimeout = false;
 }
