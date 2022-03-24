@@ -6,7 +6,9 @@ import java.io.Serializable;
 
 
 /**
- * Enum with all possible hCaptcha errors
+ * Enum with all possible hCaptcha errors.
+ * It contains both errors related to the android sdk instance and js client errors.
+ * More info about js client errors here: https://docs.hcaptcha.com/configuration#error-codes
  */
 public enum HCaptchaError implements Serializable {
 
@@ -16,6 +18,21 @@ public enum HCaptchaError implements Serializable {
      * Make sure AndroidManifest requires internet permission: {@code {@literal <}uses-permission android:name="android.permission.INTERNET" /{@literal >}}
      */
     NETWORK_ERROR(7, "No internet connection"),
+
+    /**
+     * Invalid data is not accepted by endpoints.
+     */
+    INVALID_DATA(8, "Invalid data is not accepted by endpoints"),
+
+    /**
+     * User may need to select the checkbox or if invisible programmatically call execute to initiate the challenge again.
+     */
+    CHALLENGE_ERROR(9, "Challenge encountered error on setup"),
+
+    /**
+     * User may need to select the checkbox or if invisible programmatically call execute to initiate the challenge again.
+     */
+    INTERNAL_ERROR(10, "hCaptcha client encountered an internal error"),
 
     /**
      * hCaptcha session timed out either the token or challenge expired
