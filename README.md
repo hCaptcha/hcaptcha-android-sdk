@@ -3,7 +3,7 @@
 ![CI](https://github.com/hCaptcha/hcaptcha-android-sdk/workflows/Android%20SDK%20CI/badge.svg)
 [![Release](https://jitpack.io/v/hCaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hCaptcha/hcaptcha-android-sdk)
 
-###### [Installation](#installation) | [Basic usage](#basic-usage) | [Example](#display-a-hcaptcha-challenge) | [Customization](#config-params) | [Error handling](#error-handling) | [Testing](#testing) | [Publishing](#publishing)
+###### [Installation](#installation) | [Basic usage](#basic-usage) | [Example](#display-a-hcaptcha-challenge) | [Customization](#config-params) | [Error handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
 
 This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com), and is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
 
@@ -108,6 +108,11 @@ In some scenarios in which the human verification process cannot be completed, y
 * RATE_LIMITED (31): spam detected
 * INVALID_CUSTOM_THEME (32): invalid custom theme
 * ERROR (29): general failure
+
+
+#### Debugging Tips
+
+Useful error messages are often rendered on the hCaptcha checkbox. For example, if the sitekey within your config is invalid, you'll see a message there. To quickly debug your local instance using this tool, set `.size(HCaptchaSize.NORMAL)`
 
 
 #### Verify the completed challenge
