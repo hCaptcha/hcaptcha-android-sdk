@@ -55,7 +55,6 @@ public class MainActivity extends AppCompatActivity {
         final String YOUR_API_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(YOUR_API_SITE_KEY)
-                .apiEndpoint("https://js.hcaptcha.com/1/api.js")
                 .size(hCaptchaSize)
                 .loading(true)
                 .build();

@@ -65,7 +65,6 @@ You can also customize the look and feel, language, endpoint, etc. by passing a 
 ```java
 final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(YOUR_API_SITE_KEY)
-                .apiEndpoint("https://js.hcaptcha.com/1/api.js")
                 .locale("ro")
                 .size(HCaptchaSize.INVISIBLE)
                 .loading(false)
@@ -101,9 +100,13 @@ HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
 In some scenarios in which the human verification process cannot be completed, you should add logic to gracefully handle the errors. The following is a list of possible error codes:
 
 * NETWORK_ERROR (7): there is no internet connection
+* INVALID_DATA (8): invalid data is not accepted by endpoints
+* CHALLENGE_ERROR (9): js client encountered an error on challenge setup
+* INTERNAL_ERROR (10): js client encountered an internal error
 * SESSION_TIMEOUT (15): the challenge expired
 * CHALLENGE_CLOSED (30): the challenge was closed by the user
 * RATE_LIMITED (31): spam detected
+* INVALID_CUSTOM_THEME (32): invalid custom theme
 * ERROR (29): general failure
 
 
