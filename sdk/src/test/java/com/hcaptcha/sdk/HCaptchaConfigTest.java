@@ -10,7 +10,7 @@ import static org.junit.Assert.assertNull;
 
 public class HCaptchaConfigTest {
 
-    private static final String MOCK_SITE_KEY = "mocked-site-key";
+    public static final String MOCK_SITE_KEY = "mocked-site-key";
 
     @Test
     public void custom_locale() {

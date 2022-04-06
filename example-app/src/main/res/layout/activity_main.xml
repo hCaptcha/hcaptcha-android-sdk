@@ -7,33 +7,39 @@
     android:theme="@style/Theme.AppCompat"
     tools:context=".MainActivity">
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <RadioGroup
+        android:id="@+id/sizes"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton
+            android:id="@+id/size_invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HCaptcha&#10;(invisible)"
-            android:textSize="12sp"
-            android:onClick="onClickHCaptchaInvisible" />
-
-        <Button
+            android:text="@string/size_invisible"
+            android:onClick="onClickHCaptchaInvisible"/>
+        <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HCaptcha&#10;(compact)"
-            android:textSize="12sp"
-            android:onClick="onClickHCaptchaCompact" />
-
-        <Button
+            android:text="@string/size_compact"
+            android:onClick="onClickHCaptchaCompact"/>
+        <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="HCaptcha&#10;(normal)"
-            android:textSize="12sp"
-            android:onClick="onClickHCaptchaNormal" />
+            android:text="@string/size_normal"
+            android:onClick="onClickHCaptchaNormal"/>
+        <RadioButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/size_null"
+            android:onClick="onClickHCaptchaNull"/>
+    </RadioGroup>
 
-    </LinearLayout>
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/show_hcaptcha"
+        android:onClick="onClickShowHCaptcha" />
 
     <LinearLayout
         android:background="@android:color/holo_green_light"

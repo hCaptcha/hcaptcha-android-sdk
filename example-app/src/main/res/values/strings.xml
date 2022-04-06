@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Example hCaptcha App</string>
+    <string name="size_invisible">Invisible</string>
+    <string name="size_compact">Compact</string>
+    <string name="size_normal">Normal</string>
+    <string name="size_null">Null</string>
+    <string name="show_hcaptcha">Show</string>
 </resources>

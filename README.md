@@ -43,7 +43,7 @@ The following snippet code will ask the user to complete a challenge.
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.*;
 
-HCaptcha.getClient(this).verifyWithHCaptcha(YOUR_API_SITE_KEY)
+HCaptcha.getClient(this, YOUR_API_SITE_KEY).verifyWithHCaptcha()
     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
         @Override
         public void onSuccess(HCaptchaTokenResponse response) {
@@ -60,7 +60,28 @@ HCaptcha.getClient(this).verifyWithHCaptcha(YOUR_API_SITE_KEY)
     });
 ```
 
-You can also customize the look and feel, language, endpoint, etc. by passing a `HCaptchaConfig` object to `verifyWithHCaptcha` method.
+You can also pass `YOUR_API_SITE_KEY` via `AndroidManifest.xml` like this:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest ...>
+    ...
+    <application ...>
+        <meta-data
+            android:name="com.hcaptcha.sdk.site-key"
+            android:value="YOUR_API_SITE_KEY" />
+       ...
+    </application>
+</manifest>
+```
+
+And then simply call:
+
+```java
+HCaptcha.getClient(this).verifyWithHCaptcha()...
+```
+
+If you need to customize the look and feel, language, endpoint, etc. this can be achieved by passing a `HCaptchaConfig` object to `getClient` method.
 
 ```java
 final HCaptchaConfig config = HCaptchaConfig.builder()
@@ -71,7 +92,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
                 .resetOnTimeout(true)
                 .theme(HCaptchaTheme.DARK)
                 .build();
-HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
+HCaptcha.getClient(this, config).verifyWithHCaptcha()...;
 ```
 
 ##### Config params

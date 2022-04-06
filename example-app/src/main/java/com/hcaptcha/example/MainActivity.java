@@ -3,7 +3,10 @@ package com.hcaptcha.example;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.RadioGroup;
 import android.widget.TextView;
+
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
@@ -18,6 +21,8 @@ public class MainActivity extends AppCompatActivity {
 
     private TextView errorTextView;
 
+    private HCaptcha hCaptcha;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +31,25 @@ public class MainActivity extends AppCompatActivity {
         this.errorTextView = findViewById(R.id.errorTextView);
         // For debugging purposes only
         // android.webkit.WebView.setWebContentsDebuggingEnabled(true);
+
+        initHCaptcha(HCaptchaSize.INVISIBLE);
+        RadioGroup sizes = findViewById(R.id.sizes);
+        sizes.check(R.id.size_invisible);
+    }
+
+    private void initHCaptcha(@Nullable HCaptchaSize size) {
+        if (size == null) {
+            hCaptcha = HCaptcha.getClient(this);
+            return;
+        }
+
+        final String YOUR_API_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
+        final HCaptchaConfig config = HCaptchaConfig.builder()
+                .siteKey(YOUR_API_SITE_KEY)
+                .size(size)
+                .loading(true)
+                .build();
+        hCaptcha = HCaptcha.getClient(this, config);
     }
 
     private void setTokenTextView(final String text) {
@@ -39,26 +63,24 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickHCaptchaInvisible(View v) {
-        onClickHCaptcha(HCaptchaSize.INVISIBLE);
+        initHCaptcha(HCaptchaSize.INVISIBLE);
     }
 
     public void onClickHCaptchaCompact(View v) {
-        onClickHCaptcha(HCaptchaSize.COMPACT);
+        initHCaptcha(HCaptchaSize.COMPACT);
     }
 
     public void onClickHCaptchaNormal(View v) {
-        onClickHCaptcha(HCaptchaSize.NORMAL);
+        initHCaptcha(HCaptchaSize.NORMAL);
     }
 
-    public void onClickHCaptcha(final HCaptchaSize hCaptchaSize) {
+    public void onClickHCaptchaNull(View v) {
+        initHCaptcha(null);
+    }
+
+    public void onClickShowHCaptcha(final View v) {
         setTokenTextView("-");
-        final String YOUR_API_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
-        final HCaptchaConfig config = HCaptchaConfig.builder()
-                .siteKey(YOUR_API_SITE_KEY)
-                .size(hCaptchaSize)
-                .loading(true)
-                .build();
-        HCaptcha.getClient(this).verifyWithHCaptcha(config)
+        hCaptcha.verifyWithHCaptcha()
                 .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                     @Override
                     public void onSuccess(HCaptchaTokenResponse response) {

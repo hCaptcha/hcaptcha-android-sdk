@@ -152,8 +152,9 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         final WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setLoadWithOverviewMode(true);
+        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setLayerType(WebView.LAYER_TYPE_SOFTWARE, null);
+        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         webView.addJavascriptInterface(hCaptchaJsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
         webView.addJavascriptInterface(hCaptchaDebugInfo, HCaptchaDebugInfo.JS_INTERFACE_TAG);
         webView.loadUrl("file:///android_asset/hcaptcha-form.html");
