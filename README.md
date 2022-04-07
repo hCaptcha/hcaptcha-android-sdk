@@ -43,7 +43,7 @@ The following snippet code will ask the user to complete a challenge.
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.*;
 
-HCaptcha.getClient(this, YOUR_API_SITE_KEY).verifyWithHCaptcha()
+HCaptcha.getClient(this).verifyWithHCaptcha(YOUR_API_SITE_KEY)
     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
         @Override
         public void onSuccess(HCaptchaTokenResponse response) {
@@ -92,8 +92,18 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
                 .resetOnTimeout(true)
                 .theme(HCaptchaTheme.DARK)
                 .build();
-HCaptcha.getClient(this, config).verifyWithHCaptcha()...;
+HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
 ```
+
+Also to improve hCaptcha start time with `setup` like this:
+
+```java
+HCaptcha hCaptcha = HCaptcha.getClient(this).setup()
+```
+
+`setup` accepts the same arguments as `verifyWithHCaptcha`. Once `setup` is called, later you can call `verifyWithHCaptcha` with no arguments
+
+If `verifyWithHCaptcha` will be called with different arguments than `setup`, SDK will handle this and re-configure hCaptcha.
 
 ##### Config params
 

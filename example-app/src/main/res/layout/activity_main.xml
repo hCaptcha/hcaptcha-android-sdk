@@ -8,7 +8,7 @@
     tools:context=".MainActivity">
 
     <RadioGroup
-        android:id="@+id/sizes"
+        android:id="@+id/sizeRadioGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -16,24 +16,43 @@
             android:id="@+id/size_invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_invisible"
-            android:onClick="onClickHCaptchaInvisible"/>
+            android:text="@string/size_invisible"/>
         <RadioButton
+            android:id="@+id/size_compact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_compact"
-            android:onClick="onClickHCaptchaCompact"/>
+            android:text="@string/size_compact"/>
         <RadioButton
+            android:id="@+id/size_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_normal"
-            android:onClick="onClickHCaptchaNormal"/>
+            android:text="@string/size_normal"/>
         <RadioButton
+            android:id="@+id/size_default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_null"
-            android:onClick="onClickHCaptchaNull"/>
+            android:text="@string/size_default"/>
     </RadioGroup>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <CheckBox
+            android:id="@+id/setupCheckBox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="true"
+            android:text="@string/setup" />
+        <CheckBox
+            android:id="@+id/webViewDebug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="false"
+            android:text="@string/web_view_debug" />
+    </LinearLayout>
 
     <Button
         android:layout_width="match_parent"
@@ -59,6 +78,7 @@
             android:id="@+id/tokenTextView"
             android:text="-"
             android:textColor="@android:color/white"
+            android:ellipsize="end"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

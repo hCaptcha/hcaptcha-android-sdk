@@ -3,6 +3,8 @@
     <string name="size_invisible">Invisible</string>
     <string name="size_compact">Compact</string>
     <string name="size_normal">Normal</string>
-    <string name="size_null">Null</string>
+    <string name="size_default">Default</string>
+    <string name="setup">Setup</string>
     <string name="show_hcaptcha">Show</string>
+    <string name="web_view_debug">WebView Debug</string>
 </resources>

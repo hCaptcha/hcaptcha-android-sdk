@@ -1,12 +1,16 @@
 package com.hcaptcha.example;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
@@ -17,43 +21,65 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private RadioGroup sizeRadioGroup;
+    private CheckBox setupCheckBox;
     private TextView tokenTextView;
-
     private TextView errorTextView;
 
     private HCaptcha hCaptcha;
+    private HCaptchaConfig hCaptchaConfig;
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.tokenTextView = findViewById(R.id.tokenTextView);
-        this.errorTextView = findViewById(R.id.errorTextView);
-        // For debugging purposes only
-        // android.webkit.WebView.setWebContentsDebuggingEnabled(true);
+        setupCheckBox = findViewById(R.id.setupCheckBox);
+        setupCheckBox.setOnCheckedChangeListener((checkBox, checked) -> {
+            initHCaptcha(getSizeFromRadio(sizeRadioGroup));
+        });
 
-        initHCaptcha(HCaptchaSize.INVISIBLE);
-        RadioGroup sizes = findViewById(R.id.sizes);
-        sizes.check(R.id.size_invisible);
+        sizeRadioGroup = findViewById(R.id.sizeRadioGroup);
+        sizeRadioGroup.setOnCheckedChangeListener((radioGroup, resId) -> {
+            initHCaptcha(getSizeFromRadio(radioGroup));
+        });
+        sizeRadioGroup.check(R.id.size_invisible);
+        tokenTextView = findViewById(R.id.tokenTextView);
+        errorTextView = findViewById(R.id.errorTextView);
+
+        CheckBox debugCheckBox = findViewById(R.id.webViewDebug);
+        debugCheckBox.setOnCheckedChangeListener((checkBox, checked) -> {
+            android.webkit.WebView.setWebContentsDebuggingEnabled(checked);
+        });
+    }
+
+    private HCaptchaSize getSizeFromRadio(@NonNull RadioGroup radioGroup) {
+        switch (radioGroup.getCheckedRadioButtonId()) {
+            case R.id.size_invisible: return HCaptchaSize.INVISIBLE;
+            case R.id.size_compact: return HCaptchaSize.COMPACT;
+            case R.id.size_normal: return HCaptchaSize.NORMAL;
+            default: return null;
+        }
     }
 
     private void initHCaptcha(@Nullable HCaptchaSize size) {
-        if (size == null) {
-            hCaptcha = HCaptcha.getClient(this);
-            return;
+        HCaptchaConfig.HCaptchaConfigBuilder builder = HCaptchaConfig.builder()
+                .siteKey("10000000-ffff-ffff-ffff-000000000001")
+                .loading(true);
+        if (size != null) {
+            builder.size(size);
         }
 
-        final String YOUR_API_SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
-        final HCaptchaConfig config = HCaptchaConfig.builder()
-                .siteKey(YOUR_API_SITE_KEY)
-                .size(size)
-                .loading(true)
-                .build();
-        hCaptcha = HCaptcha.getClient(this, config);
+        hCaptchaConfig = builder.build();
+
+        hCaptcha = HCaptcha.getClient(this);
+        if (setupCheckBox.isChecked()) {
+            hCaptcha.setup(hCaptchaConfig);
+        }
     }
 
     private void setTokenTextView(final String text) {
-        tokenTextView.setText(text.substring(0, Math.min(100, text.length())) + "...");
+        tokenTextView.setText(text);
         errorTextView.setText("-");
     }
 
@@ -62,25 +88,17 @@ public class MainActivity extends AppCompatActivity {
         errorTextView.setText(error);
     }
 
-    public void onClickHCaptchaInvisible(View v) {
-        initHCaptcha(HCaptchaSize.INVISIBLE);
-    }
+    public HCaptcha verifyWithHCaptcha() {
+        if (setupCheckBox.isChecked() || getSizeFromRadio(sizeRadioGroup) == null) {
+            return hCaptcha.verifyWithHCaptcha();
+        }
 
-    public void onClickHCaptchaCompact(View v) {
-        initHCaptcha(HCaptchaSize.COMPACT);
-    }
-
-    public void onClickHCaptchaNormal(View v) {
-        initHCaptcha(HCaptchaSize.NORMAL);
-    }
-
-    public void onClickHCaptchaNull(View v) {
-        initHCaptcha(null);
+        return hCaptcha.verifyWithHCaptcha(hCaptchaConfig);
     }
 
     public void onClickShowHCaptcha(final View v) {
         setTokenTextView("-");
-        hCaptcha.verifyWithHCaptcha()
+        verifyWithHCaptcha()
                 .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                     @Override
                     public void onSuccess(HCaptchaTokenResponse response) {
