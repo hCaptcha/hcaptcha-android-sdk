@@ -103,7 +103,7 @@ HCaptcha hCaptcha = HCaptcha.getClient(this).setup()
 
 `setup` accepts the same arguments as `verifyWithHCaptcha`. Once `setup` is called, later you can call `verifyWithHCaptcha` with no arguments
 
-If `verifyWithHCaptcha` will be called with different arguments than `setup`, SDK will handle this and re-configure hCaptcha.
+If `verifyWithHCaptcha` is called with different arguments than `setup` the SDK will handle this by re-configuring hCaptcha. Note that this will reduce some of the performance benefit of using `setup`.
 
 ##### Config params
 
