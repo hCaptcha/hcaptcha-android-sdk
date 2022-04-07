@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -16,22 +17,27 @@
             android:id="@+id/size_invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_invisible"/>
+            android:text="@string/size_invisible"
+            style="@style/CheckBoxText" />
         <RadioButton
             android:id="@+id/size_compact"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_compact"/>
+            android:text="@string/size_compact"
+            style="@style/CheckBoxText" />
         <RadioButton
             android:id="@+id/size_normal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_normal"/>
+            android:text="@string/size_normal"
+            style="@style/CheckBoxText" />
         <RadioButton
             android:id="@+id/size_default"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/size_default"/>
+            android:text="@string/size_default"
+            app:buttonTint="@color/colorAccent"
+            style="@style/CheckBoxText" />
     </RadioGroup>
 
     <LinearLayout
@@ -44,14 +50,16 @@
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:checked="true"
-            android:text="@string/setup" />
+            android:text="@string/setup"
+            style="@style/CheckBoxText" />
         <CheckBox
             android:id="@+id/webViewDebug"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:checked="false"
-            android:text="@string/web_view_debug" />
+            android:text="@string/web_view_debug"
+            style="@style/CheckBoxText" />
     </LinearLayout>
 
     <Button
@@ -79,6 +87,7 @@
             android:text="-"
             android:textColor="@android:color/white"
             android:ellipsize="end"
+            android:maxLines="1"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

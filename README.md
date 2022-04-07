@@ -81,7 +81,7 @@ And then simply call:
 HCaptcha.getClient(this).verifyWithHCaptcha()...
 ```
 
-If you need to customize the look and feel, language, endpoint, etc. this can be achieved by passing a `HCaptchaConfig` object to `getClient` method.
+If you need to customize the look and feel, language, endpoint, etc. this can be achieved by passing a `HCaptchaConfig` object to `verifyWithHCaptcha` method.
 
 ```java
 final HCaptchaConfig config = HCaptchaConfig.builder()
@@ -95,7 +95,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
 HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
 ```
 
-Also to improve hCaptcha start time with `setup` like this:
+Also to reduce hCaptcha start time, `setup` can be used:
 
 ```java
 HCaptcha hCaptcha = HCaptcha.getClient(this).setup()

@@ -72,7 +72,6 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
     /**
      * Prepare the client which allows to display a challenge dialog
      *
-     * @param context The current context
      * @return new {@link HCaptcha} object
      */
     public HCaptcha setup() {
