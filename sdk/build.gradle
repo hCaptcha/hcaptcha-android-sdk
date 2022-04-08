@@ -12,11 +12,11 @@ android {
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
-        versionCode 10
+        versionCode 11
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "2.0.0"
+        versionName "2.1.0"
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 
@@ -46,7 +46,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.16'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-core:3.6.28'
+    testImplementation 'org.mockito:mockito-inline:3.6.28'
     testImplementation 'org.skyscreamer:jsonassert:1.5.0'
 
     androidTestImplementation 'androidx.test:core:1.4.0'

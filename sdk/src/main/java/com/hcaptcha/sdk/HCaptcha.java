@@ -2,7 +2,12 @@ package com.hcaptcha.sdk;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.os.Bundle;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import com.hcaptcha.sdk.tasks.Task;
@@ -35,19 +40,23 @@ import com.hcaptcha.sdk.tasks.Task;
  *  </pre>
  */
 public class HCaptcha extends Task<HCaptchaTokenResponse> {
+    public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
 
+    @NonNull
+    private final Context context;
+
+    @NonNull
     private final FragmentManager fragmentManager;
 
-    private HCaptcha(@NonNull final Activity activity) {
-        this((Context) activity);
-    }
+    @Nullable
+    private HCaptchaDialogFragment hCaptchaDialogFragment;
+
+    @Nullable
+    private HCaptchaConfig hCaptchaConfig;
 
     private HCaptcha(@NonNull final Context context) {
-        this(((FragmentActivity) context).getSupportFragmentManager());
-    }
-
-    private HCaptcha(@NonNull final FragmentManager fragmentManager) {
-        this.fragmentManager = fragmentManager;
+        this.context = context;
+        this.fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
     }
 
     /**
@@ -61,34 +70,49 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
     }
 
     /**
-     * Constructs a new client which allows to display a challenge dialog
+     * Prepare the client which allows to display a challenge dialog
      *
-     * @param activity The current activity
      * @return new {@link HCaptcha} object
      */
-    public static HCaptcha getClient(@NonNull final Activity activity) {
-        return new HCaptcha(activity);
+    public HCaptcha setup() {
+        String siteKey = null;
+        try {
+            String packageName = context.getPackageName();
+            ApplicationInfo app = context.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+            Bundle bundle = app.metaData;
+            siteKey = bundle.getString(META_SITE_KEY);
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new IllegalStateException(e);
+        }
+
+        if (siteKey == null) {
+            throw new IllegalStateException("Add missing " + META_SITE_KEY + " meta-data to AndroidManifest.xml"
+                    + " or call getClient(context, siteKey) method");
+        }
+
+        return setup(siteKey);
     }
 
     /**
-     * Shows a captcha challenge dialog to be completed by the user
+     * Constructs a new client which allows to display a challenge dialog
      *
      * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
-     * @return {@link HCaptcha}
+     * @return new {@link HCaptcha} object
      */
-    public HCaptcha verifyWithHCaptcha(@NonNull final String siteKey) {
+    public HCaptcha setup(@NonNull final String siteKey) {
         final HCaptchaConfig hCaptchaConfig = HCaptchaConfig.builder().siteKey(siteKey).build();
-        return verifyWithHCaptcha(hCaptchaConfig);
+        return setup(hCaptchaConfig);
     }
 
     /**
-     * Shows a captcha challenge dialog to be completed by the user
+     * Constructs a new client which allows to display a challenge dialog
      *
      * @param hCaptchaConfig Config to customize: size, theme, locale, endpoint, rqdata, etc.
-     * @return {@link HCaptcha}
+     * @return new {@link HCaptcha} object
      */
-    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig hCaptchaConfig) {
-        final HCaptchaDialogFragment hCaptchaDialogFragment = HCaptchaDialogFragment.newInstance(hCaptchaConfig, new HCaptchaDialogListener() {
+    public HCaptcha setup(@NonNull final HCaptchaConfig hCaptchaConfig) {
+        this.hCaptchaConfig = hCaptchaConfig;
+        this.hCaptchaDialogFragment = HCaptchaDialogFragment.newInstance(hCaptchaConfig, new HCaptchaDialogListener() {
             @Override
             void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
                 setResult(hCaptchaTokenResponse);
@@ -99,8 +123,56 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
                 setException(hCaptchaException);
             }
         });
-        hCaptchaDialogFragment.show(fragmentManager, HCaptchaDialogFragment.TAG);
+
         return this;
     }
 
+    /**
+     * Shows a captcha challenge dialog to be completed by the user
+     *
+     * @return {@link HCaptcha}
+     */
+    public HCaptcha verifyWithHCaptcha() {
+        if (hCaptchaConfig == null || hCaptchaDialogFragment == null) {
+            setup();
+        }
+
+        return showHCaptcha();
+    }
+
+    /**
+     * Shows a captcha challenge dialog to be completed by the user
+     *
+     * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
+     * @return {@link HCaptcha}
+     */
+    public HCaptcha verifyWithHCaptcha(@NonNull final String siteKey) {
+        if (hCaptchaConfig == null || !siteKey.equals(hCaptchaConfig.getSiteKey()) || hCaptchaDialogFragment == null) {
+            setup(siteKey);
+        }
+
+        return showHCaptcha();
+    }
+
+    /**
+     * Shows a captcha challenge dialog to be completed by the user
+     *
+     * @param hCaptchaConfig Config to customize: size, theme, locale, endpoint, rqdata, etc.
+     * @return {@link HCaptcha}
+     */
+    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig hCaptchaConfig) {
+        if (!hCaptchaConfig.equals(this.hCaptchaConfig) || hCaptchaDialogFragment == null) {
+            setup(hCaptchaConfig);
+        }
+
+        return showHCaptcha();
+    }
+
+    private HCaptcha showHCaptcha() {
+        assert this.hCaptchaConfig != null;
+        assert hCaptchaDialogFragment != null;
+
+        hCaptchaDialogFragment.show(fragmentManager, HCaptchaDialogFragment.TAG);
+        return this;
+    }
 }

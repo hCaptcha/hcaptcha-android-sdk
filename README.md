@@ -60,7 +60,28 @@ HCaptcha.getClient(this).verifyWithHCaptcha(YOUR_API_SITE_KEY)
     });
 ```
 
-You can also customize the look and feel, language, endpoint, etc. by passing a `HCaptchaConfig` object to `verifyWithHCaptcha` method.
+You can also pass `YOUR_API_SITE_KEY` via `AndroidManifest.xml` like this:
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest ...>
+    ...
+    <application ...>
+        <meta-data
+            android:name="com.hcaptcha.sdk.site-key"
+            android:value="YOUR_API_SITE_KEY" />
+       ...
+    </application>
+</manifest>
+```
+
+And then simply call:
+
+```java
+HCaptcha.getClient(this).verifyWithHCaptcha()...
+```
+
+If you need to customize the look and feel, language, endpoint, etc. this can be achieved by passing a `HCaptchaConfig` object to `verifyWithHCaptcha` method.
 
 ```java
 final HCaptchaConfig config = HCaptchaConfig.builder()
@@ -73,6 +94,16 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
                 .build();
 HCaptcha.getClient(this).verifyWithHCaptcha(config)...;
 ```
+
+Also to reduce hCaptcha start time, `setup` can be used:
+
+```java
+HCaptcha hCaptcha = HCaptcha.getClient(this).setup()
+```
+
+`setup` accepts the same arguments as `verifyWithHCaptcha`. Once `setup` is called, later you can call `verifyWithHCaptcha` with no arguments
+
+If `verifyWithHCaptcha` is called with different arguments than `setup` the SDK will handle this by re-configuring hCaptcha. Note that this will reduce some of the performance benefit of using `setup`.
 
 ##### Config params
 
