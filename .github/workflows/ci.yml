@@ -40,4 +40,6 @@ jobs:
           target: ${{ matrix.target }}
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew connectedCheck
+          script: |
+            brew install parallel
+            parallel --retries 5 ::: "./gradlew connectedCheck"
