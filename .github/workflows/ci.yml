@@ -42,4 +42,4 @@ jobs:
           profile: Nexus 6
           script: |
             brew install parallel
-            parallel --retries 5 ::: "./gradlew connectedCheck"
+            parallel --retries 3 ::: "./gradlew connectedCheck"
