@@ -53,7 +53,7 @@
         onError: function onError(errCode) {
             return console.log("error: code ".concat(errCode));
         },
-        onLoaded: function onLoaded() {
+        onOpen: function onOpen() {
             return console.log('cb: challenge or checkbox is visible');
         }
     };
@@ -71,7 +71,7 @@
         if (renderConfig.size === 'invisible') {
             hcaptcha.execute(hCaptchaID);
         } else {
-            BridgeObject.onLoaded();
+            BridgeObject.onOpen();
         }
     }
 
@@ -132,7 +132,7 @@
                 }
             },
             'open-callback': function openCallback() {
-                return BridgeObject.onLoaded();
+                return BridgeObject.onOpen();
             }
         };
     }

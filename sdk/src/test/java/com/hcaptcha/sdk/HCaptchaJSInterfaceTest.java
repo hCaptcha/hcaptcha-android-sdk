@@ -2,7 +2,7 @@ package com.hcaptcha.sdk;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
-import com.hcaptcha.sdk.tasks.OnLoadedListener;
+import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
 import org.json.JSONException;
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.verify;
 public class HCaptchaJSInterfaceTest {
 
     @Spy
-    OnLoadedListener onLoadedListener;
+    OnOpenListener onOpenListener;
 
     @Spy
     OnSuccessListener<HCaptchaTokenResponse> onSuccessListener;
@@ -125,9 +125,9 @@ public class HCaptchaJSInterfaceTest {
 
     @Test
     public void calls_on_challenge_visible_cb() {
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, onLoadedListener, null, null);
-        hCaptchaJSInterface.onLoaded();
-        verify(onLoadedListener, times(1)).onLoaded();
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, onOpenListener, null, null);
+        hCaptchaJSInterface.onOpen();
+        verify(onOpenListener, times(1)).onOpen();
     }
 
     @Test

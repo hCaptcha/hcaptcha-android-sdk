@@ -17,7 +17,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
-import com.hcaptcha.sdk.tasks.OnLoadedListener;
+import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
 
@@ -25,7 +25,7 @@ import com.hcaptcha.sdk.tasks.OnSuccessListener;
  * HCaptcha Dialog Fragment Class
  */
 public class HCaptchaDialogFragment extends DialogFragment implements
-        OnLoadedListener,
+        OnOpenListener,
         OnSuccessListener<HCaptchaTokenResponse>,
         OnFailureListener {
 
@@ -168,10 +168,12 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     }
 
     @Override
-    public void onLoaded() {
+    public void onOpen() {
         handler.post(new Runnable() {
             @Override
             public void run() {
+                hCaptchaDialogListener.onOpen();
+
                 if (showLoader) {
                     loadingContainer.animate().alpha(0.0f).setDuration(200)
                             .setListener(

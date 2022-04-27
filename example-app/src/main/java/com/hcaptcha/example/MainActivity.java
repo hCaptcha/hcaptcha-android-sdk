@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.RadioGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
+import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
 
@@ -112,7 +114,14 @@ public class MainActivity extends AppCompatActivity {
                         Log.d(TAG, "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")");
                         setErrorTextView(e.getMessage());
                     }
+                })
+                .addOnOpenListener(new OnOpenListener() {
+                    @Override
+                    public void onOpen() {
+                        Toast.makeText(MainActivity.this, "hCaptcha shown", Toast.LENGTH_SHORT).show();
+                    }
                 });
+
     }
 
 }

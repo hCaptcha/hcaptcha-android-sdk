@@ -9,6 +9,8 @@ abstract class HCaptchaDialogListener implements Parcelable {
 
     abstract void onFailure(HCaptchaException hCaptchaException);
 
+    abstract void onOpen();
+
     @Override
     public int describeContents() {
         return 0;

@@ -28,6 +28,8 @@ public abstract class Task<TResult> {
 
     private final List<OnFailureListener> onFailureListeners;
 
+    private final List<OnOpenListener> onOpenListeners;
+
     /**
      * Creates a new Task object
      */
@@ -36,6 +38,7 @@ public abstract class Task<TResult> {
         this.successful = false;
         this.onSuccessListeners = new ArrayList<>();
         this.onFailureListeners = new ArrayList<>();
+        this.onOpenListeners = new ArrayList<>();
     }
 
     /**
@@ -93,6 +96,19 @@ public abstract class Task<TResult> {
     }
 
     /**
+     * Internal callback which called once 'open-callback' fired in js SDK
+     */
+    protected void captchaOpened() {
+        final Iterator<OnOpenListener> iterator = onOpenListeners.iterator();
+        while (iterator.hasNext()) {
+            final OnOpenListener onSuccessListener = iterator.next();
+            onSuccessListener.onOpen();
+            // Remove listener as result was successfully delivered
+            iterator.remove();
+        }
+    }
+
+    /**
      * Add a success listener triggered when the task finishes successfully
      *
      * @param onSuccessListener the success listener to be triggered
@@ -112,6 +128,18 @@ public abstract class Task<TResult> {
      */
     public Task<TResult> addOnFailureListener(@NonNull final OnFailureListener onFailureListener) {
         this.onFailureListeners.add(onFailureListener);
+        tryCb();
+        return this;
+    }
+
+    /**
+     * Add a hCaptcha open listener triggered when the hCaptcha View is displayed
+     *
+     * @param onOpenListener the open listener to be triggered
+     * @return current object
+     */
+    public Task<TResult> addOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
+        this.onOpenListeners.add(onOpenListener);
         tryCb();
         return this;
     }
