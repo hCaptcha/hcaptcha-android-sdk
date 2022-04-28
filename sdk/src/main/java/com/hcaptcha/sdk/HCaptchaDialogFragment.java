@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
+import com.hcaptcha.sdk.tasks.OnLoadedListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
@@ -25,6 +26,7 @@ import com.hcaptcha.sdk.tasks.OnSuccessListener;
  * HCaptcha Dialog Fragment Class
  */
 public class HCaptchaDialogFragment extends DialogFragment implements
+        OnLoadedListener,
         OnOpenListener,
         OnSuccessListener<HCaptchaTokenResponse>,
         OnFailureListener {
@@ -95,7 +97,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         this.resetOnTimeout = hCaptchaConfig.getResetOnTimeout();
-        this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this);
+        this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this, this);
         this.hCaptchaDebugInfo = new HCaptchaDebugInfo(getContext());
         this.showLoader = hCaptchaConfig.getLoading();
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
@@ -160,6 +162,28 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         webView.loadUrl("file:///android_asset/hcaptcha-form.html");
     }
 
+    /**
+     * Update UI (hide loading, dim effect) once SDK in WebView is ready to operate
+     */
+    private void ready() {
+        if (showLoader) {
+            loadingContainer.animate().alpha(0.0f).setDuration(200)
+                    .setListener(
+                            new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    loadingContainer.setVisibility(View.GONE);
+                                }
+                            });
+        } else {
+            // Add back dialog shadow in case the checkbox or challenge is shown
+            final Dialog dialog = getDialog();
+            if (dialog != null) {
+                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+            }
+        }
+    }
+
     @Override
     public void onCancel(@NonNull DialogInterface dialogInterface) {
         // User canceled the dialog through either `back` button or an outside touch
@@ -168,28 +192,22 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     }
 
     @Override
+    public void onLoaded() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                ready();
+            }
+        });
+    }
+
+    @Override
     public void onOpen() {
         handler.post(new Runnable() {
             @Override
             public void run() {
                 hCaptchaDialogListener.onOpen();
-
-                if (showLoader) {
-                    loadingContainer.animate().alpha(0.0f).setDuration(200)
-                            .setListener(
-                                    new AnimatorListenerAdapter() {
-                                        @Override
-                                        public void onAnimationEnd(Animator animation) {
-                                            loadingContainer.setVisibility(View.GONE);
-                                        }
-                                    });
-                } else {
-                    // Add back dialog shadow in case the checkbox or challenge is shown
-                    final Dialog dialog = getDialog();
-                    if (dialog != null) {
-                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                    }
-                }
+                ready();
             }
         });
     }

@@ -53,8 +53,11 @@
         onError: function onError(errCode) {
             return console.log("error: code ".concat(errCode));
         },
+        onLoaded: function onOpen() {
+            return console.log('cb: challenge is visible');
+        }
         onOpen: function onOpen() {
-            return console.log('cb: challenge or checkbox is visible');
+            return console.log('cb: checkbox is visible');
         }
     };
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
@@ -71,7 +74,7 @@
         if (renderConfig.size === 'invisible') {
             hcaptcha.execute(hCaptchaID);
         } else {
-            BridgeObject.onOpen();
+            BridgeObject.onLoaded();
         }
     }
 

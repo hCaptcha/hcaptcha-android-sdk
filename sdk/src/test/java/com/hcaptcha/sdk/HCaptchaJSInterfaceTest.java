@@ -2,6 +2,7 @@ package com.hcaptcha.sdk;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
+import com.hcaptcha.sdk.tasks.OnLoadedListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
@@ -23,6 +24,9 @@ import static org.mockito.Mockito.verify;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HCaptchaJSInterfaceTest {
+
+    @Spy
+    OnLoadedListener onLoadedListener;
 
     @Spy
     OnOpenListener onOpenListener;
@@ -66,7 +70,7 @@ public class HCaptchaJSInterfaceTest {
                 .host(host)
                 .resetOnTimeout(true)
                 .build();
-        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null);
+        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null, null);
 
         JSONObject expected = new JSONObject();
         expected.put("siteKey", siteKey);
@@ -101,7 +105,7 @@ public class HCaptchaJSInterfaceTest {
                 .theme(HCaptchaTheme.DARK)
                 .rqdata(rqdata)
                 .build();
-        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null);
+        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null, null);
 
         JSONObject expected = new JSONObject();
         expected.put("siteKey", siteKey);
@@ -124,8 +128,15 @@ public class HCaptchaJSInterfaceTest {
     }
 
     @Test
+    public void calls_on_challenge_ready() {
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, onLoadedListener, null, null, null);
+        hCaptchaJSInterface.onLoaded();
+        verify(onLoadedListener, times(1)).onLoaded();
+    }
+
+    @Test
     public void calls_on_challenge_visible_cb() {
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, onOpenListener, null, null);
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, onOpenListener, null, null);
         hCaptchaJSInterface.onOpen();
         verify(onOpenListener, times(1)).onOpen();
     }
@@ -133,7 +144,7 @@ public class HCaptchaJSInterfaceTest {
     @Test
     public void on_pass_forwards_token_to_listeners() {
         final String token = "mock-token";
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, onSuccessListener, null);
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, null, onSuccessListener, null);
         hCaptchaJSInterface.onPass(token);
         verify(onSuccessListener, times(1)).onSuccess(tokenCaptor.capture());
         assertEquals(token, tokenCaptor.getValue().getTokenResult());
@@ -142,11 +153,10 @@ public class HCaptchaJSInterfaceTest {
     @Test
     public void on_error_forwards_error_to_listeners() {
         final HCaptchaError error = HCaptchaError.CHALLENGE_CLOSED;
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, null, onFailureListener);
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, null, null, onFailureListener);
         hCaptchaJSInterface.onError(error.getErrorId());
         verify(onFailureListener, times(1)).onFailure(exceptionCaptor.capture());
         assertEquals(error.getMessage(), exceptionCaptor.getValue().getMessage());
         assertNotNull(exceptionCaptor.getValue());
     }
-
 }

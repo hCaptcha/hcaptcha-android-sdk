@@ -4,6 +4,7 @@ import android.webkit.JavascriptInterface;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
+import com.hcaptcha.sdk.tasks.OnLoadedListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,9 @@ class HCaptchaJSInterface implements Serializable {
 
     private final HCaptchaConfig hCaptchaConfig;
 
-    private final OnOpenListener onOpenedListener;
+    private final OnLoadedListener onLoadedListener;
+
+    private final OnOpenListener onOpenListener;
 
     private final OnSuccessListener<HCaptchaTokenResponse> onSuccessListener;
 
@@ -47,7 +50,12 @@ class HCaptchaJSInterface implements Serializable {
     }
 
     @JavascriptInterface
+    public void onLoaded() {
+        this.onLoadedListener.onLoaded();
+    }
+
+    @JavascriptInterface
     public void onOpen() {
-        this.onOpenedListener.onOpen();
+        this.onOpenListener.onOpen();
     }
 }
