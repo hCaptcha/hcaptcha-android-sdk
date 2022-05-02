@@ -53,8 +53,8 @@
         onError: function onError(errCode) {
             return console.log("error: code ".concat(errCode));
         },
-        onLoaded: function onOpen() {
-            return console.log('cb: challenge is visible');
+        onLoaded: function onLoaded() {
+            return console.log('cb: api is loaded');
         },
         onOpen: function onOpen() {
             return console.log('cb: checkbox is visible');
@@ -73,8 +73,6 @@
 
         if (renderConfig.size === 'invisible') {
             hcaptcha.execute(hCaptchaID);
-        } else {
-            BridgeObject.onLoaded();
         }
     }
 
@@ -135,6 +133,7 @@
                 }
             },
             'open-callback': function openCallback() {
+                console.log('open-callback');
                 return BridgeObject.onOpen();
             }
         };
@@ -144,7 +143,7 @@
         try {
             var renderConfig = getRenderConfig();
             hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
-
+            BridgeObject.onLoaded();
             execute(bridgeConfig, renderConfig);
         } catch (e) {
             console.error(e);

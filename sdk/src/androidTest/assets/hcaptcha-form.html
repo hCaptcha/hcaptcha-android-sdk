@@ -17,10 +17,13 @@
 
         function onHcaptchaLoaded() {
             try {
-                BridgeObject.onOpen();
+                BridgeObject.onLoaded();
             } catch (e) {
                 BridgeObject.onError(29);
             }
+            setTimeout(function() {
+                BridgeObject.onOpen();
+            }, 200);
         }
 
         function onPass() {

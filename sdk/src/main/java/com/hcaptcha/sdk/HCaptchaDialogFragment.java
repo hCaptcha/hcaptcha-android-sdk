@@ -162,28 +162,6 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         webView.loadUrl("file:///android_asset/hcaptcha-form.html");
     }
 
-    /**
-     * Update UI (hide loading, dim effect) once SDK in WebView is ready to operate
-     */
-    private void ready() {
-        if (showLoader) {
-            loadingContainer.animate().alpha(0.0f).setDuration(200)
-                    .setListener(
-                            new AnimatorListenerAdapter() {
-                                @Override
-                                public void onAnimationEnd(Animator animation) {
-                                    loadingContainer.setVisibility(View.GONE);
-                                }
-                            });
-        } else {
-            // Add back dialog shadow in case the checkbox or challenge is shown
-            final Dialog dialog = getDialog();
-            if (dialog != null) {
-                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-            }
-        }
-    }
-
     @Override
     public void onCancel(@NonNull DialogInterface dialogInterface) {
         // User canceled the dialog through either `back` button or an outside touch
@@ -196,7 +174,22 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         handler.post(new Runnable() {
             @Override
             public void run() {
-                ready();
+                if (showLoader) {
+                    loadingContainer.animate().alpha(0.0f).setDuration(200)
+                            .setListener(
+                                    new AnimatorListenerAdapter() {
+                                        @Override
+                                        public void onAnimationEnd(Animator animation) {
+                                            loadingContainer.setVisibility(View.GONE);
+                                        }
+                                    });
+                } else {
+                    // Add back dialog shadow in case the checkbox or challenge is shown
+                    final Dialog dialog = getDialog();
+                    if (dialog != null) {
+                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                    }
+                }
             }
         });
     }
@@ -207,7 +200,6 @@ public class HCaptchaDialogFragment extends DialogFragment implements
             @Override
             public void run() {
                 hCaptchaDialogListener.onOpen();
-                ready();
             }
         });
     }
