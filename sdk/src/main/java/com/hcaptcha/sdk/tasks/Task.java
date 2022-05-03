@@ -99,12 +99,8 @@ public abstract class Task<TResult> {
      * Internal callback which called once 'open-callback' fired in js SDK
      */
     protected void captchaOpened() {
-        final Iterator<OnOpenListener> iterator = onOpenListeners.iterator();
-        while (iterator.hasNext()) {
-            final OnOpenListener onSuccessListener = iterator.next();
-            onSuccessListener.onOpen();
-            // Remove listener as result was successfully delivered
-            iterator.remove();
+        for (OnOpenListener listener : onOpenListeners) {
+            listener.onOpen();
         }
     }
 

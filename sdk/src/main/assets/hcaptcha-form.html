@@ -57,7 +57,7 @@
             return console.log('cb: api is loaded');
         },
         onOpen: function onOpen() {
-            return console.log('cb: checkbox is visible');
+            return console.log('cb: challenge is visible');
         }
     };
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
@@ -133,7 +133,6 @@
                 }
             },
             'open-callback': function openCallback() {
-                console.log('open-callback');
                 return BridgeObject.onOpen();
             }
         };
