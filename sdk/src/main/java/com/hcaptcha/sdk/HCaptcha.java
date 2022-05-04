@@ -114,6 +114,11 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
         this.hCaptchaConfig = hCaptchaConfig;
         this.hCaptchaDialogFragment = HCaptchaDialogFragment.newInstance(hCaptchaConfig, new HCaptchaDialogListener() {
             @Override
+            void onOpen() {
+                captchaOpened();
+            }
+
+            @Override
             void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
                 setResult(hCaptchaTokenResponse);
             }

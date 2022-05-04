@@ -36,6 +36,10 @@ import java.util.concurrent.TimeUnit;
 public class HCaptchaDialogFragmentTest {
     public class HCaptchaDialogTestAdapter extends HCaptchaDialogListener {
         @Override
+        void onOpen() {
+        }
+
+        @Override
         void onSuccess(HCaptchaTokenResponse hCaptchaTokenResponse) {
         }
 
@@ -134,6 +138,31 @@ public class HCaptchaDialogFragmentTest {
                         String.valueOf(HCaptchaError.SESSION_TIMEOUT.getErrorId())));
 
         onWebView().withElement(findElement(Locator.ID, "on-error"))
+                .perform(webClick());
+
+        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS)); // wait for callback
+    }
+
+    @Test
+    public void onOpenCallbackWorks() throws Exception {
+        CountDownLatch latch = new CountDownLatch(1);
+        final HCaptchaDialogListener listener = new HCaptchaDialogTestAdapter() {
+            @Override
+            void onOpen() {
+                latch.countDown();
+            }
+        };
+
+        final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(listener);
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed(1000));
+
+        onWebView(withId(R.id.webView)).forceJavascriptEnabled();
+
+        onWebView().withElement(findElement(Locator.ID, "input-text"))
+                .perform(clearElement())
+                .perform(DriverAtoms.webKeys("test-token"));
+
+        onWebView().withElement(findElement(Locator.ID, "on-pass"))
                 .perform(webClick());
 
         assertTrue(latch.await(1000, TimeUnit.MILLISECONDS)); // wait for callback

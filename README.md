@@ -105,6 +105,19 @@ HCaptcha hCaptcha = HCaptcha.getClient(this).setup()
 
 If `verifyWithHCaptcha` is called with different arguments than `setup` the SDK will handle this by re-configuring hCaptcha. Note that this will reduce some of the performance benefit of using `setup`.
 
+The SDK also provides a listener to track hCaptcha open events, e.g. for analytics:
+
+```java
+HCaptcha.getClient(this).verifyWithHCaptcha(YOUR_API_SITE_KEY)
+    ...
+    .addOnOpenListener(new OnOpenListener() {
+         @Override
+         public void onOpen() {
+             Log.d("MainActivity", "hCaptcha has been displayed");
+         }
+     });
+```
+
 ##### Config params
 
 

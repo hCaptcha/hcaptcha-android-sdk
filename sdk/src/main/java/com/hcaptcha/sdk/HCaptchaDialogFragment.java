@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnLoadedListener;
+import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
 
@@ -26,6 +27,7 @@ import com.hcaptcha.sdk.tasks.OnSuccessListener;
  */
 public class HCaptchaDialogFragment extends DialogFragment implements
         OnLoadedListener,
+        OnOpenListener,
         OnSuccessListener<HCaptchaTokenResponse>,
         OnFailureListener {
 
@@ -95,7 +97,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         this.resetOnTimeout = hCaptchaConfig.getResetOnTimeout();
-        this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this);
+        this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this, this);
         this.hCaptchaDebugInfo = new HCaptchaDebugInfo(getContext());
         this.showLoader = hCaptchaConfig.getLoading();
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
@@ -188,6 +190,16 @@ public class HCaptchaDialogFragment extends DialogFragment implements
                         dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                     }
                 }
+            }
+        });
+    }
+
+    @Override
+    public void onOpen() {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                hCaptchaDialogListener.onOpen();
             }
         });
     }
