@@ -43,3 +43,26 @@ jobs:
           script: |
             brew install parallel
             parallel --retries 3 ::: "./gradlew connectedCheck"
+  size-report:
+    name: Diffuse report
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    - uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: adopt
+        cache: 'gradle'
+    - name: Build sdk for PR and main branch
+      run: |
+        ./gradlew build --stacktrace
+        cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
+        git checkout origin/main
+        ./gradlew build --stacktrace
+        cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
+    - name: Diffuse report
+      run: |
+        wget https://github.com/JakeWharton/diffuse/releases/download/0.1.0/diffuse-0.1.0-binary.jar
+        java -jar diffuse-0.1.0-binary.jar diff --aar sdk-main.aar sdk-pr.aar
