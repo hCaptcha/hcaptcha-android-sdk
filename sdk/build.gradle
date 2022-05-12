@@ -119,3 +119,34 @@ project.afterEvaluate {
         }
     }
 }
+
+long MAX_AAR_SIZE_KB = 200
+
+android.libraryVariants.all { variant ->
+    def variantName = variant.name.capitalize()
+    project.task("report${variantName}AarSize") {
+        group 'Help'
+        description "Report ${variant.name} AAR size"
+        dependsOn variant.packageLibraryProvider
+
+        doFirst {
+            String aarPath = variant.packageLibraryProvider.get().archivePath
+            long aarSizeKb = file(aarPath).length() / 1024
+            println("File ${aarPath} is ${aarSizeKb}Kbyte")
+        }
+    }
+
+    project.tasks.findByName("check").dependsOn(project.task("check${variantName}AarSize") {
+        group 'Verification'
+        description "Checks ${variant.name} AAR size doesn't exceed ${MAX_AAR_SIZE_KB}Kb"
+        dependsOn variant.packageLibraryProvider
+
+        doFirst {
+            String aarPath = variant.packageLibraryProvider.get().archivePath
+            long aarSizeKb = file(aarPath).length() / 1024
+            if (aarSizeKb > MAX_AAR_SIZE_KB) {
+                throw new GradleException("${aarPath} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
+            }
+        }
+    })
+}
