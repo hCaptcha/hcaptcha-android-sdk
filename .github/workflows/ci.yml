@@ -1,5 +1,8 @@
 name: Android SDK CI
-on: push
+on:
+  push:
+    branches: [ main ]
+  pull_request:
 jobs:
   build:
     name: Build & Unit-test
@@ -12,13 +15,20 @@ jobs:
           distribution: adopt
           cache: 'gradle'
       - name: Assemble & Test
-        run: ./gradlew build --stacktrace
+        run: |
+          ./gradlew build --stacktrace
+          cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
       - name: HTML ES5 test
         run: |
           npm install -g jshint
           jshint --extract=always sdk/src/main/assets/hcaptcha-form.html
       - name: JitPack Test
         run: ./gradlew publishReleasePublicationToMavenLocal
+      - if: github.event_name == 'push'
+        uses: actions/cache@v2
+        with:
+          path: sdk-main.aar
+          key: diffuse-${{ github.sha }}
   ui-tests:
     name: Android UI Tests
     runs-on: macos-latest
@@ -45,6 +55,7 @@ jobs:
             parallel --retries 3 ::: "./gradlew connectedCheck"
   size-report:
     name: Diffuse report
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
