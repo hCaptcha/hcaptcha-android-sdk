@@ -35,6 +35,12 @@ public class HCaptchaConfig implements Serializable {
     private Boolean loading = true;
 
     /**
+     * Show / Hide hCaptcha dialog.
+     */
+    @Builder.Default
+    private Boolean showDialog = true;
+
+    /**
      * Custom supplied challenge data.
      */
     private String rqdata;

@@ -7,4 +7,5 @@
     <string name="setup">Setup</string>
     <string name="show_hcaptcha">Show</string>
     <string name="web_view_debug">WebView Debug</string>
+    <string name="interactive">Interactive</string>
 </resources>

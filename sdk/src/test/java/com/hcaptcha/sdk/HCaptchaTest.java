@@ -103,8 +103,6 @@ public class HCaptchaTest {
 
     @Test
     public void test_verify_with_hcaptcha_passes_site_key_as_config() {
-        when(fragmentActivity.getSupportFragmentManager()).thenReturn(fragmentManager);
-
         final String siteKey = HCaptchaConfigTest.MOCK_SITE_KEY;
         final HCaptcha hCaptcha = HCaptcha.getClient(fragmentActivity);
 
@@ -115,7 +113,7 @@ public class HCaptchaTest {
 
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(hCaptchaConfigCaptor.capture(), any(HCaptchaDialogListener.class)));
-        verify(fragment).show(fragmentManager, HCaptchaDialogFragment.TAG);
+        verify(fragment).startVerification(fragmentActivity);
 
         final HCaptchaConfig config = hCaptchaConfigCaptor.getValue();
         assertNotNull(config);

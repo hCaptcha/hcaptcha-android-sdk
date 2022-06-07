@@ -69,6 +69,7 @@ public class HCaptchaJSInterfaceTest {
                 .reportapi(reportapi)
                 .host(host)
                 .resetOnTimeout(true)
+                .showDialog(false)
                 .build();
         final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null, null);
 
@@ -88,6 +89,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", host);
         expected.put("resetOnTimeout", true);
+        expected.put("showDialog", false);
 
         JSONAssert.assertEquals(HCaptchaJsInterface.getConfig(), expected, false);
     }
@@ -123,6 +125,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", JSONObject.NULL);
         expected.put("resetOnTimeout", false);
+        expected.put("showDialog", true);
 
         JSONAssert.assertEquals(HCaptchaJsInterface.getConfig(), expected, false);
     }

@@ -1,6 +1,5 @@
 package com.hcaptcha.sdk;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -43,20 +42,20 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
 
     @NonNull
-    private final Context context;
+    private final FragmentActivity activity;
 
     @NonNull
     private final FragmentManager fragmentManager;
 
     @Nullable
-    private HCaptchaDialogFragment hCaptchaDialogFragment;
+    private HCaptchaWebViewProvider hCaptchaWebViewProvider;
 
     @Nullable
     private HCaptchaConfig hCaptchaConfig;
 
     private HCaptcha(@NonNull final Context context) {
-        this.context = context;
-        this.fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
+        this.activity = (FragmentActivity) context;
+        this.fragmentManager = activity.getSupportFragmentManager();
     }
 
     /**
@@ -77,8 +76,8 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
     public HCaptcha setup() {
         String siteKey = null;
         try {
-            String packageName = context.getPackageName();
-            ApplicationInfo app = context.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
+            String packageName = activity.getPackageName();
+            ApplicationInfo app = activity.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
             Bundle bundle = app.metaData;
             siteKey = bundle.getString(META_SITE_KEY);
         } catch (PackageManager.NameNotFoundException e) {
@@ -112,7 +111,8 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
      */
     public HCaptcha setup(@NonNull final HCaptchaConfig hCaptchaConfig) {
         this.hCaptchaConfig = hCaptchaConfig;
-        this.hCaptchaDialogFragment = HCaptchaDialogFragment.newInstance(hCaptchaConfig, new HCaptchaDialogListener() {
+
+        final HCaptchaDialogListener listener = new HCaptchaDialogListener() {
             @Override
             void onOpen() {
                 captchaOpened();
@@ -127,7 +127,13 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
             void onFailure(final HCaptchaException hCaptchaException) {
                 setException(hCaptchaException);
             }
-        });
+        };
+
+        if (hCaptchaConfig.getShowDialog()) {
+            this.hCaptchaWebViewProvider = HCaptchaDialogFragment.newInstance(hCaptchaConfig, listener);
+        } else {
+            this.hCaptchaWebViewProvider = new HCaptchaHeadlessWebView(activity, hCaptchaConfig, listener);
+        }
 
         return this;
     }
@@ -138,11 +144,13 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
      * @return {@link HCaptcha}
      */
     public HCaptcha verifyWithHCaptcha() {
-        if (hCaptchaConfig == null || hCaptchaDialogFragment == null) {
+        if (hCaptchaConfig == null || hCaptchaWebViewProvider == null) {
             setup();
         }
 
-        return showHCaptcha();
+        hCaptchaWebViewProvider.startVerification(activity);
+
+        return this;
     }
 
     /**
@@ -152,11 +160,13 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
      * @return {@link HCaptcha}
      */
     public HCaptcha verifyWithHCaptcha(@NonNull final String siteKey) {
-        if (hCaptchaConfig == null || !siteKey.equals(hCaptchaConfig.getSiteKey()) || hCaptchaDialogFragment == null) {
+        if (hCaptchaConfig == null || !siteKey.equals(hCaptchaConfig.getSiteKey()) || hCaptchaWebViewProvider == null) {
             setup(siteKey);
         }
 
-        return showHCaptcha();
+        hCaptchaWebViewProvider.startVerification(activity);
+
+        return this;
     }
 
     /**
@@ -166,18 +176,12 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
      * @return {@link HCaptcha}
      */
     public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig hCaptchaConfig) {
-        if (!hCaptchaConfig.equals(this.hCaptchaConfig) || hCaptchaDialogFragment == null) {
+        if (!hCaptchaConfig.equals(this.hCaptchaConfig) || hCaptchaWebViewProvider == null) {
             setup(hCaptchaConfig);
         }
 
-        return showHCaptcha();
-    }
+        hCaptchaWebViewProvider.startVerification(activity);
 
-    private HCaptcha showHCaptcha() {
-        assert this.hCaptchaConfig != null;
-        assert hCaptchaDialogFragment != null;
-
-        hCaptchaDialogFragment.show(fragmentManager, HCaptchaDialogFragment.TAG);
         return this;
     }
 }

@@ -60,6 +60,14 @@
             android:checked="false"
             android:text="@string/web_view_debug"
             style="@style/CheckBoxText" />
+        <CheckBox
+            android:id="@+id/interactive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="true"
+            android:text="@string/interactive"
+            style="@style/CheckBoxText" />
     </LinearLayout>
 
     <Button

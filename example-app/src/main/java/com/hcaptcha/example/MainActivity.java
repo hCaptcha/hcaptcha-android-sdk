@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RadioGroup sizeRadioGroup;
     private CheckBox setupCheckBox;
+    private CheckBox interactive;
     private TextView tokenTextView;
     private TextView errorTextView;
 
@@ -38,14 +39,13 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         setupCheckBox = findViewById(R.id.setupCheckBox);
         setupCheckBox.setOnCheckedChangeListener((checkBox, checked) -> {
-            initHCaptcha(getSizeFromRadio(sizeRadioGroup));
+            initHCaptcha();
         });
 
         sizeRadioGroup = findViewById(R.id.sizeRadioGroup);
         sizeRadioGroup.setOnCheckedChangeListener((radioGroup, resId) -> {
-            initHCaptcha(getSizeFromRadio(radioGroup));
+            initHCaptcha();
         });
-        sizeRadioGroup.check(R.id.size_invisible);
         tokenTextView = findViewById(R.id.tokenTextView);
         errorTextView = findViewById(R.id.errorTextView);
 
@@ -53,6 +53,13 @@ public class MainActivity extends AppCompatActivity {
         debugCheckBox.setOnCheckedChangeListener((checkBox, checked) -> {
             android.webkit.WebView.setWebContentsDebuggingEnabled(checked);
         });
+
+        interactive = findViewById(R.id.interactive);
+        interactive.setOnCheckedChangeListener((checkBox, checked) -> {
+            initHCaptcha();
+        });
+
+        sizeRadioGroup.check(R.id.size_invisible);
     }
 
     private HCaptchaSize getSizeFromRadio(@NonNull RadioGroup radioGroup) {
@@ -64,10 +71,14 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    private void initHCaptcha(@Nullable HCaptchaSize size) {
+    private void initHCaptcha() {
+        HCaptchaSize size = getSizeFromRadio(sizeRadioGroup);
+        boolean showDialog = interactive.isChecked();
+
         HCaptchaConfig.HCaptchaConfigBuilder builder = HCaptchaConfig.builder()
                 .siteKey("10000000-ffff-ffff-ffff-000000000001")
-                .loading(true);
+                .loading(false)
+                .showDialog(showDialog);
         if (size != null) {
             builder.size(size);
         }
@@ -121,7 +132,5 @@ public class MainActivity extends AppCompatActivity {
                         Toast.makeText(MainActivity.this, "hCaptcha shown", Toast.LENGTH_SHORT).show();
                     }
                 });
-
     }
-
 }
