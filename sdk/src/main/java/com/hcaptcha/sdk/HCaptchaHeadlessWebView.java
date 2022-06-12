@@ -32,12 +32,16 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
 
     @Override
     public void startVerification(@NonNull FragmentActivity activity) {
-        this.webView = new WebView(activity);
+        if (this.webView == null) {
+            this.webView = new WebView(activity);
+        }
         this.webView.setId(R.id.webView);
         this.webView.setVisibility(View.GONE);
 
-        final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
-        rootView.addView(webView);
+        if (webView.getParent() == null) {
+            final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
+            rootView.addView(webView);
+        }
 
         webViewHelper.setup();
     }
@@ -54,6 +58,7 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
             @Override
             public void run() {
                 webViewHelper.cleanup();
+                webView = null;
                 listener.onFailure(hCaptchaException);
             }
         });
@@ -65,6 +70,7 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
             @Override
             public void run() {
                 webViewHelper.cleanup();
+                webView = null;
                 listener.onSuccess(hCaptchaTokenResponse);
             }
         });
