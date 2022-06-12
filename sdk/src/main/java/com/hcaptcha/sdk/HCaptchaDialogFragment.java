@@ -44,14 +44,14 @@ public class HCaptchaDialogFragment extends DialogFragment implements
 
     private final Handler handler = new Handler(Looper.getMainLooper());
 
-    private HCaptchaConfig config;
+    private HCaptchaWebViewHelper webViewHelper;
 
     private boolean showLoader;
 
     private boolean resetOnTimeout;
 
     @NonNull
-    private HCaptchaDialogListener hCaptchaDialogListener;
+    private HCaptchaStateListener hCaptchaStateListener;
 
     private View rootView;
 
@@ -62,18 +62,18 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     /**
      * Creates a new instance
      *
-     * @param hCaptchaConfig the config
-     * @param hCaptchaDialogListener the listener
+     * @param config the config
+     * @param listener the listener
      * @return a new instance
      */
     public static HCaptchaDialogFragment newInstance(
-            @NonNull final HCaptchaConfig hCaptchaConfig,
-            @NonNull final HCaptchaDialogListener hCaptchaDialogListener
+            @NonNull final HCaptchaConfig config,
+            @NonNull final HCaptchaStateListener listener
 
     ) {
         final Bundle args = new Bundle();
-        args.putSerializable(KEY_CONFIG, hCaptchaConfig);
-        args.putParcelable(KEY_LISTENER, hCaptchaDialogListener);
+        args.putSerializable(KEY_CONFIG, config);
+        args.putParcelable(KEY_LISTENER, listener);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
         return hCaptchaDialogFragment;
@@ -84,7 +84,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         super.onCreate(savedInstanceState);
         assert getArguments() != null;
         try {
-            hCaptchaDialogListener = getArguments().getParcelable(KEY_LISTENER);
+            hCaptchaStateListener = getArguments().getParcelable(KEY_LISTENER);
         } catch (BadParcelableException e) {
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back
@@ -93,7 +93,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         }
         final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
 
-        this.config = hCaptchaConfig;
+        this.webViewHelper = new HCaptchaWebViewHelper(requireContext(), hCaptchaConfig, this);
         this.showLoader = hCaptchaConfig.getLoading();
         this.resetOnTimeout = hCaptchaConfig.getResetOnTimeout();
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
@@ -105,7 +105,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         loadingContainer.setVisibility(showLoader ? View.VISIBLE : View.GONE);
         webView = rootView.findViewById(R.id.webView);
-        HCaptchaWebViewHelper.prepare(config, this);
+        webViewHelper.setup();
         return rootView;
     }
 
@@ -113,7 +113,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     public void onDestroy() {
         super.onDestroy();
         if (webView != null) {
-            HCaptchaWebViewHelper.finish(this);
+            webViewHelper.cleanup();
             webView = null;
         }
     }
@@ -170,7 +170,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         handler.post(new Runnable() {
             @Override
             public void run() {
-                hCaptchaDialogListener.onOpen();
+                hCaptchaStateListener.onOpen();
             }
         });
     }
@@ -188,7 +188,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
                     // Re-open the challenge
                     webView.loadUrl("javascript:resetAndExecute();");
                 } else {
-                    hCaptchaDialogListener.onFailure(hCaptchaException);
+                    hCaptchaStateListener.onFailure(hCaptchaException);
                 }
             }
         });
@@ -202,7 +202,7 @@ public class HCaptchaDialogFragment extends DialogFragment implements
         handler.post(new Runnable() {
             @Override
             public void run() {
-                hCaptchaDialogListener.onSuccess(hCaptchaTokenResponse);
+                hCaptchaStateListener.onSuccess(hCaptchaTokenResponse);
             }
         });
     }

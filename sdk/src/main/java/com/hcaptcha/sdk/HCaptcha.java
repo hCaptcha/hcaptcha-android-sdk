@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,6 +41,7 @@ import com.hcaptcha.sdk.tasks.Task;
  */
 public class HCaptcha extends Task<HCaptchaTokenResponse> {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
+    public static final String TAG = "hcaptcha";
 
     @NonNull
     private final FragmentActivity activity;
@@ -112,7 +114,7 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
     public HCaptcha setup(@NonNull final HCaptchaConfig hCaptchaConfig) {
         this.hCaptchaConfig = hCaptchaConfig;
 
-        final HCaptchaDialogListener listener = new HCaptchaDialogListener() {
+        final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
             void onOpen() {
                 captchaOpened();
@@ -132,7 +134,14 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
         if (hCaptchaConfig.getShowDialog()) {
             this.hCaptchaWebViewProvider = HCaptchaDialogFragment.newInstance(hCaptchaConfig, listener);
         } else {
-            this.hCaptchaWebViewProvider = new HCaptchaHeadlessWebView(activity, hCaptchaConfig, listener);
+            HCaptchaConfig config = hCaptchaConfig;
+            HCaptchaSize size = hCaptchaConfig.getSize();
+            if (size != HCaptchaSize.INVISIBLE) {
+                Log.w(TAG, "Size " + HCaptchaSize.INVISIBLE + " will be used instead of " + size);
+                config = hCaptchaConfig.toBuilder().size(HCaptchaSize.INVISIBLE).build();
+            }
+
+            this.hCaptchaWebViewProvider = new HCaptchaHeadlessWebView(activity, config, listener);
         }
 
         return this;

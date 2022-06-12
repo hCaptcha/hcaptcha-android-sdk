@@ -26,13 +26,13 @@
             }, 200);
         }
 
-        function onPass() {
-            const token = document.getElementById("input-text").value;
+        function onPass(arg) {
+            const token = arg || document.getElementById("input-text").value;
             BridgeObject.onPass(token);
         }
 
-        function onError() {
-            const errorCode = parseInt(document.getElementById("input-text").value);
+        function onError(arg) {
+            const errorCode = arg || parseInt(document.getElementById("input-text").value);
             BridgeObject.onError(errorCode);
         }
 

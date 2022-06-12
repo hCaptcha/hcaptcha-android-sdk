@@ -1,44 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme.AppCompat"
     tools:context=".MainActivity">
 
-    <RadioGroup
-        android:id="@+id/sizeRadioGroup"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <RadioButton
-            android:id="@+id/size_invisible"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/size_invisible"
-            style="@style/CheckBoxText" />
-        <RadioButton
-            android:id="@+id/size_compact"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/size_compact"
-            style="@style/CheckBoxText" />
-        <RadioButton
-            android:id="@+id/size_normal"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/size_normal"
-            style="@style/CheckBoxText" />
-        <RadioButton
-            android:id="@+id/size_default"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/size_default"
-            app:buttonTint="@color/colorAccent"
-            style="@style/CheckBoxText" />
-    </RadioGroup>
+    <Spinner
+        android:id="@+id/sizes"
+        android:theme="@style/ThemeOverlay.AppCompat.Light"
+        android:spinnerMode="dropdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,12 +35,20 @@
             android:text="@string/web_view_debug"
             style="@style/CheckBoxText" />
         <CheckBox
-            android:id="@+id/interactive"
+            android:id="@+id/loading"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:checked="true"
-            android:text="@string/interactive"
+            android:text="@string/loading"
+            style="@style/CheckBoxText" />
+        <CheckBox
+            android:id="@+id/show_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="true"
+            android:text="@string/show_dialog"
             style="@style/CheckBoxText" />
     </LinearLayout>
 

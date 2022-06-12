@@ -3,84 +3,80 @@ package com.hcaptcha.sdk;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewParent;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
-public class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
+final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
 
     @NonNull
     private final Handler handler = new Handler(Looper.getMainLooper());
 
     @NonNull
-    private final HCaptchaDialogListener listener;
+    private final HCaptchaStateListener listener;
 
     @NonNull
-    private final HCaptchaConfig config;
+    private final HCaptchaWebViewHelper webViewHelper;
 
-    @NonNull
-    private final WebView webView;
+    private WebView webView;
 
     public HCaptchaHeadlessWebView(@NonNull Context context,
                                    @NonNull HCaptchaConfig config,
-                                   @NonNull HCaptchaDialogListener listener) {
-        this.webView = new WebView(context);
-        this.webView.setVisibility(View.GONE);
+                                   @NonNull HCaptchaStateListener listener) {
         this.listener = listener;
-        this.config = config;
+        this.webViewHelper = new HCaptchaWebViewHelper(context, config, this);
     }
 
     @Override
     public void startVerification(@NonNull FragmentActivity activity) {
-        ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
+        this.webView = new WebView(activity);
+        this.webView.setId(R.id.webView);
+        this.webView.setVisibility(View.GONE);
+
+        final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
         rootView.addView(webView);
 
-        HCaptchaWebViewHelper.prepare(config, this);
+        webViewHelper.setup();
     }
 
     @Override
+    @NonNull
     public WebView getWebView() {
         return webView;
     }
 
     @Override
-    public void onFailure(HCaptchaException hCaptchaException) {
+    public void onFailure(final HCaptchaException hCaptchaException) {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                HCaptchaWebViewHelper.finish(HCaptchaHeadlessWebView.this);
+                webViewHelper.cleanup();
                 listener.onFailure(hCaptchaException);
             }
         });
     }
 
     @Override
+    public void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                webViewHelper.cleanup();
+                listener.onSuccess(hCaptchaTokenResponse);
+            }
+        });
+    }
+
+    @Override
     public void onLoaded() {
+        // this callback make no sense for invisible WebView
     }
 
     @Override
     public void onOpen() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                listener.onOpen();
-            }
-        });
-    }
-
-    @Override
-    public void onSuccess(HCaptchaTokenResponse hCaptchaTokenResponse) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                HCaptchaWebViewHelper.finish(HCaptchaHeadlessWebView.this);
-                listener.onSuccess(hCaptchaTokenResponse);
-            }
-        });
+        // this callback make no sense for invisible WebView
     }
 }

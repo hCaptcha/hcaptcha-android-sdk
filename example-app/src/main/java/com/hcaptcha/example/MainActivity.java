@@ -4,13 +4,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
-import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
@@ -18,14 +18,17 @@ import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
+import java.util.Arrays;
+
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
-    private RadioGroup sizeRadioGroup;
+    private Spinner sizeSpinner;
     private CheckBox setupCheckBox;
-    private CheckBox interactive;
+    private CheckBox showDialog;
+    private CheckBox loading;
     private TextView tokenTextView;
     private TextView errorTextView;
 
@@ -42,9 +45,19 @@ public class MainActivity extends AppCompatActivity {
             initHCaptcha();
         });
 
-        sizeRadioGroup = findViewById(R.id.sizeRadioGroup);
-        sizeRadioGroup.setOnCheckedChangeListener((radioGroup, resId) -> {
-            initHCaptcha();
+        sizeSpinner = (Spinner) findViewById(R.id.sizes);
+        ArrayAdapter<HCaptchaSize> adapter = new ArrayAdapter<>(this,
+                android.R.layout.simple_spinner_dropdown_item,
+                Arrays.asList(HCaptchaSize.NORMAL, HCaptchaSize.INVISIBLE, HCaptchaSize.COMPACT));
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        sizeSpinner.setAdapter(adapter);
+        sizeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            public void onItemSelected(AdapterView<?> parent, View view, int pos, long id) {
+                initHCaptcha();
+            }
+
+            public void onNothingSelected(AdapterView<?> parent) {
+            }
         });
         tokenTextView = findViewById(R.id.tokenTextView);
         errorTextView = findViewById(R.id.errorTextView);
@@ -54,30 +67,31 @@ public class MainActivity extends AppCompatActivity {
             android.webkit.WebView.setWebContentsDebuggingEnabled(checked);
         });
 
-        interactive = findViewById(R.id.interactive);
-        interactive.setOnCheckedChangeListener((checkBox, checked) -> {
+        showDialog = findViewById(R.id.show_dialog);
+        showDialog.setOnCheckedChangeListener((checkBox, checked) -> {
             initHCaptcha();
         });
 
-        sizeRadioGroup.check(R.id.size_invisible);
+        loading = findViewById(R.id.loading);
+        loading.setOnCheckedChangeListener((checkBox, checked) -> {
+            initHCaptcha();
+        });
+
+        initHCaptcha();
     }
 
-    private HCaptchaSize getSizeFromRadio(@NonNull RadioGroup radioGroup) {
-        switch (radioGroup.getCheckedRadioButtonId()) {
-            case R.id.size_invisible: return HCaptchaSize.INVISIBLE;
-            case R.id.size_compact: return HCaptchaSize.COMPACT;
-            case R.id.size_normal: return HCaptchaSize.NORMAL;
-            default: return null;
-        }
+    private HCaptchaSize getSizeFromSpinner() {
+        return (HCaptchaSize) sizeSpinner.getSelectedItem();
     }
 
     private void initHCaptcha() {
-        HCaptchaSize size = getSizeFromRadio(sizeRadioGroup);
-        boolean showDialog = interactive.isChecked();
+        HCaptchaSize size = getSizeFromSpinner();
+        boolean showDialog = this.showDialog.isChecked();
+        boolean loading = this.loading.isChecked();
 
         HCaptchaConfig.HCaptchaConfigBuilder builder = HCaptchaConfig.builder()
                 .siteKey("10000000-ffff-ffff-ffff-000000000001")
-                .loading(false)
+                .loading(loading)
                 .showDialog(showDialog);
         if (size != null) {
             builder.size(size);
@@ -102,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public HCaptcha verifyWithHCaptcha() {
-        if (setupCheckBox.isChecked() || getSizeFromRadio(sizeRadioGroup) == null) {
+        if (setupCheckBox.isChecked() || getSizeFromSpinner() == null) {
             return hCaptcha.verifyWithHCaptcha();
         }
 

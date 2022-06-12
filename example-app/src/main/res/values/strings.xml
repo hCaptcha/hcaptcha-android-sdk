@@ -1,11 +1,8 @@
 <resources>
     <string name="app_name">Example hCaptcha App</string>
-    <string name="size_invisible">Invisible</string>
-    <string name="size_compact">Compact</string>
-    <string name="size_normal">Normal</string>
-    <string name="size_default">Default</string>
     <string name="setup">Setup</string>
     <string name="show_hcaptcha">Show</string>
+    <string name="loading">Loading</string>
     <string name="web_view_debug">WebView Debug</string>
-    <string name="interactive">Interactive</string>
+    <string name="show_dialog">Dialog</string>
 </resources>

@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk;
 
 import android.webkit.JavascriptInterface;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
@@ -19,14 +20,13 @@ import java.io.Serializable;
 @Data
 @AllArgsConstructor
 class HCaptchaJSInterface implements Serializable {
-
     public static final String JS_INTERFACE_TAG = "JSInterface";
 
     private final HCaptchaConfig hCaptchaConfig;
 
-    private final OnLoadedListener onLoadedListener;
+    private OnLoadedListener onLoadedListener;
 
-    private final OnOpenListener onOpenListener;
+    private OnOpenListener onOpenListener;
 
     private final OnSuccessListener<HCaptchaTokenResponse> onSuccessListener;
 
