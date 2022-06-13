@@ -1,3 +1,10 @@
+plugins {
+    id "pmd"
+    id "checkstyle"
+    id "com.github.spotbugs" version "4.8.0"
+    id "org.owasp.dependencycheck" version "7.1.1"
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
@@ -150,3 +157,47 @@ android.libraryVariants.all { variant ->
         }
     })
 }
+
+task checkstyle(type: Checkstyle) {
+    description 'Check code standard'
+    group 'verification'
+    configFile file("${project.rootDir}/gradle/config/checkstyle.xml")
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+    ignoreFailures = false
+}
+
+checkstyle {
+    configFile = file("${rootDir}/gradle/config/checkstyle.xml")
+    toolVersion = '8.34'
+    ignoreFailures = false
+    maxWarnings = 0
+}
+
+task pmd(type: Pmd) {
+    ruleSetFiles = files("${project.rootDir}/gradle/config/pmd.xml")
+    ignoreFailures = false
+    ruleSets = []
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    reports {
+        xml.enabled = false
+        html.enabled = true
+        html.destination = file("$project.buildDir/outputs/pmd/pmd.html")
+    }
+}
+
+// enable html report
+gradle.taskGraph.beforeTask { task ->
+    if (task.name.toLowerCase().contains('spotbugs')) {
+        task.reports {
+            html.enabled = true
+            xml.enabled = true
+        }
+    }
+}
+
+check.dependsOn('checkstyle', 'pmd')
