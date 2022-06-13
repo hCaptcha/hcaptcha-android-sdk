@@ -40,7 +40,7 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
             final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
             rootView.addView(webView);
         }
-        webViewHelper = new HCaptchaWebViewHelper(activity, config, this, listener, webView);
+        webViewHelper = new HCaptchaWebViewHelper(activity, config,this, listener, webView);
     }
 
     @Override
@@ -55,11 +55,6 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
 
     private void resetAndExecute() {
         webViewHelper.getWebView().loadUrl("javascript:resetAndExecute();");
-    }
-
-    @Override
-    public @NonNull HCaptchaConfig getConfig() {
-        return config;
     }
 
     @Override

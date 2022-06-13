@@ -14,9 +14,6 @@ interface HCaptchaWebViewProvider extends
         OnSuccessListener<HCaptchaTokenResponse>,
         OnFailureListener {
 
-    @NonNull
-    HCaptchaConfig getConfig();
-
     void verifyWithHCaptcha(@NonNull FragmentActivity activity);
 
 }

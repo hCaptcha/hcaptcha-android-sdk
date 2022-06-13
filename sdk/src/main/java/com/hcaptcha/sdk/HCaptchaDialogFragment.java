@@ -202,12 +202,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements HCap
     }
 
     @Override
-    public @NonNull HCaptchaConfig getConfig() {
-        assert webViewHelper != null;
-        return webViewHelper.getConfig();
-    }
-
-    @Override
     public void verifyWithHCaptcha(@NonNull FragmentActivity fragmentActivity) {
         final FragmentManager fragmentManager = fragmentActivity.getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
