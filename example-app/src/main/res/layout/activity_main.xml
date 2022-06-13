@@ -7,33 +7,16 @@
     android:theme="@style/Theme.AppCompat"
     tools:context=".MainActivity">
 
-    <Spinner
-        android:id="@+id/sizes"
-        android:theme="@style/ThemeOverlay.AppCompat.Light"
-        android:spinnerMode="dropdown"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-        <CheckBox
-            android:id="@+id/setupCheckBox"
+        <Spinner
+            android:id="@+id/sizes"
+            android:theme="@style/ThemeOverlay.AppCompat.Light"
+            android:spinnerMode="dropdown"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="true"
-            android:text="@string/setup"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/webViewDebug"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/web_view_debug"
-            style="@style/CheckBoxText" />
+            android:layout_height="wrap_content" />
         <CheckBox
             android:id="@+id/loading"
             android:layout_width="wrap_content"
@@ -43,20 +26,46 @@
             android:text="@string/loading"
             style="@style/CheckBoxText" />
         <CheckBox
-            android:id="@+id/show_dialog"
+            android:id="@+id/full_invisible"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
-            android:checked="true"
-            android:text="@string/show_dialog"
+            android:checked="false"
+            android:text="@string/full_invisible"
             style="@style/CheckBoxText" />
     </LinearLayout>
 
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/show_hcaptcha"
-        android:onClick="onClickShowHCaptcha" />
+        android:orientation="horizontal">
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/clear"
+            android:onClick="onClickClear" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setup"
+            android:onClick="onClickSetup" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/verify"
+            android:onClick="onClickVerify" />
+
+        <CheckBox
+            android:id="@+id/webViewDebug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="false"
+            android:text="@string/web_view_debug"
+            style="@style/CheckBoxText" />
+    </LinearLayout>
 
     <LinearLayout
         android:background="@android:color/holo_green_light"
@@ -77,7 +86,7 @@
             android:text="-"
             android:textColor="@android:color/white"
             android:ellipsize="end"
-            android:maxLines="1"
+            android:maxLines="10"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
     </LinearLayout>

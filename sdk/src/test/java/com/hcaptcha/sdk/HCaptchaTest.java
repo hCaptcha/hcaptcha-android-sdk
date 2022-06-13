@@ -53,7 +53,6 @@ public class HCaptchaTest {
     @Before
     public void init() {
         MockitoAnnotations.openMocks(this);
-
         dialogFragmentMock = mockStatic(HCaptchaDialogFragment.class);
         dialogFragmentMock
                 .when(() -> HCaptchaDialogFragment.newInstance(
@@ -109,7 +108,7 @@ public class HCaptchaTest {
 
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(hCaptchaConfigCaptor.capture(), any(HCaptchaStateListener.class)));
-        verify(fragment).startVerification(fragmentActivity);
+        verify(fragment).verifyWithHCaptcha(fragmentActivity);
 
         final HCaptchaConfig config = hCaptchaConfigCaptor.getValue();
         assertNotNull(config);

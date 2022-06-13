@@ -1,13 +1,13 @@
 package com.hcaptcha.sdk;
 
-import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 
-import androidx.annotation.NonNull;
+import lombok.Getter;
+import lombok.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
@@ -15,51 +15,61 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
     @NonNull
     private final Handler handler = new Handler(Looper.getMainLooper());
 
+    @Getter
+    @NonNull
+    private final HCaptchaConfig config;
+
     @NonNull
     private final HCaptchaStateListener listener;
 
     @NonNull
-    private final HCaptchaWebViewHelper webViewHelper;
+    private HCaptchaWebViewHelper webViewHelper;
 
-    private WebView webView;
-
-    public HCaptchaHeadlessWebView(@NonNull Context context,
-                                   @NonNull HCaptchaConfig config,
-                                   @NonNull HCaptchaStateListener listener) {
+    public HCaptchaHeadlessWebView(@NonNull FragmentActivity activity,
+                                   @NonNull final HCaptchaConfig config,
+                                   @NonNull final HCaptchaStateListener listener) {
+        this.config = config;
         this.listener = listener;
-        this.webViewHelper = new HCaptchaWebViewHelper(context, config, this);
-    }
-
-    @Override
-    public void startVerification(@NonNull FragmentActivity activity) {
-        if (this.webView == null) {
-            this.webView = new WebView(activity);
+        if (webViewHelper != null) {
+            // Setup was already done.
+            return;
         }
-        this.webView.setId(R.id.webView);
-        this.webView.setVisibility(View.GONE);
-
+        final WebView webView = new WebView(activity);
+        webView.setId(R.id.webView);
+        webView.setVisibility(View.GONE);
         if (webView.getParent() == null) {
             final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
             rootView.addView(webView);
         }
-
-        webViewHelper.setup();
+        webViewHelper = new HCaptchaWebViewHelper(activity, config, this, listener, webView);
     }
 
     @Override
-    @NonNull
-    public WebView getWebView() {
-        return webView;
+    public void verifyWithHCaptcha(@NonNull FragmentActivity activity) {
+        resetAndExecute();
+    }
+
+    private void resetAndExecute() {
+        webViewHelper.getWebView().loadUrl("javascript:resetAndExecute();");
+    }
+
+    @Override
+    public @NonNull HCaptchaConfig getConfig() {
+        return config;
     }
 
     @Override
     public void onFailure(final HCaptchaException hCaptchaException) {
+        final boolean silentRetry = webViewHelper.getConfig().getResetOnTimeout()
+                && hCaptchaException.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
         handler.post(new Runnable() {
             @Override
             public void run() {
-                webViewHelper.cleanup();
-                webView = null;
-                listener.onFailure(hCaptchaException);
+                if (silentRetry) {
+                    resetAndExecute();
+                } else {
+                    listener.onFailure(hCaptchaException);
+                }
             }
         });
     }
@@ -69,8 +79,6 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                webViewHelper.cleanup();
-                webView = null;
                 listener.onSuccess(hCaptchaTokenResponse);
             }
         });
@@ -78,11 +86,16 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
 
     @Override
     public void onLoaded() {
-        // this callback make no sense for invisible WebView
+        // Do nothing when hCaptcha is loaded.
     }
 
     @Override
     public void onOpen() {
-        // this callback make no sense for invisible WebView
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                listener.onOpen();
+            }
+        });
     }
 }

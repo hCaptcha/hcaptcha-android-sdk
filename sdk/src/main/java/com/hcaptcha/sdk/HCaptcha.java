@@ -4,60 +4,28 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 
-import androidx.annotation.NonNull;
+import lombok.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentManager;
 import com.hcaptcha.sdk.tasks.Task;
 
 
-/**
- * hCaptcha client which allows invoking of challenge completion and listening for the result.
- *
- * <pre>
- * Usage example:
- * 1. Get a client either using the site key or customize by passing a config:
- *    client = HCaptcha.getClient(this).verifyWithHCaptcha(YOUR_API_SITE_KEY)
- *    client = HCaptcha.getClient(this).verifyWithHCaptcha({@link com.hcaptcha.sdk.HCaptchaConfig})
- * 2. Listen for the result and error events:
- *
- *  client.addOnSuccessListener(new OnSuccessListener{@literal <}HCaptchaTokenResponse{@literal >}() {
- *            {@literal @}Override
- *             public void onSuccess(HCaptchaTokenResponse response) {
- *                 String userResponseToken = response.getTokenResult();
- *                 Log.d(TAG, "hCaptcha token: " + userResponseToken);
- *                 // Validate the user response token using the hCAPTCHA siteverify API
- *             }
- *         })
- *         .addOnFailureListener(new OnFailureListener() {
- *            {@literal @}Override
- *             public void onFailure(HCaptchaException e) {
- *                 Log.d(TAG, "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")");
- *             }
- *         });
- *  </pre>
- */
-public class HCaptcha extends Task<HCaptchaTokenResponse> {
+public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
-    public static final String TAG = "hcaptcha";
+    public static final String TAG = "hCaptcha";
 
     @NonNull
     private final FragmentActivity activity;
 
-    @NonNull
-    private final FragmentManager fragmentManager;
+    @Nullable
+    private HCaptchaWebViewProvider webViewProvider;
 
     @Nullable
-    private HCaptchaWebViewProvider hCaptchaWebViewProvider;
-
-    @Nullable
-    private HCaptchaConfig hCaptchaConfig;
+    private HCaptchaConfig config;
 
     private HCaptcha(@NonNull final Context context) {
         this.activity = (FragmentActivity) context;
-        this.fragmentManager = activity.getSupportFragmentManager();
     }
 
     /**
@@ -70,13 +38,9 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
         return new HCaptcha(context);
     }
 
-    /**
-     * Prepare the client which allows to display a challenge dialog
-     *
-     * @return new {@link HCaptcha} object
-     */
+    @Override
     public HCaptcha setup() {
-        String siteKey = null;
+        final String siteKey;
         try {
             String packageName = activity.getPackageName();
             ApplicationInfo app = activity.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
@@ -85,112 +49,78 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> {
         } catch (PackageManager.NameNotFoundException e) {
             throw new IllegalStateException(e);
         }
-
         if (siteKey == null) {
             throw new IllegalStateException("Add missing " + META_SITE_KEY + " meta-data to AndroidManifest.xml"
                     + " or call getClient(context, siteKey) method");
         }
-
         return setup(siteKey);
     }
 
-    /**
-     * Constructs a new client which allows to display a challenge dialog
-     *
-     * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
-     * @return new {@link HCaptcha} object
-     */
+    @Override
     public HCaptcha setup(@NonNull final String siteKey) {
-        final HCaptchaConfig hCaptchaConfig = HCaptchaConfig.builder().siteKey(siteKey).build();
-        return setup(hCaptchaConfig);
+        return setup(HCaptchaConfig.builder().siteKey(siteKey).build());
     }
 
-    /**
-     * Constructs a new client which allows to display a challenge dialog
-     *
-     * @param hCaptchaConfig Config to customize: size, theme, locale, endpoint, rqdata, etc.
-     * @return new {@link HCaptcha} object
-     */
-    public HCaptcha setup(@NonNull final HCaptchaConfig hCaptchaConfig) {
-        this.hCaptchaConfig = hCaptchaConfig;
-
+    @Override
+    public HCaptcha setup(@NonNull HCaptchaConfig config) {
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
             void onOpen() {
                 captchaOpened();
             }
-
             @Override
             void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
                 setResult(hCaptchaTokenResponse);
             }
-
             @Override
             void onFailure(final HCaptchaException hCaptchaException) {
                 setException(hCaptchaException);
             }
         };
-
-        if (hCaptchaConfig.getShowDialog()) {
-            this.hCaptchaWebViewProvider = HCaptchaDialogFragment.newInstance(hCaptchaConfig, listener);
+        if (config.getFullInvisible()) {
+            // Force config values in case of full invisible
+            config = config.toBuilder()
+                    .size(HCaptchaSize.INVISIBLE)
+                    .loading(false)
+                    .build();
+            webViewProvider = new HCaptchaHeadlessWebView(
+                    activity, config, listener);
         } else {
-            HCaptchaConfig config = hCaptchaConfig;
-            HCaptchaSize size = hCaptchaConfig.getSize();
-            if (size != HCaptchaSize.INVISIBLE) {
-                Log.w(TAG, "Size " + HCaptchaSize.INVISIBLE + " will be used instead of " + size);
-                config = hCaptchaConfig.toBuilder().size(HCaptchaSize.INVISIBLE).build();
-            }
-
-            this.hCaptchaWebViewProvider = new HCaptchaHeadlessWebView(activity, config, listener);
+            webViewProvider = HCaptchaDialogFragment.newInstance(config, listener);
         }
-
+        this.config = config;
         return this;
     }
 
-    /**
-     * Shows a captcha challenge dialog to be completed by the user
-     *
-     * @return {@link HCaptcha}
-     */
+    @Override
     public HCaptcha verifyWithHCaptcha() {
-        if (hCaptchaConfig == null || hCaptchaWebViewProvider == null) {
+        if (webViewProvider == null) {
+            // Cold start at verification time.
             setup();
         }
-
-        hCaptchaWebViewProvider.startVerification(activity);
-
+        webViewProvider.verifyWithHCaptcha(activity);
         return this;
     }
 
-    /**
-     * Shows a captcha challenge dialog to be completed by the user
-     *
-     * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
-     * @return {@link HCaptcha}
-     */
+    @Override
     public HCaptcha verifyWithHCaptcha(@NonNull final String siteKey) {
-        if (hCaptchaConfig == null || !siteKey.equals(hCaptchaConfig.getSiteKey()) || hCaptchaWebViewProvider == null) {
+        if (webViewProvider == null || this.config == null || !siteKey.equals(this.config.getSiteKey())) {
+            // Cold start at verification time.
+            // Or new sitekey detected, thus new setup is needed.
             setup(siteKey);
         }
-
-        hCaptchaWebViewProvider.startVerification(activity);
-
+        webViewProvider.verifyWithHCaptcha(activity);
         return this;
     }
 
-    /**
-     * Shows a captcha challenge dialog to be completed by the user
-     *
-     * @param hCaptchaConfig Config to customize: size, theme, locale, endpoint, rqdata, etc.
-     * @return {@link HCaptcha}
-     */
-    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig hCaptchaConfig) {
-        if (!hCaptchaConfig.equals(this.hCaptchaConfig) || hCaptchaWebViewProvider == null) {
-            setup(hCaptchaConfig);
+    @Override
+    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig config) {
+        if (webViewProvider == null || !config.equals(this.config)) {
+            // Cold start at verification time.
+            // Or new config detected, thus new setup is needed.
+            setup(config);
         }
-
-        hCaptchaWebViewProvider.startVerification(activity);
-
+        webViewProvider.verifyWithHCaptcha(activity);
         return this;
     }
 }

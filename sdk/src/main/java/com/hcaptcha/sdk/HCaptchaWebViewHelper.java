@@ -10,26 +10,41 @@ import android.view.ViewParent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
-import androidx.annotation.NonNull;
+import lombok.Getter;
+import lombok.NonNull;
 
 final class HCaptchaWebViewHelper {
     static final String HCAPTCHA_URL = "file:///android_asset/hcaptcha-form.html";
 
     @NonNull
+    private final Context context;
+
+    @Getter
+    @NonNull
+    private final HCaptchaConfig config;
+
+    @NonNull
     private final HCaptchaWebViewProvider provider;
 
+    @Getter
     @NonNull
-    private final HCaptchaJSInterface jsInterface;
+    private final HCaptchaStateListener listener;
 
+    @Getter
     @NonNull
-    private final HCaptchaDebugInfo debugInfo;
+    private final WebView webView;
 
-    HCaptchaWebViewHelper(@NonNull Context context,
-                          @NonNull HCaptchaConfig config,
-                          @NonNull HCaptchaWebViewProvider provider) {
+    public HCaptchaWebViewHelper(@NonNull final Context context,
+                                 @NonNull final HCaptchaConfig config,
+                                 @NonNull final HCaptchaWebViewProvider provider,
+                                 @NonNull final HCaptchaStateListener listener,
+                                 @NonNull final WebView webView) {
+        this.context = context;
+        this.config = config;
         this.provider = provider;
-        this.jsInterface = new HCaptchaJSInterface(config, provider, provider, provider, provider);
-        this.debugInfo = new HCaptchaDebugInfo(context);
+        this.listener = listener;
+        this.webView = webView;
+        setupWebView();
     }
 
     /**
@@ -38,12 +53,9 @@ final class HCaptchaWebViewHelper {
      * * loads custom html page to display challenge and/or checkbox
      */
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
-    public void setup() {
-        final WebView webView = provider.getWebView();
-        if (webView == null) {
-            Log.w(HCaptcha.TAG, "WebView doesn't ready for setup");
-            return;
-        }
+    private void setupWebView() {
+        final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(config, provider, provider, provider, provider);
+        final HCaptchaDebugInfo debugInfo = new HCaptchaDebugInfo(context);
         final WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setLoadWithOverviewMode(true);
@@ -55,12 +67,7 @@ final class HCaptchaWebViewHelper {
         webView.loadUrl(HCAPTCHA_URL);
     }
 
-    public void cleanup() {
-        final WebView webView = provider.getWebView();
-        if (webView == null) {
-            Log.w(HCaptcha.TAG, "WebView doesn't ready for cleanup");
-            return;
-        }
+    public void destroy() {
         webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
         webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);
         final ViewParent parent = webView.getParent();

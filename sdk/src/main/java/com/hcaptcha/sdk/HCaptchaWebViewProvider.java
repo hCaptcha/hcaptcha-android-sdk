@@ -1,9 +1,6 @@
 package com.hcaptcha.sdk;
 
-import android.webkit.WebView;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import lombok.NonNull;
 import androidx.fragment.app.FragmentActivity;
 
 import com.hcaptcha.sdk.tasks.OnFailureListener;
@@ -16,7 +13,10 @@ interface HCaptchaWebViewProvider extends
         OnOpenListener,
         OnSuccessListener<HCaptchaTokenResponse>,
         OnFailureListener {
-    @Nullable
-    WebView getWebView();
-    void startVerification(@NonNull FragmentActivity activity);
+
+    @NonNull
+    HCaptchaConfig getConfig();
+
+    void verifyWithHCaptcha(@NonNull FragmentActivity activity);
+
 }

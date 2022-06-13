@@ -40,11 +40,9 @@ public class HCaptchaHeadlessWebViewTest {
     @Test
     public void testSuccess() throws Exception {
         final CountDownLatch latch = new CountDownLatch(1);
-        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onOpen() {
-                fail("Should never be called for HCaptchaHeadlessWebView");
             }
 
             @Override
@@ -60,8 +58,8 @@ public class HCaptchaHeadlessWebViewTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(context, config, listener);
-            subject.startVerification(activity);
+            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(activity, config, listener);
+            subject.verifyWithHCaptcha(activity);
         });
 
         onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));
@@ -73,11 +71,9 @@ public class HCaptchaHeadlessWebViewTest {
     @Test
     public void testFailure() throws Exception {
         final CountDownLatch latch = new CountDownLatch(1);
-        final Context context = InstrumentationRegistry.getInstrumentation().getTargetContext();
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onOpen() {
-                fail("Should never be called for HCaptchaHeadlessWebView");
             }
 
             @Override
@@ -93,8 +89,8 @@ public class HCaptchaHeadlessWebViewTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(context, config, listener);
-            subject.startVerification(activity);
+            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(activity, config, listener);
+            subject.verifyWithHCaptcha(activity);
         });
 
         onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));

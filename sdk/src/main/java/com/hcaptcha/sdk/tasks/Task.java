@@ -142,21 +142,13 @@ public abstract class Task<TResult> {
 
     private void tryCb() {
         if (getResult() != null) {
-            final Iterator<OnSuccessListener<TResult>> iterator = onSuccessListeners.iterator();
-            while (iterator.hasNext()) {
-                final OnSuccessListener<TResult> onSuccessListener = iterator.next();
+            for (OnSuccessListener<TResult> onSuccessListener : onSuccessListeners) {
                 onSuccessListener.onSuccess(getResult());
-                // Remove listener as result was successfully delivered
-                iterator.remove();
             }
         }
         if (getException() != null) {
-            final Iterator<OnFailureListener> iterator = onFailureListeners.iterator();
-            while (iterator.hasNext()) {
-                final OnFailureListener onFailureListener = iterator.next();
+            for (OnFailureListener onFailureListener : onFailureListeners) {
                 onFailureListener.onFailure(getException());
-                // Remove listener as exception was successfully delivered
-                iterator.remove();
             }
         }
     }
