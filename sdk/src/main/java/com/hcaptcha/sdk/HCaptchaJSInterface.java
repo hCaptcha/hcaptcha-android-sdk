@@ -24,9 +24,9 @@ class HCaptchaJSInterface implements Serializable {
 
     private final HCaptchaConfig hCaptchaConfig;
 
-    private OnLoadedListener onLoadedListener;
+    private final OnLoadedListener onLoadedListener;
 
-    private OnOpenListener onOpenListener;
+    private final OnOpenListener onOpenListener;
 
     private final OnSuccessListener<HCaptchaTokenResponse> onSuccessListener;
 
