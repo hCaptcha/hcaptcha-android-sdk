@@ -25,6 +25,9 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
     @NonNull
     private final HCaptchaWebViewHelper webViewHelper;
 
+    private boolean webViewLoaded;
+    private boolean shouldExecuteOnLoad;
+
     public HCaptchaHeadlessWebView(@NonNull FragmentActivity activity,
                                    @NonNull final HCaptchaConfig config,
                                    @NonNull final HCaptchaStateListener listener) {
@@ -42,7 +45,12 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
 
     @Override
     public void verifyWithHCaptcha(@NonNull FragmentActivity activity) {
-        resetAndExecute();
+        if (webViewLoaded) {
+            // Safe to execute
+            resetAndExecute();
+        } else {
+            shouldExecuteOnLoad = true;
+        }
     }
 
     private void resetAndExecute() {
@@ -82,7 +90,16 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
 
     @Override
     public void onLoaded() {
-        // Do nothing when hCaptcha is loaded.
+        webViewLoaded = true;
+        if (shouldExecuteOnLoad) {
+            shouldExecuteOnLoad = false;
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    resetAndExecute();
+                }
+            });
+        }
     }
 
     @Override
