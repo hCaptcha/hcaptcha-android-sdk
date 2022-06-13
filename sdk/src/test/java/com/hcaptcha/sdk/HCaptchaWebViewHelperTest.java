@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -37,7 +38,7 @@ public class HCaptchaWebViewHelperTest {
     HCaptchaConfig config;
 
     @Mock
-    HCaptchaWebViewProvider webViewProvider;
+    IHCaptchaVerifier captchaVerifier;
 
     @Mock
     HCaptchaStateListener hCaptchaStateListener;
@@ -51,6 +52,9 @@ public class HCaptchaWebViewHelperTest {
     @NonNull
     HCaptchaWebViewHelper webViewHelper;
 
+    @Mock
+    Handler handler;
+
     MockedStatic<Log> androidLogMock;
 
     @Before
@@ -61,7 +65,7 @@ public class HCaptchaWebViewHelperTest {
         webView = mock(WebView.class);
         webSettings = mock(WebSettings.class);
         when(webView.getSettings()).thenReturn(webSettings);
-        webViewHelper = new HCaptchaWebViewHelper(context, config, webViewProvider, hCaptchaStateListener, webView);
+        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier, hCaptchaStateListener, webView);
     }
 
     @After

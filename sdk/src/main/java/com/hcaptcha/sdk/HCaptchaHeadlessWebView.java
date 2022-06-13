@@ -5,16 +5,11 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-
+import androidx.fragment.app.FragmentActivity;
 import lombok.Getter;
 import lombok.NonNull;
-import androidx.fragment.app.FragmentActivity;
 
-final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
-
-    @NonNull
-    private final Handler handler = new Handler(Looper.getMainLooper());
-
+final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     @Getter
     @NonNull
     private final HCaptchaConfig config;
@@ -40,11 +35,11 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
             final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
             rootView.addView(webView);
         }
-        webViewHelper = new HCaptchaWebViewHelper(activity, config,this, listener, webView);
+        webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()), activity, config, this, listener, webView);
     }
 
     @Override
-    public void verifyWithHCaptcha(@NonNull FragmentActivity activity) {
+    public void startVerification(@NonNull FragmentActivity activity) {
         if (webViewLoaded) {
             // Safe to execute
             resetAndExecute();
@@ -61,26 +56,16 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
     public void onFailure(final HCaptchaException hCaptchaException) {
         final boolean silentRetry = webViewHelper.getConfig().getResetOnTimeout()
                 && hCaptchaException.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (silentRetry) {
-                    resetAndExecute();
-                } else {
-                    listener.onFailure(hCaptchaException);
-                }
-            }
-        });
+        if (silentRetry) {
+            resetAndExecute();
+        } else {
+            listener.onFailure(hCaptchaException);
+        }
     }
 
     @Override
     public void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                listener.onSuccess(hCaptchaTokenResponse);
-            }
-        });
+        listener.onSuccess(hCaptchaTokenResponse);
     }
 
     @Override
@@ -88,22 +73,12 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
         webViewLoaded = true;
         if (shouldExecuteOnLoad) {
             shouldExecuteOnLoad = false;
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    resetAndExecute();
-                }
-            });
+            resetAndExecute();
         }
     }
 
     @Override
     public void onOpen() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                listener.onOpen();
-            }
-        });
+        listener.onOpen();
     }
 }

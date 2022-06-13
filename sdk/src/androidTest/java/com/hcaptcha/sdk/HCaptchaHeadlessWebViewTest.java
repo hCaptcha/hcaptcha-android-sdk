@@ -58,7 +58,7 @@ public class HCaptchaHeadlessWebViewTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(activity, config, listener);
-            subject.verifyWithHCaptcha(activity);
+            subject.startVerification(activity);
         });
 
         onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));
@@ -89,7 +89,7 @@ public class HCaptchaHeadlessWebViewTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(activity, config, listener);
-            subject.verifyWithHCaptcha(activity);
+            subject.startVerification(activity);
         });
 
         onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));

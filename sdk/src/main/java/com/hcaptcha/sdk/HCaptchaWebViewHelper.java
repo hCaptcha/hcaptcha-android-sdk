@@ -3,13 +3,13 @@ package com.hcaptcha.sdk;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -24,7 +24,7 @@ final class HCaptchaWebViewHelper {
     private final HCaptchaConfig config;
 
     @NonNull
-    private final HCaptchaWebViewProvider provider;
+    private final IHCaptchaVerifier captchaVerifier;
 
     @Getter
     @NonNull
@@ -34,17 +34,18 @@ final class HCaptchaWebViewHelper {
     @NonNull
     private final WebView webView;
 
-    public HCaptchaWebViewHelper(@NonNull final Context context,
+    public HCaptchaWebViewHelper(@NonNull final Handler handler,
+                                 @NonNull final Context context,
                                  @NonNull final HCaptchaConfig config,
-                                 @NonNull final HCaptchaWebViewProvider provider,
+                                 @NonNull final IHCaptchaVerifier captchaVerifier,
                                  @NonNull final HCaptchaStateListener listener,
                                  @NonNull final WebView webView) {
         this.context = context;
         this.config = config;
-        this.provider = provider;
+        this.captchaVerifier = captchaVerifier;
         this.listener = listener;
         this.webView = webView;
-        setupWebView();
+        setupWebView(handler);
     }
 
     /**
@@ -53,8 +54,8 @@ final class HCaptchaWebViewHelper {
      * * loads custom html page to display challenge and/or checkbox
      */
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
-    private void setupWebView() {
-        final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(config, provider, provider, provider, provider);
+    private void setupWebView(@NonNull final Handler handler) {
+        final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
         final HCaptchaDebugInfo debugInfo = new HCaptchaDebugInfo(context);
         final WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);

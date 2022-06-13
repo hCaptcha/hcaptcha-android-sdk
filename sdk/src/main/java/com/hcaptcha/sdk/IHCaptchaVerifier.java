@@ -1,19 +1,21 @@
 package com.hcaptcha.sdk;
 
-import lombok.NonNull;
 import androidx.fragment.app.FragmentActivity;
-
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnLoadedListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
+import lombok.NonNull;
 
-interface HCaptchaWebViewProvider extends
+interface IHCaptchaVerifier extends
         OnLoadedListener,
         OnOpenListener,
         OnSuccessListener<HCaptchaTokenResponse>,
         OnFailureListener {
 
-    void verifyWithHCaptcha(@NonNull FragmentActivity activity);
+    /**
+     * Starts the human verification process.
+     */
+    void startVerification(@NonNull FragmentActivity activity);
 
 }

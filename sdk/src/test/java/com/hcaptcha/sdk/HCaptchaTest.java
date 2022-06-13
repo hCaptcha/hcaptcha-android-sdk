@@ -108,7 +108,7 @@ public class HCaptchaTest {
 
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(hCaptchaConfigCaptor.capture(), any(HCaptchaStateListener.class)));
-        verify(fragment).verifyWithHCaptcha(fragmentActivity);
+        verify(fragment).startVerification(fragmentActivity);
 
         final HCaptchaConfig config = hCaptchaConfigCaptor.getValue();
         assertNotNull(config);

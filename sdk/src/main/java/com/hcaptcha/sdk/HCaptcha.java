@@ -19,7 +19,7 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     private final FragmentActivity activity;
 
     @Nullable
-    private HCaptchaWebViewProvider webViewProvider;
+    private IHCaptchaVerifier captchaVerifier;
 
     @Nullable
     private HCaptchaConfig config;
@@ -78,15 +78,14 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
             }
         };
         if (config.getFullInvisible()) {
-            // Force config values in case of full invisible
+            // Overwrite certain config values in case of full invisible to avoid behavior collision
             config = config.toBuilder()
                     .size(HCaptchaSize.INVISIBLE)
                     .loading(false)
                     .build();
-            webViewProvider = new HCaptchaHeadlessWebView(
-                    activity, config, listener);
+            captchaVerifier = new HCaptchaHeadlessWebView(activity, config, listener);
         } else {
-            webViewProvider = HCaptchaDialogFragment.newInstance(config, listener);
+            captchaVerifier = HCaptchaDialogFragment.newInstance(config, listener);
         }
         this.config = config;
         return this;
@@ -94,33 +93,33 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
 
     @Override
     public HCaptcha verifyWithHCaptcha() {
-        if (webViewProvider == null) {
+        if (captchaVerifier == null) {
             // Cold start at verification time.
             setup();
         }
-        webViewProvider.verifyWithHCaptcha(activity);
+        captchaVerifier.startVerification(activity);
         return this;
     }
 
     @Override
     public HCaptcha verifyWithHCaptcha(@NonNull final String siteKey) {
-        if (webViewProvider == null || this.config == null || !siteKey.equals(this.config.getSiteKey())) {
+        if (captchaVerifier == null || this.config == null || !siteKey.equals(this.config.getSiteKey())) {
             // Cold start at verification time.
             // Or new sitekey detected, thus new setup is needed.
             setup(siteKey);
         }
-        webViewProvider.verifyWithHCaptcha(activity);
+        captchaVerifier.startVerification(activity);
         return this;
     }
 
     @Override
     public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig config) {
-        if (webViewProvider == null || !config.equals(this.config)) {
+        if (captchaVerifier == null || !config.equals(this.config)) {
             // Cold start at verification time.
             // Or new config detected, thus new setup is needed.
             setup(config);
         }
-        webViewProvider.verifyWithHCaptcha(activity);
+        captchaVerifier.startVerification(activity);
         return this;
     }
 }
