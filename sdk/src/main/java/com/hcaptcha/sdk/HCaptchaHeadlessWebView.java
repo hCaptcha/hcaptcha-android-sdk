@@ -23,17 +23,13 @@ final class HCaptchaHeadlessWebView implements HCaptchaWebViewProvider {
     private final HCaptchaStateListener listener;
 
     @NonNull
-    private HCaptchaWebViewHelper webViewHelper;
+    private final HCaptchaWebViewHelper webViewHelper;
 
     public HCaptchaHeadlessWebView(@NonNull FragmentActivity activity,
                                    @NonNull final HCaptchaConfig config,
                                    @NonNull final HCaptchaStateListener listener) {
         this.config = config;
         this.listener = listener;
-        if (webViewHelper != null) {
-            // Setup was already done.
-            return;
-        }
         final WebView webView = new WebView(activity);
         webView.setId(R.id.webView);
         webView.setVisibility(View.GONE);
