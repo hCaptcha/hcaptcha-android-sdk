@@ -34,11 +34,17 @@ public abstract class Task<TResult> {
      * Creates a new Task object
      */
     protected Task() {
-        this.complete = false;
-        this.successful = false;
         this.onSuccessListeners = new ArrayList<>();
         this.onFailureListeners = new ArrayList<>();
         this.onOpenListeners = new ArrayList<>();
+        this.reset();
+    }
+
+    private void reset() {
+        this.complete = false;
+        this.successful = false;
+        this.result = null;
+        this.hCaptchaException = null;
     }
 
     /**
@@ -141,15 +147,21 @@ public abstract class Task<TResult> {
     }
 
     private void tryCb() {
+        boolean shouldReset = false;
         if (getResult() != null) {
             for (OnSuccessListener<TResult> onSuccessListener : onSuccessListeners) {
                 onSuccessListener.onSuccess(getResult());
+                shouldReset = true;
             }
         }
         if (getException() != null) {
             for (OnFailureListener onFailureListener : onFailureListeners) {
                 onFailureListener.onFailure(getException());
+                shouldReset = true;
             }
+        }
+        if (shouldReset) {
+            reset();
         }
     }
 
