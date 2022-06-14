@@ -63,22 +63,13 @@
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
     var hCaptchaID = null;
 
-    function execute(bridgeConfig, renderConfig) {
-        var rqdata = bridgeConfig.rqdata;
-        if (rqdata) {
-            hcaptcha.setData(hCaptchaID, {
-                rqdata: rqdata
-            });
-        }
-
-        if (renderConfig.size === 'invisible') {
-            hcaptcha.execute(hCaptchaID);
-        }
+    function execute() {
+        hcaptcha.execute(hCaptchaID);
     }
 
     function resetAndExecute() {
         hcaptcha.reset();
-        execute(bridgeConfig, getRenderConfig());
+        hcaptcha.execute(hCaptchaID);
     }
 
     function getTheme(bridgeConfig) {
@@ -143,7 +134,15 @@
             var renderConfig = getRenderConfig();
             hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
             BridgeObject.onLoaded();
-            execute(bridgeConfig, renderConfig);
+            var rqdata = bridgeConfig.rqdata;
+            if (rqdata) {
+                hcaptcha.setData(hCaptchaID, { rqdata: rqdata });
+            }
+            if (renderConfig.size === 'invisible' && !bridgeConfig.fullInvisible) {
+                // We want to auto execute in case of `invisible` checkbox. But not in case of `fullInvisible`
+                // since verification process might be desired to happen at a later time.
+                hcaptcha.execute(hCaptchaID);
+            }
         } catch (e) {
             console.error(e);
             BridgeObject.onError(29);

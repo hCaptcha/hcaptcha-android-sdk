@@ -1,4 +1,3 @@
-// add debug info for CI
 package com.hcaptcha.sdk;
 
 import android.content.Context;
@@ -24,7 +23,7 @@ import lombok.RequiredArgsConstructor;
 
 
 /**
- * Debug info for CI
+ * Debug info for CI.
  */
 @Data
 @RequiredArgsConstructor

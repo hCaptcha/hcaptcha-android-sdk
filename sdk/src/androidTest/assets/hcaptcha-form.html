@@ -21,9 +21,12 @@
             } catch (e) {
                 BridgeObject.onError(29);
             }
-            setTimeout(function() {
-                BridgeObject.onOpen();
-            }, 200);
+
+            if (!bridgeConfig.fullInvisible) {
+                setTimeout(function() {
+                    BridgeObject.onOpen();
+                }, 200);
+            }
         }
 
         function onPass(arg) {

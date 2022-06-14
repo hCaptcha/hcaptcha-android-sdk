@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -37,10 +38,22 @@ public class HCaptchaWebViewHelperTest {
     HCaptchaConfig config;
 
     @Mock
-    HCaptchaWebViewProvider webViewProvider;
+    IHCaptchaVerifier captchaVerifier;
+
+    @Mock
+    HCaptchaStateListener hCaptchaStateListener;
+
+    @Mock
+    WebView webView;
+
+    @Mock
+    WebSettings webSettings;
 
     @NonNull
-    HCaptchaWebViewHelper subject;
+    HCaptchaWebViewHelper webViewHelper;
+
+    @Mock
+    Handler handler;
 
     MockedStatic<Log> androidLogMock;
 
@@ -48,8 +61,11 @@ public class HCaptchaWebViewHelperTest {
     public void init() {
         MockitoAnnotations.openMocks(this);
         androidLogMock = mockStatic(Log.class);
-
-        subject = new HCaptchaWebViewHelper(context, config, webViewProvider);
+        hCaptchaStateListener = mock(HCaptchaStateListener.class);
+        webView = mock(WebView.class);
+        webSettings = mock(WebSettings.class);
+        when(webView.getSettings()).thenReturn(webSettings);
+        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier, hCaptchaStateListener, webView);
     }
 
     @After
@@ -58,52 +74,22 @@ public class HCaptchaWebViewHelperTest {
     }
 
     @Test
-    public void test_setup() {
-        WebView webView = mock(WebView.class);
-        when(webViewProvider.getWebView()).thenReturn(webView);
-        WebSettings webSettings = mock(WebSettings.class);
-        when(webView.getSettings()).thenReturn(webSettings);
-
-        subject.setup();
-
+    public void test_constructor() {
         verify(webView).loadUrl(HCaptchaWebViewHelper.HCAPTCHA_URL);
         verify(webView, times(2)).addJavascriptInterface(any(), anyString());
     }
 
     @Test
-    public void test_setup_not_fail_for_null_webview() {
-        subject.setup();
-
-        verify(webViewProvider).getWebView();
-    }
-
-    @Test
-    public void test_cleanup() {
-        WebView webView = mock(WebView.class);
-        when(webViewProvider.getWebView()).thenReturn(webView);
+    public void test_destroy() {
         ViewGroup viewParent = mock(ViewGroup.class, withSettings().extraInterfaces(ViewParent.class));
         when(webView.getParent()).thenReturn(viewParent);
-
-        subject.cleanup();
-
+        webViewHelper.destroy();
         verify(viewParent).removeView(webView);
         verify(webView, times(2)).removeJavascriptInterface(anyString());
     }
 
     @Test
-    public void test_cleanup_not_fail_for_null_webview() {
-        subject.cleanup();
-
-        verify(webViewProvider).getWebView();
-    }
-
-    @Test
-    public void test_cleanup_webview_parent_null() {
-        WebView webView = mock(WebView.class);
-        when(webViewProvider.getWebView()).thenReturn(webView);
-
-        subject.cleanup();
-
-        verify(webViewProvider).getWebView();
+    public void test_destroy_webview_parent_null() {
+        webViewHelper.destroy();
     }
 }

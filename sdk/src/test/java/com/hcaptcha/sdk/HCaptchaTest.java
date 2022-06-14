@@ -53,7 +53,6 @@ public class HCaptchaTest {
     @Before
     public void init() {
         MockitoAnnotations.openMocks(this);
-
         dialogFragmentMock = mockStatic(HCaptchaDialogFragment.class);
         dialogFragmentMock
                 .when(() -> HCaptchaDialogFragment.newInstance(

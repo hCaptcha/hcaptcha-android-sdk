@@ -1,41 +1,35 @@
 package com.hcaptcha.sdk;
 
+import android.os.Handler;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.hcaptcha.sdk.tasks.OnFailureListener;
-import com.hcaptcha.sdk.tasks.OnLoadedListener;
-import com.hcaptcha.sdk.tasks.OnOpenListener;
-import com.hcaptcha.sdk.tasks.OnSuccessListener;
-
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Spy;
+import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(MockitoJUnitRunner.class)
 public class HCaptchaJSInterfaceTest {
 
-    @Spy
-    OnLoadedListener onLoadedListener;
+    @Mock
+    Handler handler;
 
     @Spy
-    OnOpenListener onOpenListener;
-
-    @Spy
-    OnSuccessListener<HCaptchaTokenResponse> onSuccessListener;
-
-    @Spy
-    OnFailureListener onFailureListener;
+    IHCaptchaVerifier captchaVerifier;
 
     @Captor
     ArgumentCaptor<HCaptchaTokenResponse> tokenCaptor;
@@ -43,6 +37,18 @@ public class HCaptchaJSInterfaceTest {
     @Captor
     ArgumentCaptor<HCaptchaException> exceptionCaptor;
 
+    HCaptchaConfig testConfig = HCaptchaConfig.builder().siteKey("0000-1111-2222-3333").build();
+
+    @Before
+    public void init() {
+        when(handler.post(any(Runnable.class))).thenAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                invocation.getArgument(0, Runnable.class).run();
+                return null;
+            }
+        });
+    }
 
     @Test
     public void full_config_serialization() throws JsonProcessingException, JSONException {
@@ -69,9 +75,9 @@ public class HCaptchaJSInterfaceTest {
                 .reportapi(reportapi)
                 .host(host)
                 .resetOnTimeout(true)
-                .showDialog(false)
+                .fullInvisible(true)
                 .build();
-        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null, null);
+        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
         JSONObject expected = new JSONObject();
         expected.put("siteKey", siteKey);
@@ -89,7 +95,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", host);
         expected.put("resetOnTimeout", true);
-        expected.put("showDialog", false);
+        expected.put("fullInvisible", true);
 
         JSONAssert.assertEquals(HCaptchaJsInterface.getConfig(), expected, false);
     }
@@ -107,7 +113,7 @@ public class HCaptchaJSInterfaceTest {
                 .theme(HCaptchaTheme.DARK)
                 .rqdata(rqdata)
                 .build();
-        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(config, null, null, null, null);
+        final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
         JSONObject expected = new JSONObject();
         expected.put("siteKey", siteKey);
@@ -125,40 +131,40 @@ public class HCaptchaJSInterfaceTest {
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", JSONObject.NULL);
         expected.put("resetOnTimeout", false);
-        expected.put("showDialog", true);
+        expected.put("fullInvisible", false);
 
         JSONAssert.assertEquals(HCaptchaJsInterface.getConfig(), expected, false);
     }
 
     @Test
-    public void calls_on_challenge_ready() {
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, onLoadedListener, null, null, null);
+    public void calls_on_challenge_ready() throws InterruptedException {
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         hCaptchaJSInterface.onLoaded();
-        verify(onLoadedListener, times(1)).onLoaded();
+        verify(captchaVerifier, times(1)).onLoaded();
     }
 
     @Test
     public void calls_on_challenge_visible_cb() {
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, onOpenListener, null, null);
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         hCaptchaJSInterface.onOpen();
-        verify(onOpenListener, times(1)).onOpen();
+        verify(captchaVerifier, times(1)).onOpen();
     }
 
     @Test
     public void on_pass_forwards_token_to_listeners() {
         final String token = "mock-token";
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, null, onSuccessListener, null);
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         hCaptchaJSInterface.onPass(token);
-        verify(onSuccessListener, times(1)).onSuccess(tokenCaptor.capture());
+        verify(captchaVerifier, times(1)).onSuccess(tokenCaptor.capture());
         assertEquals(token, tokenCaptor.getValue().getTokenResult());
     }
 
     @Test
     public void on_error_forwards_error_to_listeners() {
         final HCaptchaError error = HCaptchaError.CHALLENGE_CLOSED;
-        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(null, null, null, null, onFailureListener);
+        final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         hCaptchaJSInterface.onError(error.getErrorId());
-        verify(onFailureListener, times(1)).onFailure(exceptionCaptor.capture());
+        verify(captchaVerifier, times(1)).onFailure(exceptionCaptor.capture());
         assertEquals(error.getMessage(), exceptionCaptor.getValue().getMessage());
         assertNotNull(exceptionCaptor.getValue());
     }
