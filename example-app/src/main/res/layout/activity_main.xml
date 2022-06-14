@@ -26,12 +26,12 @@
             android:text="@string/loading"
             style="@style/CheckBoxText" />
         <CheckBox
-            android:id="@+id/full_invisible"
+            android:id="@+id/hide_dialog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minHeight="48dp"
             android:checked="false"
-            android:text="@string/full_invisible"
+            android:text="@string/hide_dialog"
             style="@style/CheckBoxText" />
     </LinearLayout>
 

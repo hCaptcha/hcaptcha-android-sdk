@@ -39,7 +39,7 @@ public class HCaptchaConfig implements Serializable {
      * See enterprise docs for more information.
      */
     @Builder.Default
-    private Boolean fullInvisible = false;
+    private Boolean hideDialog = false;
 
     /**
      * Custom supplied challenge data.

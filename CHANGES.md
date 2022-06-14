@@ -2,7 +2,7 @@
 
 # 3.0.0
 
-- Add new boolean config option `HCaptchaConfig.fullInvisible`.
+- Add new boolean config option `HCaptchaConfig.hideDialog`.
 - (breaking change) Change the behavior of `addOnSuccessListener`, `addOnFailureListener` and `addOnOpenListener` methods. 
   - previously: the callbacks were removed after utilization
   - currently: the callbacks are persisted to be reused for future calls on the same client. This allows multiple human verifications using the same client and the same callback.  

@@ -77,8 +77,8 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
                 setException(hCaptchaException);
             }
         };
-        if (config.getFullInvisible()) {
-            // Overwrite certain config values in case of full invisible to avoid behavior collision
+        if (config.getHideDialog()) {
+            // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
             config = config.toBuilder()
                     .size(HCaptchaSize.INVISIBLE)
                     .loading(false)

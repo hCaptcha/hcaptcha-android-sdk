@@ -138,8 +138,8 @@
             if (rqdata) {
                 hcaptcha.setData(hCaptchaID, { rqdata: rqdata });
             }
-            if (renderConfig.size === 'invisible' && !bridgeConfig.fullInvisible) {
-                // We want to auto execute in case of `invisible` checkbox. But not in case of `fullInvisible`
+            if (renderConfig.size === 'invisible' && !bridgeConfig.hideDialog) {
+                // We want to auto execute in case of `invisible` checkbox. But not in case of `hideDialog`
                 // since verification process might be desired to happen at a later time.
                 hcaptcha.execute(hCaptchaID);
             }

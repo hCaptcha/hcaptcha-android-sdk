@@ -75,7 +75,7 @@ public class HCaptchaJSInterfaceTest {
                 .reportapi(reportapi)
                 .host(host)
                 .resetOnTimeout(true)
-                .fullInvisible(true)
+                .hideDialog(true)
                 .build();
         final HCaptchaJSInterface HCaptchaJsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
@@ -95,7 +95,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", host);
         expected.put("resetOnTimeout", true);
-        expected.put("fullInvisible", true);
+        expected.put("hideDialog", true);
 
         JSONAssert.assertEquals(HCaptchaJsInterface.getConfig(), expected, false);
     }
@@ -131,7 +131,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", JSONObject.NULL);
         expected.put("resetOnTimeout", false);
-        expected.put("fullInvisible", false);
+        expected.put("hideDialog", false);
 
         JSONAssert.assertEquals(HCaptchaJsInterface.getConfig(), expected, false);
     }

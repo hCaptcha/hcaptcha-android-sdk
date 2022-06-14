@@ -4,7 +4,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.Spinner;
@@ -26,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String SITEKEY = "10000000-ffff-ffff-ffff-000000000001";
 
     private Spinner sizeSpinner;
-    private CheckBox fullInvisible;
+    private CheckBox hideDialog;
     private CheckBox loading;
     private TextView tokenTextView;
     private TextView errorTextView;
@@ -40,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         sizeSpinner = findViewById(R.id.sizes);
         tokenTextView = findViewById(R.id.tokenTextView);
         errorTextView = findViewById(R.id.errorTextView);
-        fullInvisible = findViewById(R.id.full_invisible);
+        hideDialog = findViewById(R.id.hide_dialog);
         loading = findViewById(R.id.loading);
         final ArrayAdapter<HCaptchaSize> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
@@ -65,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
                 .siteKey(SITEKEY)
                 .size(size)
                 .loading(loading.isChecked())
-                .fullInvisible(fullInvisible.isChecked())
+                .hideDialog(hideDialog.isChecked())
                 .build();
     }
 

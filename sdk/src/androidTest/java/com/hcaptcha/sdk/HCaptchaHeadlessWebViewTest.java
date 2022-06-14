@@ -32,7 +32,7 @@ public class HCaptchaHeadlessWebViewTest {
             .siteKey("10000000-ffff-ffff-ffff-000000000001")
             .loading(false)
             .size(HCaptchaSize.INVISIBLE)
-            .fullInvisible(true)
+            .hideDialog(true)
             .build();
 
     @Test
