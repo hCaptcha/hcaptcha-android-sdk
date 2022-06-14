@@ -137,7 +137,7 @@ public class HCaptchaJSInterfaceTest {
     }
 
     @Test
-    public void calls_on_challenge_ready() throws InterruptedException {
+    public void calls_on_challenge_ready() {
         final HCaptchaJSInterface hCaptchaJSInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         hCaptchaJSInterface.onLoaded();
         verify(captchaVerifier, times(1)).onLoaded();
