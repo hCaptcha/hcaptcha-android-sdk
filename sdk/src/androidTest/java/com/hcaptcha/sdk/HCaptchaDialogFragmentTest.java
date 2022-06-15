@@ -1,7 +1,6 @@
 package com.hcaptcha.sdk;
 
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.web.webdriver.DriverAtoms;
@@ -24,8 +23,6 @@ import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.concurrent.CountDownLatch;
@@ -34,33 +31,19 @@ import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaDialogFragmentTest {
-    public class HCaptchaDialogTestAdapter extends HCaptchaDialogListener {
-        @Override
-        void onOpen() {
-        }
-
-        @Override
-        void onSuccess(HCaptchaTokenResponse hCaptchaTokenResponse) {
-        }
-
-        @Override
-        void onFailure(HCaptchaException hCaptchaException) {
-        }
-    };
-
     public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment() {
         return launchCaptchaFragment(true);
     }
 
     public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader) {
-        return launchCaptchaFragment(showLoader, new HCaptchaDialogTestAdapter());
+        return launchCaptchaFragment(showLoader, new HCaptchaStateTestAdapter());
     }
 
-    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(HCaptchaDialogListener listener) {
+    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(HCaptchaStateListener listener) {
         return launchCaptchaFragment(true, listener);
     }
 
-    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader, HCaptchaDialogListener listener) {
+    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader, HCaptchaStateListener listener) {
         final HCaptchaConfig hCaptchaConfig = HCaptchaConfig.builder()
                 .siteKey("10000000-ffff-ffff-ffff-000000000001")
                 .endpoint("https://js.hcaptcha.com/1/api.js")
@@ -93,7 +76,7 @@ public class HCaptchaDialogFragmentTest {
     @Test
     public void webViewReturnToken() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
-        final HCaptchaDialogListener listener = new HCaptchaDialogTestAdapter() {
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onSuccess(HCaptchaTokenResponse hCaptchaTokenResponse) {
                 assertEquals("test-token", hCaptchaTokenResponse.getTokenResult());
@@ -119,7 +102,7 @@ public class HCaptchaDialogFragmentTest {
     @Test
     public void webViewReturnsError() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
-        final HCaptchaDialogListener listener = new HCaptchaDialogTestAdapter() {
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException hCaptchaException) {
                 assertEquals(HCaptchaError.SESSION_TIMEOUT, hCaptchaException.getHCaptchaError());
@@ -146,7 +129,7 @@ public class HCaptchaDialogFragmentTest {
     @Test
     public void onOpenCallbackWorks() throws Exception {
         CountDownLatch latch = new CountDownLatch(1);
-        final HCaptchaDialogListener listener = new HCaptchaDialogTestAdapter() {
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onOpen() {
                 latch.countDown();

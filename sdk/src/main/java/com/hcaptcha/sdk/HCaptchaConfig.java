@@ -35,6 +35,13 @@ public class HCaptchaConfig implements Serializable {
     private Boolean loading = true;
 
     /**
+     * Can be used in combination with passive sitekey to achieve full invisible flow.
+     * See enterprise docs for more information.
+     */
+    @Builder.Default
+    private Boolean hideDialog = false;
+
+    /**
      * Custom supplied challenge data.
      */
     private String rqdata;

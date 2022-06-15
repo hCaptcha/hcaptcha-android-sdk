@@ -2,7 +2,6 @@ package com.hcaptcha.sdk;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -11,25 +10,24 @@ import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Log;
 import android.view.*;
-import android.webkit.*;
+import android.webkit.WebView;
 import android.widget.LinearLayout;
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
-import com.hcaptcha.sdk.tasks.OnFailureListener;
-import com.hcaptcha.sdk.tasks.OnLoadedListener;
-import com.hcaptcha.sdk.tasks.OnOpenListener;
-import com.hcaptcha.sdk.tasks.OnSuccessListener;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
+import lombok.NonNull;
 
 
 /**
- * HCaptcha Dialog Fragment Class
+ * HCaptcha Dialog Fragment Class.
+ *
+ * Must have `public` modifier, so it can be properly recreated from instance state!
  */
-public class HCaptchaDialogFragment extends DialogFragment implements
-        OnLoadedListener,
-        OnOpenListener,
-        OnSuccessListener<HCaptchaTokenResponse>,
-        OnFailureListener {
+public final class HCaptchaDialogFragment extends DialogFragment implements IHCaptchaVerifier {
 
     /**
      * Static TAG String
@@ -46,38 +44,25 @@ public class HCaptchaDialogFragment extends DialogFragment implements
      */
     public static final String KEY_LISTENER = "hCaptchaDialogListener";
 
-    private final Handler handler = new Handler(Looper.getMainLooper());
-
-    private HCaptchaJSInterface hCaptchaJsInterface;
-
-    private boolean showLoader;
-
-    private boolean resetOnTimeout;
-
-    private HCaptchaDialogListener hCaptchaDialogListener;
-
-    private HCaptchaDebugInfo hCaptchaDebugInfo;
-
-    private View rootView;
-
-    private WebView webView;
+    @Nullable
+    private HCaptchaWebViewHelper webViewHelper;
 
     private LinearLayout loadingContainer;
 
     /**
      * Creates a new instance
      *
-     * @param hCaptchaConfig the config
-     * @param hCaptchaDialogListener the listener
+     * @param config   the config
+     * @param listener the listener
      * @return a new instance
      */
     public static HCaptchaDialogFragment newInstance(
-            @NonNull final HCaptchaConfig hCaptchaConfig,
-            @NonNull final HCaptchaDialogListener hCaptchaDialogListener
+            @NonNull final HCaptchaConfig config,
+            @NonNull final HCaptchaStateListener listener
     ) {
         final Bundle args = new Bundle();
-        args.putSerializable(KEY_CONFIG, hCaptchaConfig);
-        args.putParcelable(KEY_LISTENER, hCaptchaDialogListener);
+        args.putSerializable(KEY_CONFIG, config);
+        args.putParcelable(KEY_LISTENER, listener);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
         return hCaptchaDialogFragment;
@@ -86,80 +71,52 @@ public class HCaptchaDialogFragment extends DialogFragment implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        assert getArguments() != null;
-        try {
-            hCaptchaDialogListener = getArguments().getParcelable(KEY_LISTENER);
-        } catch (BadParcelableException e) {
-            // Happens when fragment tries to reconstruct because the activity was killed
-            // And thus there is no way of communicating back
-            dismiss();
-            return;
-        }
-        final HCaptchaConfig hCaptchaConfig = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
-        this.resetOnTimeout = hCaptchaConfig.getResetOnTimeout();
-        this.hCaptchaJsInterface = new HCaptchaJSInterface(hCaptchaConfig, this, this, this, this);
-        this.hCaptchaDebugInfo = new HCaptchaDebugInfo(getContext());
-        this.showLoader = hCaptchaConfig.getLoading();
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+        final View rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+        assert getArguments() != null;
+        final HCaptchaStateListener listener;
+        try {
+            listener = getArguments().getParcelable(KEY_LISTENER);
+        } catch (BadParcelableException e) {
+            // Happens when fragment tries to reconstruct because the activity was killed
+            // And thus there is no way of communicating back
+            dismiss();
+            return rootView;
+        }
+        final HCaptchaConfig config = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
+        final WebView webView = rootView.findViewById(R.id.webView);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
-        loadingContainer.setVisibility(showLoader ? View.VISIBLE : View.GONE);
-        webView = rootView.findViewById(R.id.webView);
-        setupWebView(webView);
+        loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
+        webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()), requireContext(), config, this, listener, webView);
         return rootView;
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        if (webView != null) {
-            // Since web view is attached to main activity
-            // it will leak until the activity is closed and not upon dialog dismiss
-            // To properly clean up upon dialog destroy: remove all views and destroy webview to prevent leaking
-            webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
-            webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);
-            ((ViewGroup) rootView).removeAllViews();
-            webView.destroy();
-            webView = null;
+        if (webViewHelper != null) {
+            webViewHelper.destroy();
         }
     }
 
     @Override
     public void onStart() {
         super.onStart();
+        assert webViewHelper != null;
         final Dialog dialog = getDialog();
         if (dialog != null) {
             final Window window = dialog.getWindow();
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-            if (!showLoader) {
+            if (!webViewHelper.getConfig().getLoading()) {
                 // Remove dialog shadow to appear completely invisible
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                window.setDimAmount(0);
             }
         }
-    }
-
-    /**
-     * General setup for the webview:
-     * * enables javascript to be able to load and execute hcaptcha api.js
-     * * loads custom html page to display challenge and/or checkbox
-     *
-     * @param webView the webview
-     */
-    @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
-    private void setupWebView(final WebView webView) {
-        final WebSettings settings = webView.getSettings();
-        settings.setJavaScriptEnabled(true);
-        settings.setLoadWithOverviewMode(true);
-        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
-        webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-        webView.addJavascriptInterface(hCaptchaJsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
-        webView.addJavascriptInterface(hCaptchaDebugInfo, HCaptchaDebugInfo.JS_INTERFACE_TAG);
-        webView.loadUrl("file:///android_asset/hcaptcha-form.html");
     }
 
     @Override
@@ -171,68 +128,64 @@ public class HCaptchaDialogFragment extends DialogFragment implements
 
     @Override
     public void onLoaded() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (showLoader) {
-                    loadingContainer.animate().alpha(0.0f).setDuration(200)
-                            .setListener(
-                                    new AnimatorListenerAdapter() {
-                                        @Override
-                                        public void onAnimationEnd(Animator animation) {
-                                            loadingContainer.setVisibility(View.GONE);
-                                        }
-                                    });
-                } else {
-                    // Add back dialog shadow in case the checkbox or challenge is shown
-                    final Dialog dialog = getDialog();
-                    if (dialog != null) {
-                        dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
-                    }
-                }
+        assert webViewHelper != null;
+        if (webViewHelper.getConfig().getLoading()) {
+            loadingContainer.animate().alpha(0.0f).setDuration(200).setListener(
+                    new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            loadingContainer.setVisibility(View.GONE);
+                        }
+                    });
+        } else {
+            // Add back dialog shadow in case the checkbox or challenge is shown
+            final Dialog dialog = getDialog();
+            if (dialog != null) {
+                dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
             }
-        });
+        }
     }
 
     @Override
     public void onOpen() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                hCaptchaDialogListener.onOpen();
-            }
-        });
+        assert webViewHelper != null;
+        webViewHelper.getListener().onOpen();
     }
 
     @Override
     public void onFailure(@NonNull final HCaptchaException hCaptchaException) {
-        final boolean silentRetry = this.resetOnTimeout && hCaptchaException.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+        final boolean silentRetry = webViewHelper != null
+                && webViewHelper.getConfig().getResetOnTimeout()
+                && hCaptchaException.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
         if (isAdded() && !silentRetry) {
             dismiss();
         }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                if (silentRetry) {
-                    // Re-open the challenge
-                    webView.loadUrl("javascript:resetAndExecute();");
-                } else {
-                    hCaptchaDialogListener.onFailure(hCaptchaException);
-                }
+        if (webViewHelper != null) {
+            if (silentRetry) {
+                webViewHelper.getWebView().loadUrl("javascript:resetAndExecute();");
+            } else {
+                webViewHelper.getListener().onFailure(hCaptchaException);
             }
-        });
+        }
     }
 
     @Override
     public void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
+        assert webViewHelper != null;
         if (isAdded()) {
             dismiss();
         }
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                hCaptchaDialogListener.onSuccess(hCaptchaTokenResponse);
-            }
-        });
+        webViewHelper.getListener().onSuccess(hCaptchaTokenResponse);
+    }
+
+    @Override
+    public void startVerification(@NonNull FragmentActivity fragmentActivity) {
+        final FragmentManager fragmentManager = fragmentActivity.getSupportFragmentManager();
+        final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
+        if (oldFragment != null && oldFragment.isAdded()) {
+            Log.w(TAG, "Skip. HCaptchaDialogFragment was already added.");
+            return;
+        }
+        show(fragmentManager, HCaptchaDialogFragment.TAG);
     }
 }

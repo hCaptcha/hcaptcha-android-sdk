@@ -3,7 +3,7 @@ package com.hcaptcha.sdk;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-abstract class HCaptchaDialogListener implements Parcelable {
+abstract class HCaptchaStateListener implements Parcelable {
 
     abstract void onSuccess(HCaptchaTokenResponse hCaptchaTokenResponse);
 
