@@ -131,7 +131,7 @@ The following list contains configuration properties to allows customization of 
 | `customTheme`    | Stringified JSON        | No       | -         | See Enterprise docs.                                                                                                                                                 |
 | `host`           | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
 | `loading`        | Boolean                 | No       | True      | Show or hide the loading dialog.                                                                                                                                     |
-| `hideDialog`     | Boolean                 | No       | False     | To be used in combination with a passive sitekey. See Enterprise docs.                                                                                               |
+| `hideDialog`     | Boolean                 | No       | False     | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                                              |
 
 ### Config Examples
 
