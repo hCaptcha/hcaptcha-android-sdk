@@ -6,6 +6,10 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import dalvik.system.DexFile;
+import lombok.Data;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -15,11 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
-
-import dalvik.system.DexFile;
-import lombok.Data;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 
 
 /**
@@ -31,30 +30,30 @@ class HCaptchaDebugInfo implements Serializable {
 
     public static final String JS_INTERFACE_TAG = "JSDI";
 
-    private static String cache;
+    private static String sCache;
 
     @NonNull
     private final Context context;
 
     @JavascriptInterface
     public String getDebugInfo() {
-        if (cache != null) {
-            return cache;
+        if (sCache != null) {
+            return sCache;
         }
         synchronized (this) {
-            if (cache != null) {
-                return cache;
+            if (sCache != null) {
+                return sCache;
             }
 
             try {
                 List<String> debugInfo = debugInfo(context.getPackageName(), context.getPackageCodePath());
                 final ObjectMapper objectMapper = new ObjectMapper();
-                cache = objectMapper.writeValueAsString(debugInfo);
+                sCache = objectMapper.writeValueAsString(debugInfo);
             } catch (IOException | NoSuchAlgorithmException | CloneNotSupportedException e) {
                 Log.d(JS_INTERFACE_TAG, "Cannot build debugInfo");
                 return "[]";
             }
-            return cache;
+            return sCache;
         }
     }
 

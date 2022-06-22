@@ -11,8 +11,8 @@ public interface OnSuccessListener<TResult> {
     /**
      * Called when the challenge is successfully completed
      *
-     * @param tResult the hCaptcha token result
+     * @param result the hCaptcha token result
      */
-    void onSuccess(TResult tResult);
+    void onSuccess(TResult result);
 
 }

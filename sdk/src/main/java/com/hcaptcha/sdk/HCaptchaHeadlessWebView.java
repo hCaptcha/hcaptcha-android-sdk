@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import androidx.fragment.app.FragmentActivity;
+
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -23,9 +24,9 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     private boolean webViewLoaded;
     private boolean shouldExecuteOnLoad;
 
-    public HCaptchaHeadlessWebView(@NonNull FragmentActivity activity,
-                                   @NonNull final HCaptchaConfig config,
-                                   @NonNull final HCaptchaStateListener listener) {
+    HCaptchaHeadlessWebView(@NonNull FragmentActivity activity,
+                            @NonNull final HCaptchaConfig config,
+                            @NonNull final HCaptchaStateListener listener) {
         this.config = config;
         this.listener = listener;
         final WebView webView = new WebView(activity);
@@ -35,7 +36,8 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
             final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
             rootView.addView(webView);
         }
-        webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()), activity, config, this, listener, webView);
+        webViewHelper = new HCaptchaWebViewHelper(
+                new Handler(Looper.getMainLooper()), activity, config, this, listener, webView);
     }
 
     @Override
@@ -53,19 +55,19 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     }
 
     @Override
-    public void onFailure(final HCaptchaException hCaptchaException) {
+    public void onFailure(final HCaptchaException exception) {
         final boolean silentRetry = webViewHelper.getConfig().getResetOnTimeout()
-                && hCaptchaException.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+                && exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
         if (silentRetry) {
             resetAndExecute();
         } else {
-            listener.onFailure(hCaptchaException);
+            listener.onFailure(exception);
         }
     }
 
     @Override
-    public void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
-        listener.onSuccess(hCaptchaTokenResponse);
+    public void onSuccess(final HCaptchaTokenResponse tokenResponse) {
+        listener.onSuccess(tokenResponse);
     }
 
     @Override

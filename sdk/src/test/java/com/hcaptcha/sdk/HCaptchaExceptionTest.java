@@ -1,21 +1,20 @@
 package com.hcaptcha.sdk;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class HCaptchaExceptionTest {
 
     @Test
     public void exception_matches_error() {
-        final HCaptchaError hCaptchaError = HCaptchaError.NETWORK_ERROR;
+        final HCaptchaError error = HCaptchaError.NETWORK_ERROR;
         try {
-            throw new HCaptchaException(hCaptchaError);
+            throw new HCaptchaException(error);
         } catch (HCaptchaException hCaptchaException1) {
-            assertEquals(hCaptchaError.getErrorId(), hCaptchaException1.getStatusCode());
-            assertEquals(hCaptchaError.getMessage(), hCaptchaException1.getMessage());
-            assertEquals(hCaptchaError, hCaptchaException1.getHCaptchaError());
+            assertEquals(error.getErrorId(), hCaptchaException1.getStatusCode());
+            assertEquals(error.getMessage(), hCaptchaException1.getMessage());
+            assertEquals(error, hCaptchaException1.getHCaptchaError());
         }
     }
-
 }

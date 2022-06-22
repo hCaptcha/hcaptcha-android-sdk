@@ -45,17 +45,9 @@ Description: https://source.android.com/source/code-style.html
     with an upper-case character and end with "T" (e.g. DataT).
     -->
     <module name="ClassTypeParameterName">
-      <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]+[T]$)"/>
+      <property name="format" value="(^[A-Z][0-9]?)$|([T][A-Z][a-zA-Z0-9]+$)"/>
       <message key="name.invalidPattern"
-               value="Class type parameter ''{0}'' must either be a single upper-case character, or begin with an upper-case character and end with 'T'."/>
-    </module>
-
-    <!-- Non-public, non-static members must start with "m" -->
-    <module name="MemberName">
-      <property name="format" value="^m[A-Z][a-zA-Z0-9]*$"/>
-      <property name="applyToPublic" value="false"/>
-      <message key="name.invalidPattern"
-               value="Member name ''{0}'' must be prefixed with m and be at least two characters long."/>
+               value="Class type parameter ''{0}'' must either be a single upper-case character, or begin with an upper-case character and begin with 'T'."/>
     </module>
 
     <!--
@@ -66,16 +58,6 @@ Description: https://source.android.com/source/code-style.html
       <property name="format" value="^[a-z][a-z0-9][a-zA-Z0-9_]*$"/>
       <message key="name.invalidPattern"
                value="Method name ''{0}'' must be at least two characters long."/>
-    </module>
-
-    <!--
-    Type parameters must either be a single upper-case character, or must begin
-    with an upper-case character and end with "T" (e.g. DataT).
-    -->
-    <module name="MethodTypeParameterName">
-      <property name="format" value="(^[A-Z][0-9]?)$|([A-Z][a-zA-Z0-9]+[T]$)"/>
-      <message key="name.invalidPattern"
-               value="Method type parameter ''{0}'' must either be a single upper-case character or begin with an upper-case character and end with 'T'."/>
     </module>
 
     <!-- Require parameter names to be at least two characters long -->
@@ -115,7 +97,7 @@ Description: https://source.android.com/source/code-style.html
     <!-- Capitalized abbreviations are forbidden (e.g. URL, XML, HTTP) -->
     <module name="AbbreviationAsWordInName">
         <property name="ignoreFinal" value="false"/>
-        <property name="allowedAbbreviationLength" value="1"/>
+        <property name="allowedAbbreviationLength" value="2"/>
     </module>
 
     <!-- Forbid unnecessary escaping. -->
@@ -353,7 +335,11 @@ Description: https://source.android.com/source/code-style.html
     <module name="AvoidNestedBlocks"/>
 
     <!-- Forbid the use of arbitrary numeric literals -->
-    <module name="MagicNumber"/>
+    <module name="MagicNumber">
+        <property name="ignoreFieldDeclaration" value="true"/>
+        <property name="ignoreNumbers" value="0, 1, 2, 512, 200"/>
+        <property name="ignoreAnnotation" value="true"/>
+    </module>
 
     <!-- Require boolean expressions to be simplifed -->
     <module name="SimplifyBooleanExpression"/>
@@ -364,6 +350,8 @@ Description: https://source.android.com/source/code-style.html
     <!-- Forbid interfaces with no methods -->
     <module name="InterfaceIsType"/>
 
+    <!-- Enable @SuppressWarning annotation -->
+    <module name="SuppressWarningsHolder"/>
   </module>
 
   <!--################################################-->
@@ -387,9 +375,9 @@ Description: https://source.android.com/source/code-style.html
     <property name="message" value="Line has trailing whitespace."/>
   </module>
 
-  <!-- require Javadoc for all packages -->
-  <module name="JavadocPackage"/>
-
   <!-- Require a new line at the end of all files -->
   <module name="NewlineAtEndOfFile"/>
+
+  <!-- Enable @SuppressWarning annotation -->
+  <module name="SuppressWarningsFilter"/>
 </module>

@@ -1,27 +1,38 @@
 package com.hcaptcha.sdk;
 
+import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static org.hamcrest.CoreMatchers.any;
+
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
-
 import androidx.test.espresso.PerformException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.ViewAssertion;
 import androidx.test.espresso.util.HumanReadables;
 import androidx.test.espresso.util.TreeIterables;
+
 import org.hamcrest.Matcher;
 
 import java.util.Locale;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static androidx.test.espresso.assertion.ViewAssertions.doesNotExist;
-import static androidx.test.espresso.matcher.ViewMatchers.*;
-import static org.hamcrest.CoreMatchers.any;
-import static org.hamcrest.CoreMatchers.not;
+/**
+ * Helper class with different ViewActions
+ */
+public final class AssertUtil {
 
-public class AssertUtil {
+    private static final long MAIN_LOOP_DELAY_MS = 50;
+    private static final long WAIT_TO_BE_DISPLAYED_MS = 1000;
+
+    private AssertUtil() {
+    }
+
+    public static ViewAction waitToBeDisplayed() {
+        return waitToBeDisplayed(WAIT_TO_BE_DISPLAYED_MS);
+    }
 
     public static ViewAction waitToBeDisplayed(final long millis) {
         return new ViewAction() {
@@ -46,7 +57,7 @@ public class AssertUtil {
                             return;
                         }
                     }
-                    uiController.loopMainThreadForAtLeast(50);
+                    uiController.loopMainThreadForAtLeast(MAIN_LOOP_DELAY_MS);
                 }
                 while (System.currentTimeMillis() < endTime);
                 throw new PerformException.Builder()
@@ -78,7 +89,7 @@ public class AssertUtil {
                     if (view.getVisibility() == View.GONE || view.getVisibility() == View.INVISIBLE) {
                         return;
                     }
-                    uiController.loopMainThreadForAtLeast(50);
+                    uiController.loopMainThreadForAtLeast(MAIN_LOOP_DELAY_MS);
                 } while (System.currentTimeMillis() < endTime);
 
                 throw new PerformException.Builder()
@@ -91,14 +102,12 @@ public class AssertUtil {
     }
 
     // https://stackoverflow.com/a/38385064/902217
-    public static abstract class EvaluateJsAction implements ViewAction, ValueCallback<String> {}
+    public abstract static class EvaluateJsAction implements ViewAction, ValueCallback<String> {}  // NOPMD
 
     public static ViewAction evaluateJavascript(final String jsCode) {
         return new EvaluateJsAction() {
-
             private static final long TIME_OUT = 5000;
             private final AtomicBoolean mEvaluateFinished = new AtomicBoolean(false);
-
 
             @Override
             public Matcher<View> getConstraints() {
@@ -127,7 +136,7 @@ public class AssertUtil {
                                         "Evaluating java script did not finish after %d ms of waiting.", TIME_OUT)))
                                 .build();
                     }
-                    uiController.loopMainThreadForAtLeast(50);
+                    uiController.loopMainThreadForAtLeast(MAIN_LOOP_DELAY_MS);
                 }
             }
 

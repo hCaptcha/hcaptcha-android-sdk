@@ -15,7 +15,8 @@ public enum HCaptchaError implements Serializable {
     /**
      * Internet connection is missing.
      *
-     * Make sure AndroidManifest requires internet permission: {@code {@literal <}uses-permission android:name="android.permission.INTERNET" /{@literal >}}
+     * Make sure AndroidManifest requires internet permission:
+     * {@code {@literal <}uses-permission android:name="android.permission.INTERNET" /{@literal >}}
      */
     NETWORK_ERROR(7, "No internet connection"),
 
@@ -25,12 +26,14 @@ public enum HCaptchaError implements Serializable {
     INVALID_DATA(8, "Invalid data is not accepted by endpoints"),
 
     /**
-     * User may need to select the checkbox or if invisible programmatically call execute to initiate the challenge again.
+     * User may need to select the checkbox or if invisible programmatically call execute to
+     * initiate the challenge again.
      */
     CHALLENGE_ERROR(9, "Challenge encountered error on setup"),
 
     /**
-     * User may need to select the checkbox or if invisible programmatically call execute to initiate the challenge again.
+     * User may need to select the checkbox or if invisible programmatically call execute to
+     * initiate the challenge again.
      */
     INTERNAL_ERROR(10, "hCaptcha client encountered an internal error"),
 

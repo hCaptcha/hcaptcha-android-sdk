@@ -65,6 +65,9 @@ dependencies {
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
 
     debugImplementation 'androidx.fragment:fragment-testing:1.4.1'
+
+    compileOnly 'com.google.code.findbugs:annotations:3.0.1'
+    // compileOnly 'com.google.code.findbugs:jsr305:3.0.2'
 }
 
 task androidJavadocs(type: Javadoc) {
@@ -161,17 +164,11 @@ android.libraryVariants.all { variant ->
 task checkstyle(type: Checkstyle) {
     description 'Check code standard'
     group 'verification'
-    configFile file("${project.rootDir}/gradle/config/checkstyle.xml")
+    configFile file("${rootDir}/gradle/config/checkstyle.xml")
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
     classpath = files()
-    ignoreFailures = false
-}
-
-checkstyle {
-    configFile = file("${rootDir}/gradle/config/checkstyle.xml")
-    toolVersion = '8.34'
     ignoreFailures = false
     maxWarnings = 0
 }
@@ -188,6 +185,17 @@ task pmd(type: Pmd) {
         html.enabled = true
         html.destination = file("$project.buildDir/outputs/pmd/pmd.html")
     }
+}
+
+spotbugs {
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = false
+    reportLevel = 'high'
+    excludeFilter = file("${project.rootDir}/gradle/config/findbugs-exclude.xml")
+    onlyAnalyze = ['com.hcaptcha.sdk.*']
+    projectName = name
+    release = version
 }
 
 // enable html report

@@ -50,7 +50,7 @@ public interface IHCaptcha {
      * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
      * @return new {@link HCaptcha} object
      */
-    HCaptcha setup(@NonNull final String siteKey);
+    HCaptcha setup(@NonNull String siteKey);
 
     /**
      * Constructs a new client which allows to display a challenge dialog
@@ -58,7 +58,7 @@ public interface IHCaptcha {
      * @param config Config to customize: size, theme, locale, endpoint, rqdata, etc.
      * @return new {@link HCaptcha} object
      */
-    HCaptcha setup(@NonNull final HCaptchaConfig config);
+    HCaptcha setup(@NonNull HCaptchaConfig config);
 
     /**
      * Shows a captcha challenge dialog to be completed by the user
@@ -73,7 +73,7 @@ public interface IHCaptcha {
      * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
      * @return {@link HCaptcha}
      */
-    HCaptcha verifyWithHCaptcha(@NonNull final String siteKey);
+    HCaptcha verifyWithHCaptcha(@NonNull String siteKey);
 
 
     /**
@@ -82,6 +82,6 @@ public interface IHCaptcha {
      * @param config Config to customize: size, theme, locale, endpoint, rqdata, etc.
      * @return {@link HCaptcha}
      */
-    HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig config);
+    HCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config);
 
 }

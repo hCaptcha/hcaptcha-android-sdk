@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -22,9 +21,10 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaHeadlessWebViewTest {
+    private static final long AWAIT_CALLBACK_MS = 1000;
+
     @Rule
     public ActivityScenarioRule<TestActivity> rule = new ActivityScenarioRule<>(TestActivity.class);
 
@@ -50,7 +50,7 @@ public class HCaptchaHeadlessWebViewTest {
             }
 
             @Override
-            void onFailure(HCaptchaException hCaptchaException) {
+            void onFailure(HCaptchaException exception) {
                 fail("Should not be called for this test");
             }
         };
@@ -64,16 +64,13 @@ public class HCaptchaHeadlessWebViewTest {
         onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));
         onView(withId(R.id.webView)).perform(evaluateJavascript("onPass(\"some-token\")"));
 
-        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS)); // wait for callback
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
     }
 
     @Test
     public void testFailure() throws Exception {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
-            @Override
-            void onOpen() {
-            }
 
             @Override
             void onSuccess(HCaptchaTokenResponse response) {
@@ -81,7 +78,7 @@ public class HCaptchaHeadlessWebViewTest {
             }
 
             @Override
-            void onFailure(HCaptchaException hCaptchaException) {
+            void onFailure(HCaptchaException exception) {
                 latch.countDown();
             }
         };
@@ -96,6 +93,6 @@ public class HCaptchaHeadlessWebViewTest {
         onView(withId(R.id.webView)).perform(evaluateJavascript(
                 "onError(" + HCaptchaError.ERROR.getErrorId() + ")"));
 
-        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS)); // wait for callback
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
     }
 }
