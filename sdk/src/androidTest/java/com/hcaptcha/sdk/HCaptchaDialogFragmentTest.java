@@ -79,7 +79,7 @@ public class HCaptchaDialogFragmentTest {
 
     @Test
     public void webViewReturnToken() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onSuccess(HCaptchaTokenResponse response) {
@@ -105,7 +105,7 @@ public class HCaptchaDialogFragmentTest {
 
     @Test
     public void webViewReturnsError() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException exception) {
@@ -132,7 +132,7 @@ public class HCaptchaDialogFragmentTest {
 
     @Test
     public void onOpenCallbackWorks() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onOpen() {

@@ -83,7 +83,7 @@ public final class AssertUtil {
 
             @Override
             public void perform(final UiController uiController, final View view) {
-                long endTime = System.currentTimeMillis() + millis;
+                final long endTime = System.currentTimeMillis() + millis;
 
                 do {
                     if (view.getVisibility() == View.GONE || view.getVisibility() == View.INVISIBLE) {

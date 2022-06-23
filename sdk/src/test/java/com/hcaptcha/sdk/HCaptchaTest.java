@@ -82,8 +82,8 @@ public class HCaptchaTest {
 
     @Test
     public void test_site_key_from_metadata() throws Exception {
-        ApplicationInfo applicationInfo = mock(ApplicationInfo.class);
-        Bundle bundle = mock(Bundle.class);
+        final ApplicationInfo applicationInfo = mock(ApplicationInfo.class);
+        final Bundle bundle = mock(Bundle.class);
         when(bundle.getString(META_SITE_KEY)).thenReturn(HCaptchaConfigTest.MOCK_SITE_KEY);
         bundle.putString(META_SITE_KEY, HCaptchaConfigTest.MOCK_SITE_KEY);
         applicationInfo.metaData = bundle;

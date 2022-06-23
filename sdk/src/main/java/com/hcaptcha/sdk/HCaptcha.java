@@ -41,10 +41,10 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     public HCaptcha setup() {
         final String siteKey;
         try {
-            String packageName = activity.getPackageName();
-            ApplicationInfo app = activity.getPackageManager().getApplicationInfo(
+            final String packageName = activity.getPackageName();
+            final ApplicationInfo app = activity.getPackageManager().getApplicationInfo(
                     packageName, PackageManager.GET_META_DATA);
-            Bundle bundle = app.metaData;
+            final Bundle bundle = app.metaData;
             siteKey = bundle.getString(META_SITE_KEY);
         } catch (PackageManager.NameNotFoundException e) {
             throw new IllegalStateException(e);
@@ -62,7 +62,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     }
 
     @Override
-    public HCaptcha setup(@NonNull HCaptchaConfig inputConfig) {
+    public HCaptcha setup(@NonNull final HCaptchaConfig inputConfig) {
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
             void onOpen() {

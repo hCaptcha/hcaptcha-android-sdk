@@ -81,7 +81,7 @@ public class HCaptchaJSInterfaceTest {
                 .build();
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
-        JSONObject expected = new JSONObject();
+        final JSONObject expected = new JSONObject();
         expected.put("siteKey", siteKey);
         expected.put("sentry", true);
         expected.put("loading", true);
@@ -117,7 +117,7 @@ public class HCaptchaJSInterfaceTest {
                 .build();
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
-        JSONObject expected = new JSONObject();
+        final JSONObject expected = new JSONObject();
         expected.put("siteKey", siteKey);
         expected.put("sentry", true);
         expected.put("loading", true);

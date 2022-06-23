@@ -81,7 +81,7 @@ public class HCaptchaWebViewHelperTest {
 
     @Test
     public void test_destroy() {
-        ViewGroup viewParent = mock(ViewGroup.class, withSettings().extraInterfaces(ViewParent.class));
+        final ViewGroup viewParent = mock(ViewGroup.class, withSettings().extraInterfaces(ViewParent.class));
         when(webView.getParent()).thenReturn(viewParent);
         webViewHelper.destroy();
         verify(viewParent).removeView(webView);

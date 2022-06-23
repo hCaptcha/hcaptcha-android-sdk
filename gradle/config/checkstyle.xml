@@ -352,6 +352,8 @@ Description: https://source.android.com/source/code-style.html
 
     <!-- Enable @SuppressWarning annotation -->
     <module name="SuppressWarningsHolder"/>
+
+    <module name="FinalLocalVariableCheck"/>
   </module>
 
   <!--################################################-->
