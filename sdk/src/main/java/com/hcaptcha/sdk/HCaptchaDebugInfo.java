@@ -87,21 +87,25 @@ final class HCaptchaDebugInfo implements Serializable {
     private List<String> debugInfo(String packageName, String packageCode)
             throws IOException, NoSuchAlgorithmException {
         final List<String> result = new ArrayList<>(512);
-        final DexFile dexFile = new DexFile(packageCode);
-        final Enumeration<String> classes = dexFile.entries();
         final MessageDigest androidMd5 = MessageDigest.getInstance("MD5");
         final MessageDigest appMd5 = MessageDigest.getInstance("MD5");
         final MessageDigest depsMd5 = MessageDigest.getInstance("MD5");
-        final String charsetName = "UTF-8";
-        while (classes.hasMoreElements()) {
-            final String cls = classes.nextElement();
-            if (cls.startsWith("com.google.android.") || cls.startsWith("android.")) {
-                androidMd5.update(cls.getBytes(charsetName));
-            } else if (cls.startsWith(packageName)) {
-                appMd5.update(cls.getBytes(charsetName));
-            } else {
-                depsMd5.update(cls.getBytes(charsetName));
+        final DexFile dexFile = new DexFile(packageCode);
+        try {
+            final String charsetName = "UTF-8";
+            final Enumeration<String> classes = dexFile.entries();
+            while (classes.hasMoreElements()) {
+                final String cls = classes.nextElement();
+                if (cls.startsWith("com.google.android.") || cls.startsWith("android.")) {
+                    androidMd5.update(cls.getBytes(charsetName));
+                } else if (cls.startsWith(packageName)) {
+                    appMd5.update(cls.getBytes(charsetName));
+                } else {
+                    depsMd5.update(cls.getBytes(charsetName));
+                }
             }
+        } finally {
+            dexFile.close();
         }
         final String hexFormat = "%032x";
         result.add("sys_" + String.format(hexFormat, new BigInteger(1, androidMd5.digest())));
