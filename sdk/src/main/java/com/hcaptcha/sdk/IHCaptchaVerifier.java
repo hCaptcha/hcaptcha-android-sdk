@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk;
 
 import androidx.fragment.app.FragmentActivity;
+
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnLoadedListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;

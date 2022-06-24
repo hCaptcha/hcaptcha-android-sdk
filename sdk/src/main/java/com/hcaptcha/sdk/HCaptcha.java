@@ -4,14 +4,13 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-
-import lombok.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
+
 import com.hcaptcha.sdk.tasks.Task;
+import lombok.NonNull;
 
-
-public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
+public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
     public static final String TAG = "hCaptcha";
 
@@ -42,9 +41,10 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public HCaptcha setup() {
         final String siteKey;
         try {
-            String packageName = activity.getPackageName();
-            ApplicationInfo app = activity.getPackageManager().getApplicationInfo(packageName, PackageManager.GET_META_DATA);
-            Bundle bundle = app.metaData;
+            final String packageName = activity.getPackageName();
+            final ApplicationInfo app = activity.getPackageManager().getApplicationInfo(
+                    packageName, PackageManager.GET_META_DATA);
+            final Bundle bundle = app.metaData;
             siteKey = bundle.getString(META_SITE_KEY);
         } catch (PackageManager.NameNotFoundException e) {
             throw new IllegalStateException(e);
@@ -62,32 +62,34 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     }
 
     @Override
-    public HCaptcha setup(@NonNull HCaptchaConfig config) {
+    public HCaptcha setup(@NonNull final HCaptchaConfig inputConfig) {
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
             void onOpen() {
                 captchaOpened();
             }
+
             @Override
-            void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
-                setResult(hCaptchaTokenResponse);
+            void onSuccess(final HCaptchaTokenResponse response) {
+                setResult(response);
             }
+
             @Override
-            void onFailure(final HCaptchaException hCaptchaException) {
-                setException(hCaptchaException);
+            void onFailure(final HCaptchaException exception) {
+                setException(exception);
             }
         };
-        if (config.getHideDialog()) {
+        if (inputConfig.getHideDialog()) {
             // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
-            config = config.toBuilder()
+            this.config = inputConfig.toBuilder()
                     .size(HCaptchaSize.INVISIBLE)
                     .loading(false)
                     .build();
-            captchaVerifier = new HCaptchaHeadlessWebView(activity, config, listener);
+            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, listener);
         } else {
-            captchaVerifier = HCaptchaDialogFragment.newInstance(config, listener);
+            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, listener);
+            this.config = inputConfig;
         }
-        this.config = config;
         return this;
     }
 
@@ -97,6 +99,7 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
             // Cold start at verification time.
             setup();
         }
+        assert captchaVerifier != null;
         captchaVerifier.startVerification(activity);
         return this;
     }
@@ -108,17 +111,19 @@ public class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
             // Or new sitekey detected, thus new setup is needed.
             setup(siteKey);
         }
+        assert captchaVerifier != null;
         captchaVerifier.startVerification(activity);
         return this;
     }
 
     @Override
-    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig config) {
-        if (captchaVerifier == null || !config.equals(this.config)) {
+    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig inputConfig) {
+        if (captchaVerifier == null || !inputConfig.equals(this.config)) {
             // Cold start at verification time.
             // Or new config detected, thus new setup is needed.
-            setup(config);
+            setup(inputConfig);
         }
+        assert captchaVerifier != null;
         captchaVerifier.startVerification(activity);
         return this;
     }

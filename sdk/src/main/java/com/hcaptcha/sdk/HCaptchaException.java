@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk;
 
 import androidx.annotation.Nullable;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

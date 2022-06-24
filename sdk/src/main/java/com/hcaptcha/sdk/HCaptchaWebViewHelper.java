@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -19,8 +20,8 @@ final class HCaptchaWebViewHelper {
     @NonNull
     private final Context context;
 
-    @Getter
     @NonNull
+    @Getter
     private final HCaptchaConfig config;
 
     @NonNull
@@ -34,12 +35,12 @@ final class HCaptchaWebViewHelper {
     @NonNull
     private final WebView webView;
 
-    public HCaptchaWebViewHelper(@NonNull final Handler handler,
-                                 @NonNull final Context context,
-                                 @NonNull final HCaptchaConfig config,
-                                 @NonNull final IHCaptchaVerifier captchaVerifier,
-                                 @NonNull final HCaptchaStateListener listener,
-                                 @NonNull final WebView webView) {
+    HCaptchaWebViewHelper(@NonNull final Handler handler,
+                          @NonNull final Context context,
+                          @NonNull final HCaptchaConfig config,
+                          @NonNull final IHCaptchaVerifier captchaVerifier,
+                          @NonNull final HCaptchaStateListener listener,
+                          @NonNull final WebView webView) {
         this.context = context;
         this.config = config;
         this.captchaVerifier = captchaVerifier;

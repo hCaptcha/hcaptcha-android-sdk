@@ -28,7 +28,12 @@
 <div id="hcaptcha-container"></div>
 
 <script type="text/javascript">
-    (window.JSDI ? JSON.parse(window.JSDI.getDebugInfo()) : []).forEach(function (value, i) { window[value] = true; });
+    if (window.JSDI) {
+        JSON.parse(window.JSDI.getDebugInfo()).forEach(function (value) { window[value] = true; });
+        window.sysDebug = JSON.parse(window.JSDI.getSysDebug());
+    }
+</script>
+<script type="text/javascript">
     // Android will inject this bridge object as `JSInterface`
     // Browser is missing it so we mock it
     var BridgeObject = window.JSInterface || {

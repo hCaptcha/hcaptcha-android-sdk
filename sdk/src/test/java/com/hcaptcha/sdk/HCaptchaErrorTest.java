@@ -1,10 +1,10 @@
 package com.hcaptcha.sdk;
 
-import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
+
+import org.junit.Test;
+import org.junit.function.ThrowingRunnable;
 
 public class HCaptchaErrorTest {
 
@@ -18,6 +18,7 @@ public class HCaptchaErrorTest {
     }
 
     @Test
+    @SuppressWarnings("magicnumber")
     public void enum_ids() {
         assertEquals(7, HCaptchaError.NETWORK_ERROR.getErrorId());
         assertEquals(15, HCaptchaError.SESSION_TIMEOUT.getErrorId());
@@ -27,6 +28,7 @@ public class HCaptchaErrorTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:magicnumber")
     public void get_enum_from_id() {
         assertEquals(HCaptchaError.NETWORK_ERROR, HCaptchaError.fromId(7));
         assertEquals(HCaptchaError.SESSION_TIMEOUT, HCaptchaError.fromId(15));
@@ -36,6 +38,7 @@ public class HCaptchaErrorTest {
     }
 
     @Test
+    @SuppressWarnings("checkstyle:MagicNumber")
     public void get_enum_from_invalid_id_throws() {
         assertThrows(RuntimeException.class, new ThrowingRunnable() {
             @Override
@@ -44,5 +47,4 @@ public class HCaptchaErrorTest {
             }
         });
     }
-
 }

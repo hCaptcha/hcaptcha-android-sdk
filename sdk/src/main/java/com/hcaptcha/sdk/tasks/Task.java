@@ -2,10 +2,10 @@ package com.hcaptcha.sdk.tasks;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
 import com.hcaptcha.sdk.HCaptchaException;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 
@@ -92,10 +92,10 @@ public abstract class Task<TResult> {
     /**
      * Sets the task exception and marks it as not successfully completed
      *
-     * @param hCaptchaException the hCaptcha exception
+     * @param exception the hCaptcha exception
      */
-    protected void setException(@NonNull HCaptchaException hCaptchaException) {
-        this.hCaptchaException = hCaptchaException;
+    protected void setException(@NonNull HCaptchaException exception) {
+        this.hCaptchaException = exception;
         this.successful = false;
         this.complete = true;
         tryCb();

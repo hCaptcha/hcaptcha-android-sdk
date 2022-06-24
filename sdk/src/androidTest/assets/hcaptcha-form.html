@@ -11,7 +11,8 @@
     <button id="on-pass" onclick="onPass()">Pass</button>
 
     <script type="text/javascript">
-        var DI = window.JSDI.getDebugInfo();
+        console.assert(window.JSDI.getDebugInfo() instanceof Array);
+        console.assert(typeof window.JSDI.getSysDebug() === 'object');
         var BridgeObject = window.JSInterface;
         var bridgeConfig = JSON.parse(BridgeObject.getConfig());
 

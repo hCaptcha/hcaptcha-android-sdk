@@ -1,3 +1,10 @@
+plugins {
+    id "pmd"
+    id "checkstyle"
+    id "com.github.spotbugs" version "4.8.0"
+    id "org.owasp.dependencycheck" version "7.1.1"
+}
+
 apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
@@ -12,11 +19,11 @@ android {
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
-        versionCode 13
+        versionCode 14
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "3.0.0"
+        versionName "3.1.0"
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 
@@ -58,6 +65,8 @@ dependencies {
     androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
 
     debugImplementation 'androidx.fragment:fragment-testing:1.4.1'
+
+    compileOnly 'com.google.code.findbugs:annotations:3.0.1'
 }
 
 task androidJavadocs(type: Javadoc) {
@@ -150,3 +159,52 @@ android.libraryVariants.all { variant ->
         }
     })
 }
+
+task checkstyle(type: Checkstyle) {
+    description 'Check code standard'
+    group 'verification'
+    configFile file("${rootDir}/gradle/config/checkstyle.xml")
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+    ignoreFailures = false
+    maxWarnings = 0
+}
+
+task pmd(type: Pmd) {
+    ruleSetFiles = files("${project.rootDir}/gradle/config/pmd.xml")
+    ignoreFailures = false
+    ruleSets = []
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    reports {
+        xml.enabled = false
+        html.enabled = true
+        html.destination = file("$project.buildDir/outputs/pmd/pmd.html")
+    }
+}
+
+spotbugs {
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = false
+    reportLevel = 'high'
+    excludeFilter = file("${project.rootDir}/gradle/config/findbugs-exclude.xml")
+    onlyAnalyze = ['com.hcaptcha.sdk.*']
+    projectName = name
+    release = version
+}
+
+// enable html report
+gradle.taskGraph.beforeTask { task ->
+    if (task.name.toLowerCase().contains('spotbugs')) {
+        task.reports {
+            html.enabled = true
+            xml.enabled = true
+        }
+    }
+}
+
+check.dependsOn('checkstyle', 'pmd')

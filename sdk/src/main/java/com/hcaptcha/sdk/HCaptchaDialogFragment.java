@@ -11,7 +11,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.*;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
+import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
 import androidx.annotation.Nullable;
@@ -19,6 +23,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
+
 import lombok.NonNull;
 
 
@@ -81,6 +86,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         final HCaptchaStateListener listener;
         try {
             listener = getArguments().getParcelable(KEY_LISTENER);
+            assert listener != null;
         } catch (BadParcelableException e) {
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back
@@ -88,10 +94,12 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             return rootView;
         }
         final HCaptchaConfig config = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
+        assert config != null;
         final WebView webView = rootView.findViewById(R.id.webView);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
-        webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()), requireContext(), config, this, listener, webView);
+        webViewHelper = new HCaptchaWebViewHelper(
+                new Handler(Looper.getMainLooper()), requireContext(), config, this, listener, webView);
         return rootView;
     }
 
@@ -153,10 +161,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public void onFailure(@NonNull final HCaptchaException hCaptchaException) {
+    public void onFailure(@NonNull final HCaptchaException exception) {
         final boolean silentRetry = webViewHelper != null
                 && webViewHelper.getConfig().getResetOnTimeout()
-                && hCaptchaException.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+                && exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
         if (isAdded() && !silentRetry) {
             dismiss();
         }
@@ -164,18 +172,18 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             if (silentRetry) {
                 webViewHelper.getWebView().loadUrl("javascript:resetAndExecute();");
             } else {
-                webViewHelper.getListener().onFailure(hCaptchaException);
+                webViewHelper.getListener().onFailure(exception);
             }
         }
     }
 
     @Override
-    public void onSuccess(final HCaptchaTokenResponse hCaptchaTokenResponse) {
+    public void onSuccess(final HCaptchaTokenResponse tokenResponse) {
         assert webViewHelper != null;
         if (isAdded()) {
             dismiss();
         }
-        webViewHelper.getListener().onSuccess(hCaptchaTokenResponse);
+        webViewHelper.getListener().onSuccess(tokenResponse);
     }
 
     @Override

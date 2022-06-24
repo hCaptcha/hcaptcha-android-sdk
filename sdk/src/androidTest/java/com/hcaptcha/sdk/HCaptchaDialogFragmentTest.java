@@ -1,18 +1,9 @@
 package com.hcaptcha.sdk;
 
-import android.os.Bundle;
-
-import androidx.fragment.app.testing.FragmentScenario;
-import androidx.test.espresso.web.webdriver.DriverAtoms;
-import androidx.test.espresso.web.webdriver.Locator;
-import androidx.test.ext.junit.runners.AndroidJUnit4;
-
-import org.junit.Test;
-import org.junit.runner.RunWith;
-
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
-import static androidx.test.espresso.matcher.ViewMatchers.*;
+import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.clearElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
@@ -25,12 +16,23 @@ import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import android.os.Bundle;
+import androidx.fragment.app.testing.FragmentScenario;
+import androidx.test.espresso.web.webdriver.DriverAtoms;
+import androidx.test.espresso.web.webdriver.Locator;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
+
+import org.junit.Test;
+import org.junit.runner.RunWith;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaDialogFragmentTest {
+    private static final long AWAIT_CALLBACK_MS = 1000;
+
     public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment() {
         return launchCaptchaFragment(true);
     }
@@ -43,7 +45,8 @@ public class HCaptchaDialogFragmentTest {
         return launchCaptchaFragment(true, listener);
     }
 
-    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader, HCaptchaStateListener listener) {
+    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader,
+                                                                          HCaptchaStateListener listener) {
         final HCaptchaConfig hCaptchaConfig = HCaptchaConfig.builder()
                 .siteKey("10000000-ffff-ffff-ffff-000000000001")
                 .endpoint("https://js.hcaptcha.com/1/api.js")
@@ -62,30 +65,31 @@ public class HCaptchaDialogFragmentTest {
     public void loaderVisible() {
         launchCaptchaFragment();
         onView(withId(R.id.loadingContainer)).check(matches(isDisplayed()));
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed(1000));
-        onView(withId(R.id.loadingContainer)).perform(waitToDisappear(10000));
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
+        final long waitToDisappearMs = 10000;
+        onView(withId(R.id.loadingContainer)).perform(waitToDisappear(waitToDisappearMs));
     }
 
     @Test
     public void loaderDisabled() {
         launchCaptchaFragment(false);
         onView(withId(R.id.loadingContainer)).check(matches(not(isDisplayed())));
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed(1000));
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
     }
 
     @Test
     public void webViewReturnToken() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onSuccess(HCaptchaTokenResponse hCaptchaTokenResponse) {
-                assertEquals("test-token", hCaptchaTokenResponse.getTokenResult());
+            void onSuccess(HCaptchaTokenResponse response) {
+                assertEquals("test-token", response.getTokenResult());
                 latch.countDown();
             }
         };
 
-        final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(listener);
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed(1000));
+        launchCaptchaFragment(listener);
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
 
         onWebView(withId(R.id.webView)).forceJavascriptEnabled();
 
@@ -96,22 +100,22 @@ public class HCaptchaDialogFragmentTest {
         onWebView().withElement(findElement(Locator.ID, "on-pass"))
                 .perform(webClick());
 
-        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS)); // wait for callback
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
     }
 
     @Test
     public void webViewReturnsError() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onFailure(HCaptchaException hCaptchaException) {
-                assertEquals(HCaptchaError.SESSION_TIMEOUT, hCaptchaException.getHCaptchaError());
+            void onFailure(HCaptchaException exception) {
+                assertEquals(HCaptchaError.SESSION_TIMEOUT, exception.getHCaptchaError());
                 latch.countDown();
             }
         };
 
-        final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(listener);
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed(1000));
+        launchCaptchaFragment(listener);
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
 
         onWebView(withId(R.id.webView)).forceJavascriptEnabled();
 
@@ -123,12 +127,12 @@ public class HCaptchaDialogFragmentTest {
         onWebView().withElement(findElement(Locator.ID, "on-error"))
                 .perform(webClick());
 
-        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS)); // wait for callback
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
     }
 
     @Test
     public void onOpenCallbackWorks() throws Exception {
-        CountDownLatch latch = new CountDownLatch(1);
+        final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onOpen() {
@@ -136,8 +140,8 @@ public class HCaptchaDialogFragmentTest {
             }
         };
 
-        final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(listener);
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed(1000));
+        launchCaptchaFragment(listener);
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
 
         onWebView(withId(R.id.webView)).forceJavascriptEnabled();
 
@@ -148,6 +152,6 @@ public class HCaptchaDialogFragmentTest {
         onWebView().withElement(findElement(Locator.ID, "on-pass"))
                 .perform(webClick());
 
-        assertTrue(latch.await(1000, TimeUnit.MILLISECONDS)); // wait for callback
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
     }
 }

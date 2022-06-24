@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-
 import androidx.annotation.NonNull;
 
 import org.junit.After;
@@ -41,7 +40,7 @@ public class HCaptchaWebViewHelperTest {
     IHCaptchaVerifier captchaVerifier;
 
     @Mock
-    HCaptchaStateListener hCaptchaStateListener;
+    HCaptchaStateListener stateListener;
 
     @Mock
     WebView webView;
@@ -61,11 +60,12 @@ public class HCaptchaWebViewHelperTest {
     public void init() {
         MockitoAnnotations.openMocks(this);
         androidLogMock = mockStatic(Log.class);
-        hCaptchaStateListener = mock(HCaptchaStateListener.class);
+        stateListener = mock(HCaptchaStateListener.class);
         webView = mock(WebView.class);
         webSettings = mock(WebSettings.class);
         when(webView.getSettings()).thenReturn(webSettings);
-        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier, hCaptchaStateListener, webView);
+        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier,
+                stateListener, webView);
     }
 
     @After
@@ -81,7 +81,7 @@ public class HCaptchaWebViewHelperTest {
 
     @Test
     public void test_destroy() {
-        ViewGroup viewParent = mock(ViewGroup.class, withSettings().extraInterfaces(ViewParent.class));
+        final ViewGroup viewParent = mock(ViewGroup.class, withSettings().extraInterfaces(ViewParent.class));
         when(webView.getParent()).thenReturn(viewParent);
         webViewHelper.destroy();
         verify(viewParent).removeView(webView);

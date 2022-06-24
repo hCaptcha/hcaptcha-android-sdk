@@ -1,12 +1,11 @@
 package com.hcaptcha.sdk;
 
-import org.junit.Test;
-
-import java.util.Locale;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Test;
+
+import java.util.Locale;
 
 public class HCaptchaConfigTest {
 
@@ -40,9 +39,9 @@ public class HCaptchaConfigTest {
         final String customLocale = "ro";
         final Boolean sentry = false;
         final String customTheme = "{ \"palette\": {"
-            + "\"mode\": \"light\", \"primary\": { \"main\": \"#F16622\" },"
-            + "\"warn\": {  \"main\": \"#F16622\" },"
-            + "\"text\": { \"heading\": \"#F16622\", \"body\": \"#F16622\" } } }";
+                + "\"mode\": \"light\", \"primary\": { \"main\": \"#F16622\" },"
+                + "\"warn\": {  \"main\": \"#F16622\" },"
+                + "\"text\": { \"heading\": \"#F16622\", \"body\": \"#F16622\" } } }";
 
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(MOCK_SITE_KEY)

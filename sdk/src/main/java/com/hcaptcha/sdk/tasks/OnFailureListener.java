@@ -11,8 +11,8 @@ public interface OnFailureListener {
     /**
      * Called whenever there is a hCaptcha error or user closed the challenge dialog
      *
-     * @param hCaptchaException the exception
+     * @param exception the exception
      */
-    void onFailure(HCaptchaException hCaptchaException);
+    void onFailure(HCaptchaException exception);
 
 }
