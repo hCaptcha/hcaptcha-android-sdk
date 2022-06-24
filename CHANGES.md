@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.1.0
+
+- Add `pmd`, `checkstyle`, `spotbugs` tools to build system ([#40](https://github.com/hCaptcha/hcaptcha-android-sdk/issues/40))
+
 # 3.0.0
 
 - Add new boolean config option `HCaptchaConfig.hideDialog`.
