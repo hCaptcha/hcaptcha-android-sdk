@@ -64,9 +64,14 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @Override
     public HCaptcha setup(@NonNull final HCaptchaConfig inputConfig) {
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
+
             @Override
-            void onOpen() {
-                captchaOpened();
+            void onEvent(HCaptchaEvent event) {
+                if (event == HCaptchaEvent.OPEN) {
+                    captchaOpened();
+                }
+
+                captchaEvent(event);
             }
 
             @Override
@@ -79,6 +84,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                 setException(exception);
             }
         };
+
         if (inputConfig.getHideDialog()) {
             // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
             this.config = inputConfig.toBuilder()

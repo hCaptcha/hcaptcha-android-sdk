@@ -13,6 +13,7 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
+import com.hcaptcha.sdk.tasks.OnEventListener;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
@@ -118,6 +119,12 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onOpen() {
                     Toast.makeText(MainActivity.this, "hCaptcha shown", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .addOnEventListener(new OnEventListener() {
+                @Override
+                public void onEvent(HCaptchaEvent event) {
+                    Toast.makeText(MainActivity.this, event.toString(), Toast.LENGTH_SHORT).show();
                 }
             });
     }

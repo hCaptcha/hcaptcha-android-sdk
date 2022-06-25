@@ -71,16 +71,14 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     }
 
     @Override
-    public void onLoaded() {
-        webViewLoaded = true;
-        if (shouldExecuteOnLoad) {
-            shouldExecuteOnLoad = false;
-            resetAndExecute();
+    public void onEvent(HCaptchaEvent event) {
+        if (event == HCaptchaEvent.LOADED) {
+            webViewLoaded = true;
+            if (shouldExecuteOnLoad) {
+                shouldExecuteOnLoad = false;
+                resetAndExecute();
+            }
         }
-    }
-
-    @Override
-    public void onOpen() {
-        listener.onOpen();
+        listener.onEvent(event);
     }
 }

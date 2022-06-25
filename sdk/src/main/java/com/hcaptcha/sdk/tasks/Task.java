@@ -3,6 +3,7 @@ package com.hcaptcha.sdk.tasks;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hcaptcha.sdk.HCaptchaEvent;
 import com.hcaptcha.sdk.HCaptchaException;
 
 import java.util.ArrayList;
@@ -30,6 +31,8 @@ public abstract class Task<TResult> {
 
     private final List<OnOpenListener> onOpenListeners;
 
+    private final List<OnEventListener> onEventListeners;
+
     /**
      * Creates a new Task object
      */
@@ -37,6 +40,7 @@ public abstract class Task<TResult> {
         this.onSuccessListeners = new ArrayList<>();
         this.onFailureListeners = new ArrayList<>();
         this.onOpenListeners = new ArrayList<>();
+        this.onEventListeners = new ArrayList<>();
         this.reset();
     }
 
@@ -111,6 +115,15 @@ public abstract class Task<TResult> {
     }
 
     /**
+     * Internal callback which called once '*-callback' fired in js SDK
+     */
+    protected void captchaEvent(HCaptchaEvent event) {
+        for (OnEventListener listener : onEventListeners) {
+            listener.onEvent(event);
+        }
+    }
+
+    /**
      * Add a success listener triggered when the task finishes successfully
      *
      * @param onSuccessListener the success listener to be triggered
@@ -139,9 +152,23 @@ public abstract class Task<TResult> {
      *
      * @param onOpenListener the open listener to be triggered
      * @return current object
+     * @deprecated use {@link #addOnEventListener(OnOpenListener)}
      */
+    @Deprecated
     public Task<TResult> addOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
         this.onOpenListeners.add(onOpenListener);
+        tryCb();
+        return this;
+    }
+
+    /**
+     * Add a hCaptcha event listener triggered when the hCaptcha state changes
+     *
+     * @param listener the event listener to be triggered
+     * @return current object
+     */
+    public Task<TResult> addOnEventListener(@NonNull final OnEventListener listener) {
+        this.onEventListeners.add(listener);
         tryCb();
         return this;
     }

@@ -40,8 +40,10 @@ public class HCaptchaHeadlessWebViewTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onOpen() {
-                fail("Should never be called for HCaptchaHeadlessWebView");
+            void onEvent(HCaptchaEvent event) {
+                if (event != HCaptchaEvent.LOADED) {
+                    fail("Should never be called for HCaptchaHeadlessWebView");
+                }
             }
 
             @Override

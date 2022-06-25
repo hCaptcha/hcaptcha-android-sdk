@@ -135,8 +135,10 @@ public class HCaptchaDialogFragmentTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onOpen() {
-                latch.countDown();
+            void onEvent(HCaptchaEvent event) {
+                if (event == HCaptchaEvent.OPEN) {
+                    latch.countDown();
+                }
             }
         };
 

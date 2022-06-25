@@ -62,11 +62,10 @@ hCaptcha
         Log.d("hCaptcha", "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")");
     }
   })
-  .addOnOpenListener(new OnOpenListener() {
+  .addOnEventListener(new OnEventListener() {
     @Override
-    public void onOpen() {
-        // Usefull for analytics purposes
-        Log.d("hCaptcha", "hCaptcha is now visible.");
+    public void onEvent(HCaptchaEvent event) {
+        Log.d("hCaptcha", "hCaptcha onEvent: " + event;
     }
   });
 

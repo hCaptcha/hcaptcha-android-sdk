@@ -9,7 +9,7 @@ abstract class HCaptchaStateListener implements Parcelable {
 
     abstract void onFailure(HCaptchaException exception);
 
-    abstract void onOpen();
+    abstract void onEvent(HCaptchaEvent event);
 
     @Override
     public int describeContents() {

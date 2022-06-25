@@ -142,14 +142,35 @@ public class HCaptchaJSInterfaceTest {
     public void calls_on_challenge_ready() {
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         jsInterface.onLoaded();
-        verify(captchaVerifier, times(1)).onLoaded();
+        verify(captchaVerifier, times(1)).onEvent(HCaptchaEvent.LOADED);
     }
 
     @Test
     public void calls_on_challenge_visible_cb() {
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         jsInterface.onOpen();
-        verify(captchaVerifier, times(1)).onOpen();
+        verify(captchaVerifier, times(1)).onEvent(HCaptchaEvent.OPEN);
+    }
+
+    @Test
+    public void calls_on_challenge_close_cb() {
+        final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
+        jsInterface.onClose();
+        verify(captchaVerifier, times(1)).onEvent(HCaptchaEvent.CLOSE);
+    }
+
+    @Test
+    public void calls_on_expired_cb() {
+        final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
+        jsInterface.onExpired();
+        verify(captchaVerifier, times(1)).onEvent(HCaptchaEvent.EXPIRED);
+    }
+
+    @Test
+    public void calls_on_challenge_expired_cb() {
+        final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
+        jsInterface.onChallengeExpired();
+        verify(captchaVerifier, times(1)).onEvent(HCaptchaEvent.CHALLENGE_EXPIRED);
     }
 
     @Test
