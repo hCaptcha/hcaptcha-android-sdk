@@ -94,8 +94,8 @@ jobs:
         comment-id: ${{ steps.find_comment.outputs.comment-id }}
         issue-number: ${{ github.event.pull_request.number }}
         token: ${{ secrets.GITHUB_TOKEN }}
-  api-compile-test:
-    name: Test compilation with different SDK version
+  sdk-compile-test:
+    name: "Compile target:${{ matrix.target }} compile:${{ matrix.compile }} appcompat: ${{ matrix.appcompat }}"
     needs: [build]
     runs-on: ubuntu-latest
     strategy:
