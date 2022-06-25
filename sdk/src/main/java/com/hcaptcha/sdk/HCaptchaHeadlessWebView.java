@@ -83,4 +83,19 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     public void onOpen() {
         listener.onOpen();
     }
+
+    @Override
+    public void onClose() {
+        listener.onClose();
+    }
+
+    @Override
+    public void onExpired() {
+        listener.onExpired();
+    }
+
+    @Override
+    public void onChallengeExpired() {
+        listener.onChallengeExpired();
+    }
 }

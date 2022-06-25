@@ -70,6 +70,16 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
 
             @Override
+            void onClose() {
+                captchaClosed();
+            }
+
+            @Override
+            void onChallengeExpired() {
+                captchaChallengeExpired();
+            }
+
+            @Override
             void onSuccess(final HCaptchaTokenResponse response) {
                 setResult(response);
             }
@@ -77,6 +87,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             @Override
             void onFailure(final HCaptchaException exception) {
                 setException(exception);
+            }
+
+            @Override
+            void onExpired() {
+                captchaExpired();
             }
         };
         if (inputConfig.getHideDialog()) {

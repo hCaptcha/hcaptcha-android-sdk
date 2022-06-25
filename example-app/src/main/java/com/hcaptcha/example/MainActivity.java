@@ -13,6 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
+import com.hcaptcha.sdk.tasks.OnChallengeExpiredListener;
+import com.hcaptcha.sdk.tasks.OnCloseListener;
+import com.hcaptcha.sdk.tasks.OnExpiredListener;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
@@ -118,6 +121,24 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onOpen() {
                     Toast.makeText(MainActivity.this, "hCaptcha shown", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .addOnCloseListener(new OnCloseListener() {
+                @Override
+                public void onClose() {
+                    Toast.makeText(MainActivity.this, "hCaptcha closed", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .addOnExpiredListener(new OnExpiredListener() {
+                @Override
+                public void onExpired() {
+                    Toast.makeText(MainActivity.this, "hCaptcha expired", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .addOnChallengeExpiredListener(new OnChallengeExpiredListener() {
+                @Override
+                public void onChallengeExpired() {
+                    Toast.makeText(MainActivity.this, "hCaptcha challenge expired", Toast.LENGTH_SHORT).show();
                 }
             });
     }

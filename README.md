@@ -69,6 +69,27 @@ hCaptcha
         Log.d("hCaptcha", "hCaptcha is now visible.");
     }
   });
+  .addOnCloseListener(new OnCloseListener() {
+    @Override
+    public void onClose() {
+        // Usefull for analytics purposes
+        Log.d("hCaptcha", "hCaptcha is closed");
+    }
+  })
+  .addOnExpiredListener(new OnExpiredListener() {
+    @Override
+    public void onExpired() {
+        // Usefull for analytics purposes
+        Log.d("hCaptcha", "hCaptcha is expired");
+    }
+  })
+  .addOnChallengeExpiredListener(new OnChallengeExpiredListener() {
+    @Override
+    public void onChallengeExpired() {
+        // Usefull for analytics purposes
+        Log.d("hCaptcha", "hCaptcha challenge is expired");
+    }
+  });
 
 // =================================================
 // 3. Trigger the verification process which may or may not require user input. 
