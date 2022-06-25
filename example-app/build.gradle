@@ -1,13 +1,21 @@
 apply plugin: 'com.android.application'
 
+def intProp(name, fallback) {
+    return project.hasProperty(name) ? Integer.parseInt(project.getProperty(name)) : fallback
+}
+
+def prop(name, fallback) {
+    return project.hasProperty(name) ? project.getProperty(name) : fallback
+}
+
 android {
-    compileSdkVersion 32
+    compileSdkVersion intProp("exampleCompileSdkVersion", 32)
     buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.hcaptcha.example"
         minSdkVersion 16
-        targetSdkVersion 32
+        targetSdkVersion intProp("exampleTargetSdkVersion", 32)
         versionCode 1
         versionName "0.0.1"
 
@@ -29,7 +37,8 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.4.1'
+    //noinspection GradleDependency
+    implementation "androidx.appcompat:appcompat:${prop('exampleAppcompatVersion', '1.3.1')}"
 
     implementation project(path: ':sdk')
 
