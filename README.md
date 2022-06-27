@@ -76,13 +76,6 @@ hCaptcha
         Log.d("hCaptcha", "hCaptcha is closed");
     }
   })
-  .addOnExpiredListener(new OnExpiredListener() {
-    @Override
-    public void onExpired() {
-        // Usefull for analytics purposes
-        Log.d("hCaptcha", "hCaptcha is expired");
-    }
-  })
   .addOnChallengeExpiredListener(new OnChallengeExpiredListener() {
     @Override
     public void onChallengeExpired() {

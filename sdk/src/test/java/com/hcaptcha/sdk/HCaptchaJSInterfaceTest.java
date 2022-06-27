@@ -167,13 +167,6 @@ public class HCaptchaJSInterfaceTest {
     }
 
     @Test
-    public void calls_on_expired_cb() {
-        final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
-        jsInterface.onExpired();
-        verify(captchaVerifier, times(1)).onExpired();
-    }
-
-    @Test
     public void on_pass_forwards_token_to_listeners() {
         final String token = "mock-token";
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);

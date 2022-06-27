@@ -85,16 +85,6 @@ class HCaptchaJSInterface implements Serializable {
     }
 
     @JavascriptInterface
-    public void onExpired() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                captchaVerifier.onExpired();
-            }
-        });
-    }
-
-    @JavascriptInterface
     public void onChallengeExpired() {
         handler.post(new Runnable() {
             @Override

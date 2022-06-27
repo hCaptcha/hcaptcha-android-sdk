@@ -25,9 +25,4 @@ public class HCaptchaStateTestAdapter extends HCaptchaStateListener {
     void onFailure(HCaptchaException exception) {
         // empty default implementation to reduce amount of boilerplate code in tests
     }
-
-    @Override
-    void onExpired() {
-        // empty default implementation to reduce amount of boilerplate code in tests
-    }
 }

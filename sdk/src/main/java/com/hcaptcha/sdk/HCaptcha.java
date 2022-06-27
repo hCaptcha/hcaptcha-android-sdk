@@ -88,11 +88,6 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             void onFailure(final HCaptchaException exception) {
                 setException(exception);
             }
-
-            @Override
-            void onExpired() {
-                captchaExpired();
-            }
         };
         if (inputConfig.getHideDialog()) {
             // Overwrite certain config values in case the dialog is hidden to avoid behavior collision

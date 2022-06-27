@@ -32,8 +32,6 @@ public abstract class Task<TResult> {
 
     private final List<OnCloseListener> onCloseListeners;
 
-    private final List<OnExpiredListener> onExpiredListeners;
-
     private final List<OnChallengeExpiredListener> onChallengeExpiredListeners;
 
     /**
@@ -44,7 +42,6 @@ public abstract class Task<TResult> {
         this.onFailureListeners = new ArrayList<>();
         this.onOpenListeners = new ArrayList<>();
         this.onCloseListeners = new ArrayList<>();
-        this.onExpiredListeners = new ArrayList<>();
         this.onChallengeExpiredListeners = new ArrayList<>();
         this.reset();
     }
@@ -138,15 +135,6 @@ public abstract class Task<TResult> {
     }
 
     /**
-     * Internal callback which called once 'expired-callback' fired in js SDK
-     */
-    protected void captchaExpired() {
-        for (OnExpiredListener listener : onExpiredListeners) {
-            listener.onExpired();
-        }
-    }
-
-    /**
      * Add a success listener triggered when the task finishes successfully
      *
      * @param onSuccessListener the success listener to be triggered
@@ -190,18 +178,6 @@ public abstract class Task<TResult> {
      */
     public Task<TResult> addOnCloseListener(@NonNull final OnCloseListener listener) {
         this.onCloseListeners.add(listener);
-        tryCb();
-        return this;
-    }
-
-    /**
-     * Add a hCaptcha expired listener triggered
-     *
-     * @param listener the expired listener to be triggered
-     * @return current object
-     */
-    public Task<TResult> addOnExpiredListener(@NonNull final OnExpiredListener listener) {
-        this.onExpiredListeners.add(listener);
         tryCb();
         return this;
     }

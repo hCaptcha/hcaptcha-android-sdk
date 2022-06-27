@@ -102,7 +102,6 @@
                 return BridgeObject.onPass(token);
             },
             'expired-callback': function expiredCallback() {
-                BridgeObject.onExpired();
                 return BridgeObject.onError(15);
             },
             'chalexpired-callback': function chalexpiredCallback() {

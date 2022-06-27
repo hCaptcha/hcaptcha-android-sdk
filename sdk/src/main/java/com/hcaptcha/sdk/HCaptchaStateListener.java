@@ -13,8 +13,6 @@ abstract class HCaptchaStateListener implements Parcelable {
 
     abstract void onClose();
 
-    abstract void onExpired();
-
     abstract void onChallengeExpired();
 
     @Override
