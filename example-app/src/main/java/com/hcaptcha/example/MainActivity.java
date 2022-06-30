@@ -15,6 +15,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.OnChallengeExpiredListener;
 import com.hcaptcha.sdk.tasks.OnCloseListener;
+import com.hcaptcha.sdk.tasks.OnExpiredListener;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
@@ -67,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 .size(size)
                 .loading(loading.isChecked())
                 .hideDialog(hideDialog.isChecked())
+                .expirationTimeout(10)
                 .build();
     }
 
@@ -126,6 +128,12 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClose() {
                     Toast.makeText(MainActivity.this, "hCaptcha closed", Toast.LENGTH_SHORT).show();
+                }
+            })
+            .addOnExpiredListener(new OnExpiredListener() {
+                @Override
+                public void onExpired() {
+                    Toast.makeText(MainActivity.this, "hCaptcha expired", Toast.LENGTH_SHORT).show();
                 }
             })
             .addOnChallengeExpiredListener(new OnChallengeExpiredListener() {

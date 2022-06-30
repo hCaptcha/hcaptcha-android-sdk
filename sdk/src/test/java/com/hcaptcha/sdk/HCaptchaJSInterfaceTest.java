@@ -64,6 +64,7 @@ public class HCaptchaJSInterfaceTest {
         final String imghost = "https://example.com/imghost";
         final String reportapi = "https://example.com/reportapi";
         final String host = "custom-host";
+        final long timeout = 60;
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(siteKey)
                 .locale(locale)
@@ -78,6 +79,7 @@ public class HCaptchaJSInterfaceTest {
                 .host(host)
                 .resetOnTimeout(true)
                 .hideDialog(true)
+                .expirationTimeout(timeout)
                 .build();
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
@@ -98,6 +100,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("host", host);
         expected.put("resetOnTimeout", true);
         expected.put("hideDialog", true);
+        expected.put("expirationTimeout", timeout);
 
         JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
     }
@@ -108,6 +111,7 @@ public class HCaptchaJSInterfaceTest {
         final String locale = "ro";
         final HCaptchaSize size = HCaptchaSize.NORMAL;
         final String rqdata = "custom rqdata";
+        final long defaultTimeout = 120;
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(siteKey)
                 .locale(locale)
@@ -134,6 +138,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("host", JSONObject.NULL);
         expected.put("resetOnTimeout", false);
         expected.put("hideDialog", false);
+        expected.put("expirationTimeout", defaultTimeout);
 
         JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
     }

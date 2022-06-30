@@ -1,5 +1,7 @@
 package com.hcaptcha.sdk.tasks;
 
+import android.os.Handler;
+import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -7,6 +9,7 @@ import com.hcaptcha.sdk.HCaptchaException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -32,6 +35,8 @@ public abstract class Task<TResult> {
 
     private final List<OnCloseListener> onCloseListeners;
 
+    private final List<OnExpiredListener> onExpiredListeners;
+
     private final List<OnChallengeExpiredListener> onChallengeExpiredListeners;
 
     /**
@@ -42,6 +47,7 @@ public abstract class Task<TResult> {
         this.onFailureListeners = new ArrayList<>();
         this.onOpenListeners = new ArrayList<>();
         this.onCloseListeners = new ArrayList<>();
+        this.onExpiredListeners = new ArrayList<>();
         this.onChallengeExpiredListeners = new ArrayList<>();
         this.reset();
     }
@@ -135,6 +141,22 @@ public abstract class Task<TResult> {
     }
 
     /**
+     * Internal callback which called once 'expired-callback' fired in js SDK
+     * @param expirationTimeout - token expiration timeout (seconds)
+     */
+    protected void scheduleCaptchaExpired(final long expirationTimeout) {
+        final Handler handler = new Handler(Looper.getMainLooper());
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (OnExpiredListener listener : onExpiredListeners) {
+                    listener.onExpired();
+                }
+            }
+        }, TimeUnit.SECONDS.toMillis(expirationTimeout));
+    }
+
+    /**
      * Add a success listener triggered when the task finishes successfully
      *
      * @param onSuccessListener the success listener to be triggered
@@ -178,6 +200,18 @@ public abstract class Task<TResult> {
      */
     public Task<TResult> addOnCloseListener(@NonNull final OnCloseListener listener) {
         this.onCloseListeners.add(listener);
+        tryCb();
+        return this;
+    }
+
+    /**
+     * Add a hCaptcha expired listener triggered
+     *
+     * @param listener the expired listener to be triggered
+     * @return current object
+     */
+    public Task<TResult> addOnExpiredListener(@NonNull final OnExpiredListener listener) {
+        this.onExpiredListeners.add(listener);
         tryCb();
         return this;
     }
