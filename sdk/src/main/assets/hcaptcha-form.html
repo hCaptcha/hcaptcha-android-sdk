@@ -198,9 +198,7 @@
     }
 
     document.body.onclick = function () {
-        if (window.hcaptcha) {
-            window.hcaptcha.close();
-        } else {
+        if (!window.hcaptcha) {
             BridgeObject.onError(30);
         }
     };
