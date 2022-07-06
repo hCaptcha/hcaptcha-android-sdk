@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.1.1
+
+- Fix double close error reporting
+
 # 3.1.0
 
 - Add `pmd`, `checkstyle`, `spotbugs` tools to build system ([#40](https://github.com/hCaptcha/hcaptcha-android-sdk/issues/40))
