@@ -38,7 +38,7 @@ class HCaptchaJSInterface implements Serializable {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                captchaVerifier.onSuccess(new HCaptchaTokenResponse(token));
+                captchaVerifier.onSuccess(token);
             }
         });
     }

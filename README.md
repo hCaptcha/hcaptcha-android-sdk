@@ -76,13 +76,6 @@ hCaptcha
         Log.d("hCaptcha", "hCaptcha is closed");
     }
   })
-  .addOnExpiredListener(new OnExpiredListener() {
-    @Override
-    public void onExpired() {
-        // Usefull for analytics purposes
-        Log.d("hCaptcha", "hCaptcha is expired");
-    }
-  })
   .addOnChallengeExpiredListener(new OnChallengeExpiredListener() {
     @Override
     public void onChallengeExpired() {
@@ -129,7 +122,7 @@ hCaptcha.setup().verifyWithHCaptcha()
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
    1. the same client is used to invoke multiple verifications
    2. the config option `resetOnTimeout(true)` is used which will automatically trigger a new verification when the current token expired. This will result in a new success or error callback.
-
+   3. `onFailure` with `SESSION_TIMEOUT` will be called once the token is expired. To prevent this you can call `HCaptchaTokenResponse.markUsed` once the token is utilized. Also, you can change expiration timeout with `HCaptchaConfigBuilder.expirationTimeout(timeout)` (default 2 min.)
 
 ## Config Params
 

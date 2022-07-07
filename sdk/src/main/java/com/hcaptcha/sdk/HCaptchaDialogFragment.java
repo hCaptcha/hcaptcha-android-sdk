@@ -190,12 +190,12 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public void onSuccess(final HCaptchaTokenResponse tokenResponse) {
+    public void onSuccess(final String token) {
         assert webViewHelper != null;
         if (isAdded()) {
             dismiss();
         }
-        webViewHelper.getListener().onSuccess(tokenResponse);
+        webViewHelper.getListener().onSuccess(token);
     }
 
     @Override

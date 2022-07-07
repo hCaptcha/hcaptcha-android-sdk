@@ -17,7 +17,7 @@ public class HCaptchaStateTestAdapter extends HCaptchaStateListener {
     }
 
     @Override
-    void onSuccess(HCaptchaTokenResponse rsponse) {
+    void onSuccess(String response) {
         // empty default implementation to reduce amount of boilerplate code in tests
     }
 

@@ -34,7 +34,7 @@ public class HCaptchaJSInterfaceTest {
     IHCaptchaVerifier captchaVerifier;
 
     @Captor
-    ArgumentCaptor<HCaptchaTokenResponse> tokenCaptor;
+    ArgumentCaptor<String> tokenCaptor;
 
     @Captor
     ArgumentCaptor<HCaptchaException> exceptionCaptor;
@@ -177,7 +177,7 @@ public class HCaptchaJSInterfaceTest {
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         jsInterface.onPass(token);
         verify(captchaVerifier, times(1)).onSuccess(tokenCaptor.capture());
-        assertEquals(token, tokenCaptor.getValue().getTokenResult());
+        assertEquals(token, tokenCaptor.getValue());
     }
 
     @Test

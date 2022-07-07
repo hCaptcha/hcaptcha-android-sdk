@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.OnChallengeExpiredListener;
 import com.hcaptcha.sdk.tasks.OnCloseListener;
-import com.hcaptcha.sdk.tasks.OnExpiredListener;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
@@ -33,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tokenTextView;
     private TextView errorTextView;
     private HCaptcha hCaptcha;
+    private HCaptchaTokenResponse tokenResponse;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -102,11 +102,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onTokenRelease(final View v) {
+        if (tokenResponse != null) {
+            tokenResponse.markUsed();
+        }
+    }
+
     private void setupClient(final HCaptcha hCaptcha) {
         hCaptcha
             .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                 @Override
                 public void onSuccess(HCaptchaTokenResponse response) {
+                    tokenResponse = response;
                     String userResponseToken = response.getTokenResult();
                     setTokenTextView(userResponseToken);
                 }
@@ -116,6 +123,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(HCaptchaException e) {
                     Log.d(TAG, "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")");
                     setErrorTextView(e.getMessage());
+                    tokenResponse = null;
                 }
             })
             .addOnOpenListener(new OnOpenListener() {
@@ -128,12 +136,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onClose() {
                     Toast.makeText(MainActivity.this, "hCaptcha closed", Toast.LENGTH_SHORT).show();
-                }
-            })
-            .addOnExpiredListener(new OnExpiredListener() {
-                @Override
-                public void onExpired() {
-                    Toast.makeText(MainActivity.this, "hCaptcha expired", Toast.LENGTH_SHORT).show();
                 }
             })
             .addOnChallengeExpiredListener(new OnChallengeExpiredListener() {

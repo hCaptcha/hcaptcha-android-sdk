@@ -1,5 +1,7 @@
 package com.hcaptcha.sdk;
 
+import android.os.Handler;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -11,5 +13,14 @@ import lombok.Data;
 public class HCaptchaTokenResponse {
 
     private final String tokenResult;
+
+    private final Handler handler;
+
+    /**
+     * This method will signal SDK to not fire {@link HCaptchaError#SESSION_TIMEOUT}
+     */
+    public void markUsed() {
+        handler.removeCallbacksAndMessages(null);
+    }
 
 }

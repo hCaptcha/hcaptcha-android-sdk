@@ -15,7 +15,7 @@ interface IHCaptchaVerifier extends
         OnOpenListener,
         OnChallengeExpiredListener,
         OnCloseListener,
-        OnSuccessListener<HCaptchaTokenResponse>,
+        OnSuccessListener<String>,
         OnFailureListener {
 
     /**

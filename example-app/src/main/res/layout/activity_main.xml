@@ -33,6 +33,14 @@
             android:checked="false"
             android:text="@string/hide_dialog"
             style="@style/CheckBoxText" />
+        <CheckBox
+            android:id="@+id/webViewDebug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="false"
+            android:text="@string/web_view_debug"
+            style="@style/CheckBoxText" />
     </LinearLayout>
 
     <LinearLayout
@@ -57,14 +65,11 @@
             android:text="@string/verify"
             android:onClick="onClickVerify" />
 
-        <CheckBox
-            android:id="@+id/webViewDebug"
+        <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/web_view_debug"
-            style="@style/CheckBoxText" />
+            android:text="@string/used"
+            android:onClick="onTokenRelease" />
     </LinearLayout>
 
     <LinearLayout

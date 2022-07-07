@@ -7,12 +7,14 @@ import static androidx.test.espresso.web.model.Atoms.getCurrentUrl;
 import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static com.hcaptcha.sdk.AssertUtil.evaluateJavascript;
 import static org.hamcrest.Matchers.containsString;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
-import com.hcaptcha.sdk.tasks.OnExpiredListener;
+import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 import org.junit.Rule;
 import org.junit.Test;
@@ -46,10 +48,40 @@ public class HCaptchaTest {
                             latch.countDown();
                         }
                     })
-                    .addOnExpiredListener(new OnExpiredListener() {
+                    .addOnFailureListener(new OnFailureListener() {
                         @Override
-                        public void onExpired() {
+                        public void onFailure(HCaptchaException exception) {
+                            assertEquals(HCaptchaError.SESSION_TIMEOUT, exception.getHCaptchaError());
                             latch.countDown();
+                        }
+                    });
+        });
+
+        onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));
+        onView(withId(R.id.webView)).perform(evaluateJavascript("onPass(\"some-token\")"));
+
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
+    }
+
+    @Test
+    public void webViewSessionTimeoutSuppressed() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            HCaptcha.getClient(activity)
+                    .verifyWithHCaptcha(config)
+                    .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
+                        @Override
+                        public void onSuccess(HCaptchaTokenResponse response) {
+                            response.markUsed();
+                            latch.countDown();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(HCaptchaException exception) {
+                            fail("Session timeout should not be happened");
                         }
                     });
         });

@@ -80,9 +80,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
 
             @Override
-            void onSuccess(final HCaptchaTokenResponse response) {
+            void onSuccess(final String token) {
                 scheduleCaptchaExpired(HCaptcha.this.config.getExpirationTimeout());
-                setResult(response);
+                setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));
             }
 
             @Override

@@ -32,33 +32,48 @@ import java.util.concurrent.TimeUnit;
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaDialogFragmentTest {
     private static final long AWAIT_CALLBACK_MS = 1000;
+    private static final String TEST_TOKEN = "test-token";
 
-    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment() {
+    final HCaptchaConfig config = HCaptchaConfig.builder()
+            .siteKey("10000000-ffff-ffff-ffff-000000000001")
+            .endpoint("https://js.hcaptcha.com/1/api.js")
+            .locale("en")
+            .loading(true)
+            .size(HCaptchaSize.INVISIBLE)
+            .theme(HCaptchaTheme.LIGHT)
+            .build();
+
+    private FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment() {
         return launchCaptchaFragment(true);
     }
 
-    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader) {
-        return launchCaptchaFragment(showLoader, new HCaptchaStateTestAdapter());
+    private FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader) {
+        return launchCaptchaFragment(config.toBuilder().loading(showLoader).build(), new HCaptchaStateTestAdapter());
     }
 
-    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(HCaptchaStateListener listener) {
-        return launchCaptchaFragment(true, listener);
+    private FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(HCaptchaStateListener listener) {
+        return launchCaptchaFragment(config, listener);
     }
 
-    public FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(boolean showLoader,
-                                                                          HCaptchaStateListener listener) {
-        final HCaptchaConfig hCaptchaConfig = HCaptchaConfig.builder()
-                .siteKey("10000000-ffff-ffff-ffff-000000000001")
-                .endpoint("https://js.hcaptcha.com/1/api.js")
-                .locale("en")
-                .loading(showLoader)
-                .size(HCaptchaSize.INVISIBLE)
-                .theme(HCaptchaTheme.LIGHT)
-                .build();
+    private FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(final HCaptchaConfig captchaConfig,
+                                                                           HCaptchaStateListener listener) {
         final Bundle args = new Bundle();
-        args.putSerializable(KEY_CONFIG, hCaptchaConfig);
+        args.putSerializable(KEY_CONFIG, captchaConfig);
         args.putParcelable(KEY_LISTENER, listener);
         return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, args);
+    }
+
+    private void makeWebViewToEmitToken(String token) {
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
+
+        onWebView(withId(R.id.webView)).forceJavascriptEnabled();
+
+        onWebView().withElement(findElement(Locator.ID, "input-text"))
+                .perform(clearElement())
+                .perform(DriverAtoms.webKeys(token));
+
+        onWebView().withElement(findElement(Locator.ID, "on-pass"))
+                .perform(webClick());
     }
 
     @Test
@@ -82,23 +97,14 @@ public class HCaptchaDialogFragmentTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onSuccess(HCaptchaTokenResponse response) {
-                assertEquals("test-token", response.getTokenResult());
+            void onSuccess(String token) {
+                assertEquals(TEST_TOKEN, token);
                 latch.countDown();
             }
         };
 
         launchCaptchaFragment(listener);
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
-
-        onWebView(withId(R.id.webView)).forceJavascriptEnabled();
-
-        onWebView().withElement(findElement(Locator.ID, "input-text"))
-                .perform(clearElement())
-                .perform(DriverAtoms.webKeys("test-token"));
-
-        onWebView().withElement(findElement(Locator.ID, "on-pass"))
-                .perform(webClick());
+        makeWebViewToEmitToken(TEST_TOKEN);
 
         assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
     }
@@ -109,7 +115,7 @@ public class HCaptchaDialogFragmentTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException exception) {
-                assertEquals(HCaptchaError.SESSION_TIMEOUT, exception.getHCaptchaError());
+                assertEquals(HCaptchaError.CHALLENGE_ERROR, exception.getHCaptchaError());
                 latch.countDown();
             }
         };
@@ -122,7 +128,7 @@ public class HCaptchaDialogFragmentTest {
         onWebView().withElement(findElement(Locator.ID, "input-text"))
                 .perform(clearElement())
                 .perform(DriverAtoms.webKeys(
-                        String.valueOf(HCaptchaError.SESSION_TIMEOUT.getErrorId())));
+                        String.valueOf(HCaptchaError.CHALLENGE_ERROR.getErrorId())));
 
         onWebView().withElement(findElement(Locator.ID, "on-error"))
                 .perform(webClick());
@@ -141,16 +147,7 @@ public class HCaptchaDialogFragmentTest {
         };
 
         launchCaptchaFragment(listener);
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
-
-        onWebView(withId(R.id.webView)).forceJavascriptEnabled();
-
-        onWebView().withElement(findElement(Locator.ID, "input-text"))
-                .perform(clearElement())
-                .perform(DriverAtoms.webKeys("test-token"));
-
-        onWebView().withElement(findElement(Locator.ID, "on-pass"))
-                .perform(webClick());
+        makeWebViewToEmitToken(TEST_TOKEN);
 
         assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
     }
