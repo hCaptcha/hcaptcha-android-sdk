@@ -70,16 +70,6 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
 
             @Override
-            void onClose() {
-                captchaClosed();
-            }
-
-            @Override
-            void onChallengeExpired() {
-                captchaChallengeExpired();
-            }
-
-            @Override
             void onSuccess(final String token) {
                 scheduleCaptchaExpired(HCaptcha.this.config.getExpirationTimeout());
                 setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));

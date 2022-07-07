@@ -161,14 +161,16 @@ public class HCaptchaJSInterfaceTest {
     public void calls_on_challenge_close_cb() {
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         jsInterface.onClose();
-        verify(captchaVerifier, times(1)).onClose();
+        verify(captchaVerifier, times(1)).onFailure(exceptionCaptor.capture());
+        assertEquals(HCaptchaError.CHALLENGE_CLOSED, exceptionCaptor.getValue().getHCaptchaError());
     }
 
     @Test
     public void calls_on_challenge_expired_cb() {
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         jsInterface.onChallengeExpired();
-        verify(captchaVerifier, times(1)).onChallengeExpired();
+        verify(captchaVerifier, times(1)).onFailure(exceptionCaptor.capture());
+        assertEquals(HCaptchaError.SESSION_TIMEOUT, exceptionCaptor.getValue().getHCaptchaError());
     }
 
     @Test

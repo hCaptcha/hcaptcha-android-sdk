@@ -79,7 +79,7 @@ class HCaptchaJSInterface implements Serializable {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                captchaVerifier.onClose();
+                captchaVerifier.onFailure(new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
             }
         });
     }
@@ -89,7 +89,7 @@ class HCaptchaJSInterface implements Serializable {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                captchaVerifier.onChallengeExpired();
+                captchaVerifier.onFailure(new HCaptchaException(HCaptchaError.SESSION_TIMEOUT));
             }
         });
     }

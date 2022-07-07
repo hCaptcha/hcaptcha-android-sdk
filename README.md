@@ -69,20 +69,6 @@ hCaptcha
         Log.d("hCaptcha", "hCaptcha is now visible.");
     }
   });
-  .addOnCloseListener(new OnCloseListener() {
-    @Override
-    public void onClose() {
-        // Usefull for analytics purposes
-        Log.d("hCaptcha", "hCaptcha is closed");
-    }
-  })
-  .addOnChallengeExpiredListener(new OnChallengeExpiredListener() {
-    @Override
-    public void onChallengeExpired() {
-        // Usefull for analytics purposes
-        Log.d("hCaptcha", "hCaptcha challenge is expired");
-    }
-  });
 
 // =================================================
 // 3. Trigger the verification process which may or may not require user input. 
@@ -128,24 +114,25 @@ hCaptcha.setup().verifyWithHCaptcha()
 
 The following list contains configuration properties to allows customization of the hCaptcha verification flow.
 
-| Name             | Values/Type             | Required | Default   | Description                                                                                                                                                          |
-|------------------|-------------------------|----------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `siteKey`        | String                  | **Yes**  | -         | This is your sitekey, this allows you to load challenges. If you need a sitekey, please visit [hCaptcha](https://www.hcaptcha.com), and sign up to get your sitekey. |
-| `size`           | Enum                    | No       | INVISIBLE | This specifies the "size" of the checkbox component. By default, the checkbox is invisible and the challenge is shown automatically.                                 |
-| `theme`          | Enum                    | No       | LIGHT     | hCaptcha supports light, dark, and contrast themes.                                                                                                                  |
-| `locale`         | String (ISO 639-2 code) | No       | AUTO      | You can enforce a specific language or let hCaptcha auto-detect the local language based on user's device.                                                           |
-| `resetOnTimeout` | Boolean                 | No       | False     | Automatically reload to fetch new challenge if user does not submit challenge. (Matches iOS SDK behavior.)                                                           |
-| `sentry`         | Boolean                 | No       | True      | See Enterprise docs.                                                                                                                                                 |
-| `rqdata`         | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `apiEndpoint`    | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `endpoint`       | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `reportapi`      | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `assethost`      | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `imghost`        | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `customTheme`    | Stringified JSON        | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `host`           | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
-| `loading`        | Boolean                 | No       | True      | Show or hide the loading dialog.                                                                                                                                     |
-| `hideDialog`     | Boolean                 | No       | False     | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                                              |
+| Name                | Values/Type             | Required | Default   | Description                                                                                                                                                          |
+|---------------------|-------------------------|----------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `siteKey`           | String                  | **Yes**  | -         | This is your sitekey, this allows you to load challenges. If you need a sitekey, please visit [hCaptcha](https://www.hcaptcha.com), and sign up to get your sitekey. |
+| `size`              | Enum                    | No       | INVISIBLE | This specifies the "size" of the checkbox component. By default, the checkbox is invisible and the challenge is shown automatically.                                 |
+| `theme`             | Enum                    | No       | LIGHT     | hCaptcha supports light, dark, and contrast themes.                                                                                                                  |
+| `locale`            | String (ISO 639-2 code) | No       | AUTO      | You can enforce a specific language or let hCaptcha auto-detect the local language based on user's device.                                                           |
+| `resetOnTimeout`    | Boolean                 | No       | False     | Automatically reload to fetch new challenge if user does not submit challenge. (Matches iOS SDK behavior.)                                                           |
+| `sentry`            | Boolean                 | No       | True      | See Enterprise docs.                                                                                                                                                 |
+| `rqdata`            | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `apiEndpoint`       | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `endpoint`          | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `reportapi`         | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `assethost`         | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `imghost`           | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `customTheme`       | Stringified JSON        | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `host`              | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
+| `loading`           | Boolean                 | No       | True      | Show or hide the loading dialog.                                                                                                                                     |
+| `hideDialog`        | Boolean                 | No       | False     | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
+| `expirationTimeout` | long                    | No       | 120       | hCaptcha token expiration timeout (seconds).                                                                                                                         |
 
 ### Config Examples
 
