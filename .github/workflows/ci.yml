@@ -8,7 +8,7 @@ jobs:
     name: Build & Unit-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
           java-version: '8'
@@ -18,11 +18,6 @@ jobs:
         run: |
           ./gradlew build --stacktrace
           cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
-      - name: Build and analyze
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube --info
       - name: HTML ES5 test
         run: |
           npm install -g jshint
@@ -34,6 +29,21 @@ jobs:
         with:
           path: sdk-main.aar
           key: diffuse-${{ github.sha }}
+  sonar:
+    name: SonarScaner
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: adopt
+          cache: 'gradle'
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: ./gradlew sonarqube --info
   ui-tests:
     name: Android UI Tests
     runs-on: macos-latest
@@ -43,7 +53,7 @@ jobs:
         api-level: [29] # , 23, 21]
         target: [default] #, google_apis]
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - uses: actions/setup-java@v2
         with:
           java-version: '8'
