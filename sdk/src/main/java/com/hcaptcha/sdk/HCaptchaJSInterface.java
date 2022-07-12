@@ -73,24 +73,4 @@ class HCaptchaJSInterface implements Serializable {
             }
         });
     }
-
-    @JavascriptInterface
-    public void onClose() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                captchaVerifier.onFailure(new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
-            }
-        });
-    }
-
-    @JavascriptInterface
-    public void onChallengeExpired() {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                captchaVerifier.onFailure(new HCaptchaException(HCaptchaError.SESSION_TIMEOUT));
-            }
-        });
-    }
 }

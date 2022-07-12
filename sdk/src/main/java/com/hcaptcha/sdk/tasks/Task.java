@@ -125,7 +125,7 @@ public abstract class Task<TResult> {
             @Override
             public void run() {
                 for (OnFailureListener listener : onFailureListeners) {
-                    listener.onFailure(new HCaptchaException(HCaptchaError.SESSION_TIMEOUT));
+                    listener.onFailure(new HCaptchaException(HCaptchaError.TOKEN_TIMEOUT));
                 }
             }
         }, TimeUnit.SECONDS.toMillis(expirationTimeout));

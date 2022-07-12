@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void onTokenRelease(final View v) {
+    public void onMarkUsed(final View v) {
         if (tokenResponse != null) {
             tokenResponse.markUsed();
         }

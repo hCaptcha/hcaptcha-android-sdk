@@ -169,6 +169,7 @@ The following is a list of possible error codes:
 | `CHALLENGE_ERROR`      | 9     | JS client encountered an error on challenge setup. |
 | `INTERNAL_ERROR`       | 10    | JS client encountered an internal error.           |
 | `SESSION_TIMEOUT`      | 15    | The challenge expired.                             |
+| `TOKEN_TIMEOUT`        | 16    | The token expired.                                 |
 | `CHALLENGE_CLOSED`     | 30    | The challenge was closed by the user.              |
 | `RATE_LIMITED`         | 31    | Spam detected.                                     |
 | `INVALID_CUSTOM_THEME` | 32    | Invalid custom theme.                              |
