@@ -1,5 +1,13 @@
 # Changelog
 
+# 3.2.0
+
+- Add `TOKEN_TIMEOUT` error triggered after a certain configured number of seconds elapsed from the token issuance.
+
+# 3.1.2
+
+- Fix checkbox view not dismissible
+
 # 3.1.1
 
 - Fix double close error reporting

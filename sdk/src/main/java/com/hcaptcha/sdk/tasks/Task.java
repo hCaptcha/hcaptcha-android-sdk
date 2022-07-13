@@ -1,12 +1,16 @@
 package com.hcaptcha.sdk.tasks;
 
+import android.os.Handler;
+import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hcaptcha.sdk.HCaptchaError;
 import com.hcaptcha.sdk.HCaptchaException;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -29,6 +33,8 @@ public abstract class Task<TResult> {
     private final List<OnFailureListener> onFailureListeners;
 
     private final List<OnOpenListener> onOpenListeners;
+
+    protected final Handler handler = new Handler(Looper.getMainLooper());
 
     /**
      * Creates a new Task object
@@ -108,6 +114,21 @@ public abstract class Task<TResult> {
         for (OnOpenListener listener : onOpenListeners) {
             listener.onOpen();
         }
+    }
+
+    /**
+     * Schedule timer to expire the token.
+     * @param tokenExpiration - token expiration timeout (seconds)
+     */
+    protected void scheduleCaptchaExpired(final long tokenExpiration) {
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for (OnFailureListener listener : onFailureListeners) {
+                    listener.onFailure(new HCaptchaException(HCaptchaError.TOKEN_TIMEOUT));
+                }
+            }
+        }, TimeUnit.SECONDS.toMillis(tokenExpiration));
     }
 
     /**

@@ -38,9 +38,14 @@ public enum HCaptchaError implements Serializable {
     INTERNAL_ERROR(10, "hCaptcha client encountered an internal error"),
 
     /**
-     * hCaptcha session timed out either the token or challenge expired
+     * hCaptcha challenge expired
      */
     SESSION_TIMEOUT(15, "Session Timeout"),
+
+    /**
+     * hCaptcha token expired
+     */
+    TOKEN_TIMEOUT(16, "Token Timeout"),
 
     /**
      * User closed the challenge by pressing `back` button or touching the outside of the dialog.

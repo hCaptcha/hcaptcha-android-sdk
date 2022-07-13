@@ -70,8 +70,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
 
             @Override
-            void onSuccess(final HCaptchaTokenResponse response) {
-                setResult(response);
+            void onSuccess(final String token) {
+                scheduleCaptchaExpired(HCaptcha.this.config.getTokenExpiration());
+                setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));
             }
 
             @Override
@@ -99,9 +100,8 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             // Cold start at verification time.
             setup();
         }
-        assert captchaVerifier != null;
-        captchaVerifier.startVerification(activity);
-        return this;
+
+        return startVerification();
     }
 
     @Override
@@ -111,9 +111,8 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             // Or new sitekey detected, thus new setup is needed.
             setup(siteKey);
         }
-        assert captchaVerifier != null;
-        captchaVerifier.startVerification(activity);
-        return this;
+
+        return startVerification();
     }
 
     @Override
@@ -123,6 +122,12 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             // Or new config detected, thus new setup is needed.
             setup(inputConfig);
         }
+
+        return startVerification();
+    }
+
+    private HCaptcha startVerification() {
+        handler.removeCallbacksAndMessages(null);
         assert captchaVerifier != null;
         captchaVerifier.startVerification(activity);
         return this;

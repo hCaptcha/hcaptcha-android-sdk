@@ -5,7 +5,7 @@ import android.os.Parcelable;
 
 abstract class HCaptchaStateListener implements Parcelable {
 
-    abstract void onSuccess(HCaptchaTokenResponse tokenResponse);
+    abstract void onSuccess(String token);
 
     abstract void onFailure(HCaptchaException exception);
 

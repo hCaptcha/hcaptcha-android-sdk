@@ -101,9 +101,6 @@
             callback: function callback(token) {
                 return BridgeObject.onPass(token);
             },
-            'expired-callback': function expiredCallback() {
-                return BridgeObject.onError(15);
-            },
             'chalexpired-callback': function chalexpiredCallback() {
                 return BridgeObject.onError(15);
             },
@@ -197,11 +194,15 @@
         document.head.appendChild(script);
     }
 
-    document.body.onclick = function () {
-        if (!window.hcaptcha) {
+    var container = document.getElementById("hcaptcha-container");
+    container.addEventListener("click", function () {
+        if (window.hcaptcha) {
+            // Allows dismissal of checkbox view
+            window.hcaptcha.close();
+        } else {
             BridgeObject.onError(30);
         }
-    };
+    });
 
     loadApi();
 
