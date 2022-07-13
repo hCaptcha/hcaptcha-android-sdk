@@ -66,8 +66,8 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     }
 
     @Override
-    public void onSuccess(final HCaptchaTokenResponse tokenResponse) {
-        listener.onSuccess(tokenResponse);
+    public void onSuccess(final String token) {
+        listener.onSuccess(token);
     }
 
     @Override

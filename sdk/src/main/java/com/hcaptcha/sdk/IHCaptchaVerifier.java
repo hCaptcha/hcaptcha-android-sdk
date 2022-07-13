@@ -11,7 +11,7 @@ import lombok.NonNull;
 interface IHCaptchaVerifier extends
         OnLoadedListener,
         OnOpenListener,
-        OnSuccessListener<HCaptchaTokenResponse>,
+        OnSuccessListener<String>,
         OnFailureListener {
 
     /**

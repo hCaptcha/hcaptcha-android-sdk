@@ -30,6 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView tokenTextView;
     private TextView errorTextView;
     private HCaptcha hCaptcha;
+    private HCaptchaTokenResponse tokenResponse;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 .size(size)
                 .loading(loading.isChecked())
                 .hideDialog(hideDialog.isChecked())
+                .tokenExpiration(10)
                 .build();
     }
 
@@ -98,11 +100,18 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onMarkUsed(final View v) {
+        if (tokenResponse != null) {
+            tokenResponse.markUsed();
+        }
+    }
+
     private void setupClient(final HCaptcha hCaptcha) {
         hCaptcha
             .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                 @Override
                 public void onSuccess(HCaptchaTokenResponse response) {
+                    tokenResponse = response;
                     String userResponseToken = response.getTokenResult();
                     setTokenTextView(userResponseToken);
                 }
@@ -112,6 +121,7 @@ public class MainActivity extends AppCompatActivity {
                 public void onFailure(HCaptchaException e) {
                     Log.d(TAG, "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")");
                     setErrorTextView(e.getMessage());
+                    tokenResponse = null;
                 }
             })
             .addOnOpenListener(new OnOpenListener() {

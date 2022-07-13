@@ -113,4 +113,10 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     private Boolean resetOnTimeout = false;
+
+    /**
+     * hCaptcha token expiration timeout (seconds)
+     */
+    @Builder.Default
+    private long tokenExpiration = 120;
 }

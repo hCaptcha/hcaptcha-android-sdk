@@ -45,7 +45,7 @@ public class HCaptchaHeadlessWebViewTest {
             }
 
             @Override
-            void onSuccess(HCaptchaTokenResponse response) {
+            void onSuccess(String token) {
                 latch.countDown();
             }
 
@@ -73,7 +73,7 @@ public class HCaptchaHeadlessWebViewTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(HCaptchaTokenResponse response) {
+            void onSuccess(String token) {
                 fail("Should not be called for this test");
             }
 
