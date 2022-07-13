@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.1.2
+
+- Fix checkbox view not dismissible
+
 # 3.1.1
 
 - Fix double close error reporting
