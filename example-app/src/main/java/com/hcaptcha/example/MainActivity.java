@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
                 .size(size)
                 .loading(loading.isChecked())
                 .hideDialog(hideDialog.isChecked())
-                .expirationTimeout(10)
+                .tokenExpiration(10)
                 .build();
     }
 

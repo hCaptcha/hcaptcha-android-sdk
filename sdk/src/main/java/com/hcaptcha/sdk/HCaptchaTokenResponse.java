@@ -17,7 +17,7 @@ public class HCaptchaTokenResponse {
     private final Handler handler;
 
     /**
-     * This method will signal SDK to not fire {@link HCaptchaError#SESSION_TIMEOUT}
+     * This method will signal SDK to not fire {@link HCaptchaError#TOKEN_TIMEOUT}
      */
     public void markUsed() {
         handler.removeCallbacksAndMessages(null);

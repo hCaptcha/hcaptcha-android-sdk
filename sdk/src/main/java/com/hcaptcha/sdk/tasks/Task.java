@@ -118,9 +118,9 @@ public abstract class Task<TResult> {
 
     /**
      * Internal callback which called once 'expired-callback' fired in js SDK
-     * @param expirationTimeout - token expiration timeout (seconds)
+     * @param tokenExpiration - token expiration timeout (seconds)
      */
-    protected void scheduleCaptchaExpired(final long expirationTimeout) {
+    protected void scheduleCaptchaExpired(final long tokenExpiration) {
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
@@ -128,7 +128,7 @@ public abstract class Task<TResult> {
                     listener.onFailure(new HCaptchaException(HCaptchaError.TOKEN_TIMEOUT));
                 }
             }
-        }, TimeUnit.SECONDS.toMillis(expirationTimeout));
+        }, TimeUnit.SECONDS.toMillis(tokenExpiration));
     }
 
     /**

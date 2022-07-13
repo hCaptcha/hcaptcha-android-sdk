@@ -31,7 +31,7 @@ public class HCaptchaTest {
     final HCaptchaConfig config = HCaptchaConfig.builder()
             .siteKey("10000000-ffff-ffff-ffff-000000000001")
             .hideDialog(true)
-            .expirationTimeout(1)
+            .tokenExpiration(1)
             .build();
 
     @Test
