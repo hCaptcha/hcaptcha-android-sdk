@@ -117,7 +117,7 @@ public abstract class Task<TResult> {
     }
 
     /**
-     * Internal callback which called once 'expired-callback' fired in js SDK
+     * Schedule timer to expire the token.
      * @param tokenExpiration - token expiration timeout (seconds)
      */
     protected void scheduleCaptchaExpired(final long tokenExpiration) {
