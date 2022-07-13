@@ -4,14 +4,15 @@ import android.os.Handler;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 
 /**
  * Token response which contains the token string to be verified
  */
-@Data
 @AllArgsConstructor
 public class HCaptchaTokenResponse {
 
+    @Getter
     private final String tokenResult;
 
     private final Handler handler;
