@@ -3,7 +3,6 @@ package com.hcaptcha.sdk;
 import android.os.Handler;
 
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 
 /**
