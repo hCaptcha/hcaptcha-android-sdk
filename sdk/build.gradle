@@ -134,6 +134,7 @@ project.afterEvaluate {
     }
 }
 
+// cloud-based static analysis tool
 sonarqube {
     properties {
         property "sonar.projectKey", "hCaptcha_hcaptcha-android-sdk"
