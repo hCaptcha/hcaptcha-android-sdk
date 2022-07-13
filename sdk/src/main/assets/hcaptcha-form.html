@@ -197,11 +197,15 @@
         document.head.appendChild(script);
     }
 
-    document.body.onclick = function () {
-        if (!window.hcaptcha) {
+    var container = document.getElementById("hcaptcha-container");
+    container.addEventListener("click", function () {
+        if (window.hcaptcha) {
+            // Allows dismissal of checkbox view
+            window.hcaptcha.close();
+        } else {
             BridgeObject.onError(30);
         }
-    };
+    });
 
     loadApi();
 
