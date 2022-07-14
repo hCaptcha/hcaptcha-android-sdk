@@ -30,7 +30,7 @@ jobs:
           path: sdk-main.aar
           key: diffuse-${{ github.sha }}
   sonar:
-    name: SonarScaner
+    name: SonarScanner
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -39,6 +39,7 @@ jobs:
           java-version: '11'
           distribution: adopt
           cache: 'gradle'
+          fetch-depth: 0
       - name: Build and analyze
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
