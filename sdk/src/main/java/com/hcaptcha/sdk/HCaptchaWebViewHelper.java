@@ -21,8 +21,6 @@ import lombok.Getter;
 import lombok.NonNull;
 
 final class HCaptchaWebViewHelper {
-    static final String HCAPTCHA_URL = "file:///android_asset/hcaptcha-form.html";
-
     @NonNull
     private final Context context;
 
@@ -41,17 +39,22 @@ final class HCaptchaWebViewHelper {
     @NonNull
     private final WebView webView;
 
+    @NonNull
+    private final IHCaptchaHtmlProvider htmlProvider;
+
     HCaptchaWebViewHelper(@NonNull final Handler handler,
                           @NonNull final Context context,
                           @NonNull final HCaptchaConfig config,
                           @NonNull final IHCaptchaVerifier captchaVerifier,
                           @NonNull final HCaptchaStateListener listener,
-                          @NonNull final WebView webView) {
+                          @NonNull final WebView webView,
+                          @NonNull final IHCaptchaHtmlProvider htmlProvider) {
         this.context = context;
         this.config = config;
         this.captchaVerifier = captchaVerifier;
         this.listener = listener;
         this.webView = webView;
+        this.htmlProvider = htmlProvider;
         setupWebView(handler);
     }
 
@@ -78,7 +81,7 @@ final class HCaptchaWebViewHelper {
         webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         webView.addJavascriptInterface(jsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
         webView.addJavascriptInterface(debugInfo, HCaptchaDebugInfo.JS_INTERFACE_TAG);
-        webView.loadUrl(HCAPTCHA_URL);
+        webView.loadDataWithBaseURL(null, htmlProvider.getHtml(), "text/html", "UTF-8", null);
     }
 
     public void destroy() {

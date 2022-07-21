@@ -29,6 +29,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HCaptchaWebViewHelperTest {
+    private static final String MOCK_HTML = "<html/>";
 
     @Mock
     Context context;
@@ -54,6 +55,9 @@ public class HCaptchaWebViewHelperTest {
     @Mock
     Handler handler;
 
+    @Mock
+    IHCaptchaHtmlProvider htmlProvider;
+
     MockedStatic<Log> androidLogMock;
 
     @Before
@@ -63,9 +67,11 @@ public class HCaptchaWebViewHelperTest {
         stateListener = mock(HCaptchaStateListener.class);
         webView = mock(WebView.class);
         webSettings = mock(WebSettings.class);
+        htmlProvider = mock(IHCaptchaHtmlProvider.class);
+        when(htmlProvider.getHtml()).thenReturn(MOCK_HTML);
         when(webView.getSettings()).thenReturn(webSettings);
         webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier,
-                stateListener, webView);
+                stateListener, webView, htmlProvider);
     }
 
     @After
@@ -75,7 +81,7 @@ public class HCaptchaWebViewHelperTest {
 
     @Test
     public void test_constructor() {
-        verify(webView).loadUrl(HCaptchaWebViewHelper.HCAPTCHA_URL);
+        verify(webView).loadDataWithBaseURL(null, MOCK_HTML, "text/html", "UTF-8", null);
         verify(webView, times(2)).addJavascriptInterface(any(), anyString());
     }
 

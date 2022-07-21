@@ -1,13 +1,7 @@
 package com.hcaptcha.sdk;
 
-import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.matcher.ViewMatchers.withId;
-import static androidx.test.espresso.web.assertion.WebViewAssertions.webMatches;
-import static androidx.test.espresso.web.model.Atoms.getCurrentUrl;
-import static androidx.test.espresso.web.sugar.Web.onWebView;
-import static com.hcaptcha.sdk.AssertUtil.evaluateJavascript;
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertTrue;
+import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewError;
+import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static org.junit.Assert.fail;
 
 import androidx.test.core.app.ActivityScenario;
@@ -19,7 +13,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaHeadlessWebViewTest {
@@ -34,6 +27,8 @@ public class HCaptchaHeadlessWebViewTest {
             .size(HCaptchaSize.INVISIBLE)
             .hideDialog(true)
             .build();
+
+    final IHCaptchaHtmlProvider htmlProvider = new HCaptchaTestHtml();
 
     @Test
     public void testSuccess() throws Exception {
@@ -57,14 +52,12 @@ public class HCaptchaHeadlessWebViewTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(activity, config, listener);
+            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
+                    activity, config, listener, htmlProvider);
             subject.startVerification(activity);
         });
 
-        onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));
-        onView(withId(R.id.webView)).perform(evaluateJavascript("onPass(\"some-token\")"));
-
-        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
+        waitHCaptchaWebViewToken(latch, AWAIT_CALLBACK_MS);
     }
 
     @Test
@@ -85,14 +78,11 @@ public class HCaptchaHeadlessWebViewTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(activity, config, listener);
+            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
+                    activity, config, listener, htmlProvider);
             subject.startVerification(activity);
         });
 
-        onWebView().check(webMatches(getCurrentUrl(), containsString("hcaptcha-form.html")));
-        onView(withId(R.id.webView)).perform(evaluateJavascript(
-                "onError(" + HCaptchaError.ERROR.getErrorId() + ")"));
-
-        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
+        waitHCaptchaWebViewError(latch, HCaptchaError.ERROR, AWAIT_CALLBACK_MS);
     }
 }
