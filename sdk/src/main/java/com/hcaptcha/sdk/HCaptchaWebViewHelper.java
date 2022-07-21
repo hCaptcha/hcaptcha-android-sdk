@@ -3,13 +3,19 @@ package com.hcaptcha.sdk;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Color;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import androidx.annotation.RequiresApi;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -65,6 +71,9 @@ final class HCaptchaWebViewHelper {
         settings.setGeolocationEnabled(false);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            webView.setWebViewClient(new HCaptchaWebClient());
+        }
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         webView.addJavascriptInterface(jsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
@@ -82,5 +91,19 @@ final class HCaptchaWebViewHelper {
             Log.w(HCaptcha.TAG, "webView.getParent() is null or not a ViewGroup instance");
         }
         webView.destroy();
+    }
+
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+    private class HCaptchaWebClient  extends WebViewClient {
+
+        @Override
+        public WebResourceResponse shouldInterceptRequest (final WebView view, final WebResourceRequest request) {
+            final Uri requestUri = request.getUrl();
+            if (requestUri != null && requestUri.getScheme().equals("http")) {
+                webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
+                webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);
+            }
+            return super.shouldInterceptRequest(view, request);
+        }
     }
 }
