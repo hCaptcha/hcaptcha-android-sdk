@@ -158,7 +158,7 @@ public final class AssertUtil {
 
     public static void waitHCaptchaWebViewToken(final CountDownLatch latch, final long timeout)
             throws InterruptedException {
-        onWebView().check(webMatches(getCurrentUrl(), startsWith("data:text/html,")));
+        onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
         onView(withId(R.id.webView)).perform(evaluateJavascript("onPass(\"some-token\")"));
         assertTrue(latch.await(timeout, TimeUnit.MILLISECONDS));
     }
@@ -167,7 +167,7 @@ public final class AssertUtil {
                                                 final HCaptchaError error,
                                                 final long timeout)
             throws InterruptedException {
-        onWebView().check(webMatches(getCurrentUrl(), startsWith("data:text/html,")));
+        onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
         onView(withId(R.id.webView)).perform(evaluateJavascript(
                 "onError(" + error.getErrorId() + ")"));
         assertTrue(latch.await(timeout, TimeUnit.MILLISECONDS));
