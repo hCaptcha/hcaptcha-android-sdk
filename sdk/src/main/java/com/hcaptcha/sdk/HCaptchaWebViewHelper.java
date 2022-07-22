@@ -81,7 +81,7 @@ final class HCaptchaWebViewHelper {
         webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         webView.addJavascriptInterface(jsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
         webView.addJavascriptInterface(debugInfo, HCaptchaDebugInfo.JS_INTERFACE_TAG);
-        webView.loadDataWithBaseURL(null, htmlProvider.getHtml(), "text/html", "UTF-8", null);
+        webView.loadDataWithBaseURL(config.getHost(), htmlProvider.getHtml(), "text/html", "UTF-8", null);
     }
 
     public void destroy() {

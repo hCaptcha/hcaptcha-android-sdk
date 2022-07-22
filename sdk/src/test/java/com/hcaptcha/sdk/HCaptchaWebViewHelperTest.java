@@ -70,8 +70,6 @@ public class HCaptchaWebViewHelperTest {
         htmlProvider = mock(IHCaptchaHtmlProvider.class);
         when(htmlProvider.getHtml()).thenReturn(MOCK_HTML);
         when(webView.getSettings()).thenReturn(webSettings);
-        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier,
-                stateListener, webView, htmlProvider);
     }
 
     @After
@@ -81,12 +79,16 @@ public class HCaptchaWebViewHelperTest {
 
     @Test
     public void test_constructor() {
+        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier,
+                stateListener, webView, htmlProvider);
         verify(webView).loadDataWithBaseURL(null, MOCK_HTML, "text/html", "UTF-8", null);
         verify(webView, times(2)).addJavascriptInterface(any(), anyString());
     }
 
     @Test
     public void test_destroy() {
+        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier,
+                stateListener, webView, htmlProvider);
         final ViewGroup viewParent = mock(ViewGroup.class, withSettings().extraInterfaces(ViewParent.class));
         when(webView.getParent()).thenReturn(viewParent);
         webViewHelper.destroy();
@@ -96,6 +98,17 @@ public class HCaptchaWebViewHelperTest {
 
     @Test
     public void test_destroy_webview_parent_null() {
+        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier,
+                stateListener, webView, htmlProvider);
         webViewHelper.destroy();
+    }
+
+    @Test
+    public void test_config_host_pased() {
+        final String host = "https://my.awesome.host";
+        when(config.getHost()).thenReturn(host);
+        webViewHelper = new HCaptchaWebViewHelper(handler, context, config, captchaVerifier,
+                stateListener, webView, htmlProvider);
+        verify(webView).loadDataWithBaseURL(host, MOCK_HTML, "text/html", "UTF-8", null);
     }
 }

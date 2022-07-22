@@ -1,8 +1,11 @@
 package com.hcaptcha.sdk;
 
+import androidx.annotation.NonNull;
+
 class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
 
     @Override
+    @NonNull
     public String getHtml() {
         return "<html>\n"
                 + "<head>\n"

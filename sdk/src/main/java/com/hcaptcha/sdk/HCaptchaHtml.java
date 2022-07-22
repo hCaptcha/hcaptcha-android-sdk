@@ -1,9 +1,12 @@
 package com.hcaptcha.sdk;
 
+import lombok.NonNull;
+
 final class HCaptchaHtml implements IHCaptchaHtmlProvider {
 
-    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     @Override
+    @NonNull
+    @SuppressWarnings("PMD.AvoidDuplicateLiterals")
     public String getHtml() {
         return "<html>\n"
                 + "<head>\n"
