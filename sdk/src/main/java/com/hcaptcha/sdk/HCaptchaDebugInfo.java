@@ -35,7 +35,7 @@ final class HCaptchaDebugInfo implements Serializable {
     private static final String GET_PROP_BIN = "/system/bin/getprop";
     private static final String CHARSET_NAME = "UTF-8";
 
-    private static String sDebugInfo;
+    private static String sDebugInfo = "[]";
     private static String sSysDebug;
 
     @NonNull
