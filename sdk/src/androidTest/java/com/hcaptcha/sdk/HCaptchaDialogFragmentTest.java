@@ -11,6 +11,7 @@ import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
 import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
+import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_HTML;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -60,20 +61,24 @@ public class HCaptchaDialogFragmentTest {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, captchaConfig);
         args.putParcelable(KEY_LISTENER, listener);
+        args.putSerializable(KEY_HTML, new HCaptchaTestHtml());
         return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, args);
     }
 
-    private void makeWebViewToEmitToken(String token) {
+    private void waitForWebViewToEmitToken(final CountDownLatch latch)
+            throws InterruptedException {
         onView(withId(R.id.webView)).perform(waitToBeDisplayed());
 
         onWebView(withId(R.id.webView)).forceJavascriptEnabled();
 
         onWebView().withElement(findElement(Locator.ID, "input-text"))
                 .perform(clearElement())
-                .perform(DriverAtoms.webKeys(token));
+                .perform(DriverAtoms.webKeys(TEST_TOKEN));
 
         onWebView().withElement(findElement(Locator.ID, "on-pass"))
                 .perform(webClick());
+
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -104,9 +109,7 @@ public class HCaptchaDialogFragmentTest {
         };
 
         launchCaptchaFragment(listener);
-        makeWebViewToEmitToken(TEST_TOKEN);
-
-        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
+        waitForWebViewToEmitToken(latch);
     }
 
     @Test
@@ -147,8 +150,6 @@ public class HCaptchaDialogFragmentTest {
         };
 
         launchCaptchaFragment(listener);
-        makeWebViewToEmitToken(TEST_TOKEN);
-
-        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
+        waitForWebViewToEmitToken(latch);
     }
 }

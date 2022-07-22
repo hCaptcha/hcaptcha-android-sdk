@@ -1,5 +1,10 @@
 # Changelog
 
+# 3.3.0
+
+- Disabled cleartext traffic (`android:usesCleartextTraffic="false"` added to `AndroidManifest.xml`)
+- `hcaptcha-form.html` asset moved into a variable
+
 # 3.2.0
 
 - Add `TOKEN_TIMEOUT` error triggered after a certain configured number of seconds elapsed from the token issuance.

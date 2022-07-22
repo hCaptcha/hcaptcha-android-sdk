@@ -37,17 +37,18 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     /**
      * Static TAG String
      */
-    public static final String TAG = HCaptchaDialogFragment.class.getSimpleName();
+    private static final String TAG = HCaptchaDialogFragment.class.getSimpleName();
 
     /**
      * Key for passing config to the dialog fragment
      */
-    public static final String KEY_CONFIG = "hCaptchaConfig";
+    static final String KEY_CONFIG = "hCaptchaConfig";
 
     /**
      * Key for passing listener to the dialog fragment
      */
-    public static final String KEY_LISTENER = "hCaptchaDialogListener";
+    static final String KEY_LISTENER = "hCaptchaDialogListener";
+    static final String KEY_HTML = "hCaptchaHtmlProvider";
 
     @Nullable
     private HCaptchaWebViewHelper webViewHelper;
@@ -63,11 +64,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      */
     public static HCaptchaDialogFragment newInstance(
             @NonNull final HCaptchaConfig config,
-            @NonNull final HCaptchaStateListener listener
+            @NonNull final HCaptchaStateListener listener,
+            @NonNull final IHCaptchaHtmlProvider htmlProvider
     ) {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
         args.putParcelable(KEY_LISTENER, listener);
+        args.putSerializable(KEY_HTML, htmlProvider);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
         return hCaptchaDialogFragment;
@@ -84,10 +87,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         final View rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
         assert getArguments() != null;
         final HCaptchaStateListener listener;
+        final IHCaptchaHtmlProvider htmlProvider;
         try {
             listener = getArguments().getParcelable(KEY_LISTENER);
             assert listener != null;
-        } catch (BadParcelableException e) {
+            htmlProvider = (IHCaptchaHtmlProvider) getArguments().getSerializable(KEY_HTML);
+            assert htmlProvider != null;
+        } catch (BadParcelableException | ClassCastException e) {
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back
             dismiss();
@@ -99,7 +105,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
         webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), requireContext(), config, this, listener, webView);
+                new Handler(Looper.getMainLooper()), requireContext(), config, this, listener, webView, htmlProvider);
         return rootView;
     }
 

@@ -21,7 +21,8 @@ jobs:
       - name: HTML ES5 test
         run: |
           npm install -g jshint
-          jshint --extract=always sdk/src/main/assets/hcaptcha-form.html
+          java -cp sdk/build/intermediates/javac/release/classes com.hcaptcha.sdk.HCaptchaHtml > sdk/build/hcaptcha-form.html
+          jshint --extract=always sdk/build/hcaptcha-form.html
       - name: JitPack Test
         run: ./gradlew publishReleasePublicationToMavenLocal
       - if: github.event_name == 'push'

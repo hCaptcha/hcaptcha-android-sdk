@@ -24,9 +24,10 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     private boolean webViewLoaded;
     private boolean shouldExecuteOnLoad;
 
-    HCaptchaHeadlessWebView(@NonNull FragmentActivity activity,
+    HCaptchaHeadlessWebView(@NonNull final FragmentActivity activity,
                             @NonNull final HCaptchaConfig config,
-                            @NonNull final HCaptchaStateListener listener) {
+                            @NonNull final HCaptchaStateListener listener,
+                            @NonNull final IHCaptchaHtmlProvider htmlProvider) {
         this.config = config;
         this.listener = listener;
         final WebView webView = new WebView(activity);
@@ -37,7 +38,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
             rootView.addView(webView);
         }
         webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), activity, config, this, listener, webView);
+                new Handler(Looper.getMainLooper()), activity, config, this, listener, webView, htmlProvider);
     }
 
     @Override

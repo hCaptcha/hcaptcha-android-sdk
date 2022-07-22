@@ -1,8 +1,15 @@
 package com.hcaptcha.sdk;
 
+import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.matcher.ViewMatchers.isAssignableFrom;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
+import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.web.assertion.WebViewAssertions.webMatches;
+import static androidx.test.espresso.web.model.Atoms.getCurrentUrl;
+import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static org.hamcrest.CoreMatchers.any;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.junit.Assert.assertTrue;
 
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -16,6 +23,8 @@ import androidx.test.espresso.util.TreeIterables;
 import org.hamcrest.Matcher;
 
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -145,5 +154,22 @@ public final class AssertUtil {
                 mEvaluateFinished.set(true);
             }
         };
+    }
+
+    public static void waitHCaptchaWebViewToken(final CountDownLatch latch, final long timeout)
+            throws InterruptedException {
+        onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
+        onView(withId(R.id.webView)).perform(evaluateJavascript("onPass(\"some-token\")"));
+        assertTrue(latch.await(timeout, TimeUnit.MILLISECONDS));
+    }
+
+    public static void waitHCaptchaWebViewError(final CountDownLatch latch,
+                                                final HCaptchaError error,
+                                                final long timeout)
+            throws InterruptedException {
+        onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
+        onView(withId(R.id.webView)).perform(evaluateJavascript(
+                "onError(" + error.getErrorId() + ")"));
+        assertTrue(latch.await(timeout, TimeUnit.MILLISECONDS));
     }
 }
