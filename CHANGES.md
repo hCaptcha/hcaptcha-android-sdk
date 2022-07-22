@@ -3,7 +3,7 @@
 # 3.3.0
 
 - Disabled cleartext traffic (`android:usesCleartextTraffic="false"` added to `AndroidManifest.xml`)
-- `hcaptcha-form.html` asset move to the code
+- `hcaptcha-form.html` asset moved into a variable
 
 # 3.2.0
 
