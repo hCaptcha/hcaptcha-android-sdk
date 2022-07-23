@@ -172,7 +172,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 && webViewHelper.getConfig().getResetOnTimeout()
                 && exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
         if (isAdded() && !silentRetry) {
-            dismiss();
+            dismissAllowingStateLoss();
         }
         if (webViewHelper != null) {
             if (silentRetry) {
@@ -187,7 +187,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void onSuccess(final String token) {
         assert webViewHelper != null;
         if (isAdded()) {
-            dismiss();
+            dismissAllowingStateLoss();
         }
         webViewHelper.getListener().onSuccess(token);
     }
