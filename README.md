@@ -4,7 +4,7 @@
 [![Release](https://jitpack.io/v/hCaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hCaptcha/hcaptcha-android-sdk)
 [![Minimal Android OS](https://img.shields.io/badge/Android%20OS%20-%3E=4.1-blue.svg)](https://developer.android.com/about/dashboards)
 
-| Platform   | Values/Type                                  |
+| Platform   | Requirements                                 |
 |------------|----------------------------------------------|
 | Android OS | :white_check_mark: >= 4.1 (Android API 16)   |
 | Wear OS    | :heavy_multiplication_x:                     |
