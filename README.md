@@ -6,7 +6,7 @@
 
 | Platform   | Values/Type                                  |
 |------------|----------------------------------------------|
-| Android OS | :white_check_mark: >= 4.1.1 (Android API 16) |
+| Android OS | :white_check_mark: >= 4.1 (Android API 16)   |
 | Wear OS    | :heavy_multiplication_x:                     |
 
 ###### [Installation](#installation) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
