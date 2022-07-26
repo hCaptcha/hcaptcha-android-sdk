@@ -4,7 +4,7 @@
 [![Release](https://jitpack.io/v/hCaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hCaptcha/hcaptcha-android-sdk)
 [![Minimal Android OS](https://img.shields.io/badge/Android%20OS%20-%3E=4.1-blue.svg)](https://developer.android.com/about/dashboards)
 
-###### [Installation](#installation) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
+###### [Installation](#installation) | [Requirements](#requirements) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
 
 This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com), and is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
 
