@@ -19,11 +19,11 @@ android {
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
-        versionCode 18
+        versionCode 19
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "3.3.0"
+        versionName "3.3.1"
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 

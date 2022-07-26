@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.3.1
+
+- Fix dialog dismiss crash in specific scenario
+
 # 3.3.0
 
 - Disabled cleartext traffic (`android:usesCleartextTraffic="false"` added to `AndroidManifest.xml`)
