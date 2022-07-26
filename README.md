@@ -2,8 +2,9 @@
 
 ![CI](https://github.com/hCaptcha/hcaptcha-android-sdk/workflows/Android%20SDK%20CI/badge.svg)
 [![Release](https://jitpack.io/v/hCaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hCaptcha/hcaptcha-android-sdk)
+[![Minimal Android OS](https://img.shields.io/badge/Android%20OS%20-%3E=4.1-blue.svg)](https://developer.android.com/about/dashboards)
 
-###### [Installation](#installation) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
+###### [Installation](#installation) | [Requirements](#requirements) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
 
 This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com), and is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
 
@@ -22,6 +23,13 @@ dependencies {
 </pre>
 
 *Note: replace `x.y.z` with one from [Release](https://github.com/hCaptcha/hcaptcha-android-sdk/releases) (e.g. `1.0.0`).*
+
+## Requirements
+
+| Platform   | Requirements                                 |
+|------------|----------------------------------------------|
+| Android OS | :white_check_mark: >= 4.1 (Android API 16)   |
+| Wear OS    | :heavy_multiplication_x:                     |
 
 ## Example App
 
@@ -114,8 +122,8 @@ hCaptcha.setup().verifyWithHCaptcha()
 
 The following list contains configuration properties to allows customization of the hCaptcha verification flow.
 
-| Name                | Values/Type             | Required | Default   | Description                                                                                                                                                        |
-|---------------------|-------------------------|----------|-----------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Name              | Values/Type             | Required | Default   | Description                                                                                                                                                          |
+|-------------------|-------------------------|----------|-----------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `siteKey`         | String                  | **Yes**  | -         | This is your sitekey, this allows you to load challenges. If you need a sitekey, please visit [hCaptcha](https://www.hcaptcha.com), and sign up to get your sitekey. |
 | `size`            | Enum                    | No       | INVISIBLE | This specifies the "size" of the checkbox component. By default, the checkbox is invisible and the challenge is shown automatically.                                 |
 | `theme`           | Enum                    | No       | LIGHT     | hCaptcha supports light, dark, and contrast themes.                                                                                                                  |

@@ -1,8 +1,13 @@
-name: Android SDK CI
+name: ci
+
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - '**.md'
   pull_request:
+    paths-ignore:
+      - '**.md'
 jobs:
   build:
     name: Build & Unit-test
