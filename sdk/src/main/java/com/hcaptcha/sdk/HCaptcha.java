@@ -23,9 +23,6 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @Nullable
     private HCaptchaConfig config;
 
-    @NonNull
-    private final IHCaptchaHtmlProvider htmlProvider = new HCaptchaHtml();
-
     private HCaptcha(@NonNull final Context context) {
         this.activity = (FragmentActivity) context;
     }
@@ -89,9 +86,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                     .size(HCaptchaSize.INVISIBLE)
                     .loading(false)
                     .build();
-            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, listener, htmlProvider);
+            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, listener);
         } else {
-            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, listener, htmlProvider);
+            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, listener);
             this.config = inputConfig;
         }
         return this;

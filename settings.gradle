@@ -1,3 +1,4 @@
 include ':example-app'
 include ':sdk'
 rootProject.name = "hcaptcha-android-sdk"
+include ':benchmark'

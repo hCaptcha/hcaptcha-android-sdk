@@ -57,8 +57,7 @@ public class HCaptchaTest {
         dialogFragmentMock
                 .when(() -> HCaptchaDialogFragment.newInstance(
                         any(HCaptchaConfig.class),
-                        any(HCaptchaStateListener.class),
-                        any(IHCaptchaHtmlProvider.class)))
+                        any(HCaptchaStateListener.class)))
                 .thenReturn(fragment);
     }
 
@@ -78,8 +77,7 @@ public class HCaptchaTest {
 
         dialogFragmentMock.verify(() -> HCaptchaDialogFragment.newInstance(
                 hCaptchaConfigCaptor.capture(),
-                any(HCaptchaStateListener.class),
-                any(IHCaptchaHtmlProvider.class)));
+                any(HCaptchaStateListener.class)));
     }
 
     @Test
@@ -106,16 +104,14 @@ public class HCaptchaTest {
         dialogFragmentMock.verify(never(), () ->
                 HCaptchaDialogFragment.newInstance(
                         any(HCaptchaConfig.class),
-                        any(HCaptchaStateListener.class),
-                        any(IHCaptchaHtmlProvider.class)));
+                        any(HCaptchaStateListener.class)));
 
         hCaptcha.verifyWithHCaptcha(siteKey);
 
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
                         hCaptchaConfigCaptor.capture(),
-                        any(HCaptchaStateListener.class),
-                        any(IHCaptchaHtmlProvider.class)));
+                        any(HCaptchaStateListener.class)));
         verify(fragment).startVerification(fragmentActivity);
 
         final HCaptchaConfig config = hCaptchaConfigCaptor.getValue();
@@ -141,8 +137,7 @@ public class HCaptchaTest {
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
                         hCaptchaConfigCaptor.capture(),
-                        any(HCaptchaStateListener.class),
-                        any(IHCaptchaHtmlProvider.class)));
+                        any(HCaptchaStateListener.class)));
 
         final HCaptchaConfig config = hCaptchaConfigCaptor.getValue();
         assertEquals(HCaptchaConfigTest.MOCK_SITE_KEY, config.getSiteKey());
@@ -164,8 +159,7 @@ public class HCaptchaTest {
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
                         hCaptchaConfigCaptor.capture(),
-                        any(HCaptchaStateListener.class),
-                        any(IHCaptchaHtmlProvider.class)));
+                        any(HCaptchaStateListener.class)));
 
         assertEquals(config, hCaptchaConfigCaptor.getValue());
     }
@@ -192,8 +186,7 @@ public class HCaptchaTest {
         dialogFragmentMock.verify(times(2), () ->
                 HCaptchaDialogFragment.newInstance(
                         hCaptchaConfigCaptor.capture(),
-                        any(HCaptchaStateListener.class),
-                        any(IHCaptchaHtmlProvider.class)));
+                        any(HCaptchaStateListener.class)));
 
         assertEquals(verifyConfig, hCaptchaConfigCaptor.getValue());
     }
@@ -214,8 +207,7 @@ public class HCaptchaTest {
         dialogFragmentMock.verify(times(2), () ->
                 HCaptchaDialogFragment.newInstance(
                         hCaptchaConfigCaptor.capture(),
-                        any(HCaptchaStateListener.class),
-                        any(IHCaptchaHtmlProvider.class)));
+                        any(HCaptchaStateListener.class)));
 
         assertEquals(HCaptchaConfigTest.MOCK_SITE_KEY, hCaptchaConfigCaptor.getValue().getSiteKey());
     }

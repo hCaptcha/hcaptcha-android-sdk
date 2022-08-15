@@ -11,7 +11,6 @@ import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
 import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
-import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_HTML;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
@@ -61,7 +60,6 @@ public class HCaptchaDialogFragmentTest {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, captchaConfig);
         args.putParcelable(KEY_LISTENER, listener);
-        args.putSerializable(KEY_HTML, new HCaptchaTestHtml());
         return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, args);
     }
 

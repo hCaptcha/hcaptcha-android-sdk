@@ -1,5 +1,6 @@
 package com.hcaptcha.sdk;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -119,4 +120,8 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     private long tokenExpiration = 120;
+
+    @JsonIgnore
+    @Builder.Default
+    private IHCaptchaHtmlProvider htmlProvider = new HCaptchaHtml();
 }
