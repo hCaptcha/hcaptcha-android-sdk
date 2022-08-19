@@ -41,6 +41,7 @@ public class HCaptchaDialogFragmentTest {
             .loading(true)
             .size(HCaptchaSize.INVISIBLE)
             .theme(HCaptchaTheme.LIGHT)
+            .htmlProvider(new HCaptchaTestHtml())
             .build();
 
     private FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment() {
