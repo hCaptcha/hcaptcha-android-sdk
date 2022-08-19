@@ -42,3 +42,24 @@ dependencies {
     implementation project(path: ':sdk')
     implementation 'androidx.appcompat:appcompat:1.5.0'
 }
+
+task downloadBechmarkOutput {
+    def packageName = "com.hcaptcha.sdk.bench.test"
+    def output = "${project.buildDir}/outputs/connected_android_test_additional_output/"
+    def stdout = new ByteArrayOutputStream()
+    doFirst {
+        try {
+            project.file(output).mkdirs()
+            exec {
+                standardOutput = stdout
+                commandLine android.getAdbExe(), 'pull',
+                        "/storage/emulated/0/Android/media/${packageName}/${packageName}-benchmarkData.json",
+                        output
+            }
+            println "Check ${output} for benchmark output"
+        } catch (e) {
+            println stdout.toString()
+            throw e
+        }
+    }
+}

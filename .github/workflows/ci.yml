@@ -59,6 +59,11 @@ jobs:
           script: |
             brew install parallel
             parallel --retries 3 ::: "./gradlew sdk:connectedCheck"
+      - if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: androidTest-results
+          path: sdk/build/outputs/androidTest-results
   benchmark-tests:
     name: Android Benchmark
     runs-on: macos-latest
@@ -83,9 +88,10 @@ jobs:
           script: |
             brew install parallel
             parallel --retries 3 ::: "./gradlew bench:connectedCheck"
+            ./gradlew bench:downloadBechmarkOutput
       - uses: actions/upload-artifact@v3
         with:
-          name: benchmark-output
+          name: benchmark-json-output
           path: benchmark/build/outputs/connected_android_test_additional_output
   size-report:
     name: Diffuse report
