@@ -12,7 +12,8 @@
     <application
         android:debuggable="false"
         tools:ignore="HardcodedDebugMode"
-        tools:replace="android:debuggable">
+        tools:replace="android:debuggable"
+        android:requestLegacyExternalStorage="true">
         <activity android:name="com.hcaptcha.sdk.TestActivity" android:theme="@style/Theme.AppCompat.Light" />
     </application>
 </manifest>
