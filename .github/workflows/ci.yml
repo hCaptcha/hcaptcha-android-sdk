@@ -58,7 +58,35 @@ jobs:
           profile: Nexus 6
           script: |
             brew install parallel
-            parallel --retries 3 ::: "./gradlew connectedCheck"
+            parallel --retries 3 ::: "./gradlew sdk:connectedCheck"
+  benchmark-tests:
+    name: Android Benchmark
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [29] # , 23, 21]
+        target: [default] #, google_apis]
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v2
+        with:
+          java-version: '8'
+          distribution: adopt
+          cache: 'gradle'
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            brew install parallel
+            parallel --retries 3 ::: "./gradlew bench:connectedCheck"
+      - uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-output
+          path: benchmark/build/outputs/connected_android_test_additional_output
   size-report:
     name: Diffuse report
     if: github.event_name == 'pull_request'
