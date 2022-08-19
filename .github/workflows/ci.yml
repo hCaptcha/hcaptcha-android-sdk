@@ -89,7 +89,7 @@ jobs:
             brew install parallel
             # https://developer.android.com/topic/performance/benchmarking/benchmarking-in-ci#clock-locking
             adb root
-            ./gradlew lockClocks
+            ./gradlew lockClocks || true
             parallel --retries 3 ::: "./gradlew bench:connectedCheck"
             ./gradlew bench:downloadBechmarkOutput || true
       - uses: actions/upload-artifact@v3
