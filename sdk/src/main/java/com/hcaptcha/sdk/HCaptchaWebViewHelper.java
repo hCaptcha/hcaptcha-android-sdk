@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
@@ -75,6 +76,10 @@ final class HCaptchaWebViewHelper {
         settings.setAllowContentAccess(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             webView.setWebViewClient(new HCaptchaWebClient());
+        }
+        if (BuildConfig.DEBUG) {
+            // to make js `alert`s working in WebView
+            webView.setWebChromeClient(new WebChromeClient());
         }
         webView.setBackgroundColor(Color.TRANSPARENT);
         webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
