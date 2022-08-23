@@ -27,8 +27,6 @@ import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.io.File;
-
 @RunWith(MockitoJUnitRunner.class)
 public class HCaptchaWebViewHelperTest {
     private static final String MOCK_HTML = "<html/>";
@@ -73,7 +71,6 @@ public class HCaptchaWebViewHelperTest {
         when(htmlProvider.getHtml()).thenReturn(MOCK_HTML);
         when(webView.getSettings()).thenReturn(webSettings);
         when(config.getHtmlProvider()).thenReturn(htmlProvider);
-        when(context.getCacheDir()).thenReturn(new File(System.getProperty("java.io.tmpdir", "/tmp")));
     }
 
     @After

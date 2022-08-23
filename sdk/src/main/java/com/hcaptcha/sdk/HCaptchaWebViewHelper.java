@@ -74,8 +74,6 @@ final class HCaptchaWebViewHelper {
         settings.setGeolocationEnabled(false);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
-        settings.setAppCachePath(context.getCacheDir().getAbsolutePath());
-        settings.setAppCacheEnabled(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             webView.setWebViewClient(new HCaptchaWebClient());
         }
