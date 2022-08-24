@@ -1,5 +1,6 @@
 plugins {
     id "pmd"
+    id "jacoco"
     id "checkstyle"
     id "com.github.spotbugs" version "4.8.0"
     id "org.owasp.dependencycheck" version "7.1.1"
@@ -40,13 +41,21 @@ android {
     }
 
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled true
         }
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
+        animationsDisabled true
+        execution 'ANDROID_TEST_ORCHESTRATOR'
+        unitTests {
+            returnDefaultValues = true
+            includeAndroidResources = true
+        }
     }
 }
 
@@ -215,7 +224,38 @@ gradle.taskGraph.beforeTask { task ->
     }
 }
 
-check.dependsOn('checkstyle', 'pmd')
+// https://www.rallyhealth.com/coding/code-coverage-for-android-testing
+task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+    def coverageSourceDirs = [
+        "src/main/java"
+    ]
+    def fileFilter = [
+        '**/R.class',
+        '**/R$*.class',
+        '**/*$ViewInjector*.*',
+        '**/*$ViewBinder*.*',
+        '**/BuildConfig.*',
+        '**/Manifest*.*'
+    ]
+    def javaClasses = fileTree(
+        dir: "${project.buildDir}/intermediates/classes/debug",
+        excludes: fileFilter
+    )
+
+    classDirectories.from files([ javaClasses ])
+    additionalSourceDirs.from files(coverageSourceDirs)
+    sourceDirectories.from files(coverageSourceDirs)
+    executionData.from = fileTree(dir: project.buildDir, includes: [
+        "jacoco/testDebugUnitTest.exec"
+    ])
+
+    reports {
+        xml.enabled = true
+        html.enabled = true
+    }
+}
+
+check.dependsOn('checkstyle', 'pmd', 'jacocoUnitTestReport')
 
 sonarqube {
     properties {
@@ -234,6 +274,7 @@ sonarqube {
         property "sonar.java.spotbugs.reportPaths", ["${project.buildDir}/reports/spotbugs/debug.xml", "${project.buildDir}/reports/spotbugs/release.xml"]
         property "sonar.java.pmd.reportPaths", "${project.buildDir}/reports/pmd/pmd.xml"
         property "sonar.java.checkstyle.reportPaths", "${project.buildDir}/reports/checkstyle/checkstyle.xml"
+        property "sonar.jacoco.reportPaths", fileTree(dir: project.buildDir, includes: ['**/*.exec', '**/*.ec'])
     }
 }
 
