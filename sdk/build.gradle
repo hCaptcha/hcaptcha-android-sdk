@@ -41,9 +41,6 @@ android {
     }
 
     buildTypes {
-        debug {
-            testCoverageEnabled true
-        }
         release {
             minifyEnabled true
         }
@@ -229,25 +226,20 @@ task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) 
     def coverageSourceDirs = [
         "src/main/java"
     ]
-    def fileFilter = [
-        '**/R.class',
-        '**/R$*.class',
-        '**/*$ViewInjector*.*',
-        '**/*$ViewBinder*.*',
-        '**/BuildConfig.*',
-        '**/Manifest*.*'
-    ]
     def javaClasses = fileTree(
-        dir: "${project.buildDir}/intermediates/classes/debug",
-        excludes: fileFilter
+        dir: "${project.buildDir}/intermediates/javac/debug/classes",
+        excludes: [
+            '**/R.class',
+            '**/R$*.class',
+            '**/BuildConfig.*',
+            '**/Manifest*.*'
+        ]
     )
 
-    classDirectories.from files([ javaClasses ])
+    classDirectories.from files([javaClasses])
     additionalSourceDirs.from files(coverageSourceDirs)
     sourceDirectories.from files(coverageSourceDirs)
-    executionData.from = fileTree(dir: project.buildDir, includes: [
-        "jacoco/testDebugUnitTest.exec"
-    ])
+    executionData.from = "${project.buildDir}/jacoco/testDebugUnitTest.exec"
 
     reports {
         xml.enabled = true
@@ -267,14 +259,14 @@ sonarqube {
         property "sonar.sourceEncoding", "utf-8"
 
         property "sonar.sources", "src/main"
-        property "sonar.java.binaries", "${project.buildDir}/intermediates/javac/debug"
+        property "sonar.java.binaries", "${project.buildDir}/intermediates/javac/debug/classes"
         property "sonar.tests", ["src/test/", "src/androidTest/"]
 
         property "sonar.android.lint.report", "${project.buildDir}/outputs/lint-results.xml"
         property "sonar.java.spotbugs.reportPaths", ["${project.buildDir}/reports/spotbugs/debug.xml", "${project.buildDir}/reports/spotbugs/release.xml"]
         property "sonar.java.pmd.reportPaths", "${project.buildDir}/reports/pmd/pmd.xml"
         property "sonar.java.checkstyle.reportPaths", "${project.buildDir}/reports/checkstyle/checkstyle.xml"
-        property "sonar.jacoco.reportPaths", fileTree(dir: project.buildDir, includes: ['**/*.exec', '**/*.ec'])
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/jacocoUnitTestReport.xml"
     }
 }
 
