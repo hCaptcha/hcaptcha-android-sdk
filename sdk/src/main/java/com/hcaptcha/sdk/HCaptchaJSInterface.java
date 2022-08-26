@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk;
 
 import android.os.Handler;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
 import androidx.annotation.Nullable;
 
@@ -35,7 +36,8 @@ class HCaptchaJSInterface implements Serializable {
             final ObjectMapper objectMapper = new ObjectMapper();
             configJson = objectMapper.writeValueAsString(config);
         } catch (JsonProcessingException e) {
-            // unable to parse config, html will use a embedded one
+            Log.w(JS_INTERFACE_TAG, "Cannot prepare config for passing to WebView."
+                    + " A fallback config will be used");
         }
         this.config = configJson;
     }
