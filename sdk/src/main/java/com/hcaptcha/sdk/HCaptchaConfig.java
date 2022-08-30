@@ -124,4 +124,16 @@ public class HCaptchaConfig implements Serializable {
     @JsonIgnore
     @Builder.Default
     private IHCaptchaHtmlProvider htmlProvider = new HCaptchaHtml();
+
+    /**
+     * Builder class declared to keep htmlProvider package-private
+     */
+    public static class HCaptchaConfigBuilder {
+        private IHCaptchaHtmlProvider htmlProvider$value;
+
+        HCaptchaConfigBuilder htmlProvider(IHCaptchaHtmlProvider htmlProvider) {
+            this.htmlProvider$value = htmlProvider;
+            return this;
+        }
+    }
 }
