@@ -141,6 +141,7 @@ The following list contains configuration properties to allows customization of 
 | `loading`         | Boolean                 | No       | True      | Show or hide the loading dialog.                                                                                                                                     |
 | `hideDialog`      | Boolean                 | No       | False     | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
 | `tokenExpiration` | long                    | No       | 120       | hCaptcha token expiration timeout (seconds).                                                                                                                         |
+| `diagnosticLog`   | Boolean                 | No       | False     | Enable diagnostics logs that helpful during troubleshooting                                                                                                          |
 
 ### Config Examples
 
@@ -188,6 +189,7 @@ The following is a list of possible error codes:
 
 Useful error messages are often rendered on the hCaptcha checkbox. For example, if the sitekey within your config is invalid, you'll see a message there. To quickly debug your local instance using this tool, set `.size(HCaptchaSize.NORMAL)`
 
+`HCaptchaConfigBuilder.diagnosticLog(true)` can help to get more detailed logs.
 
 ### Verify the completed challenge
 
