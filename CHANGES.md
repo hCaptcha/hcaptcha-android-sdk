@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.3.2
+
+- Add `HCaptchaConfig.diagnosticLog` to enable diagnostics logs that helpful during troubleshooting
+
 # 3.3.1
 
 - Fix dialog dismiss crash in specific scenario
