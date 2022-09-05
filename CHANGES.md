@@ -1,5 +1,13 @@
 # Changelog
 
+# 3.3.3
+
+- Fix Android 10 WebView crash on onCheckIsTextEditor call
+
+# 3.3.2
+
+- Add `HCaptchaConfig.diagnosticLog` to log diagnostics that are helpful during troubleshooting
+
 # 3.3.1
 
 - Fix dialog dismiss crash in specific scenario

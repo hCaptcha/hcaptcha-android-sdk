@@ -63,6 +63,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @Override
     public HCaptcha setup(@NonNull final HCaptchaConfig inputConfig) {
+        HCaptchaLog.sDiagnosticsLogEnabled = inputConfig.getDiagnosticLog();
+        HCaptchaLog.d("HCaptcha.setup");
+
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
             void onOpen() {
@@ -71,12 +74,14 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
             @Override
             void onSuccess(final String token) {
+                HCaptchaLog.d("HCaptcha.onSuccess");
                 scheduleCaptchaExpired(HCaptcha.this.config.getTokenExpiration());
                 setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));
             }
 
             @Override
             void onFailure(final HCaptchaException exception) {
+                HCaptchaLog.d("HCaptcha.onFailure");
                 setException(exception);
             }
         };
@@ -127,6 +132,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     }
 
     private HCaptcha startVerification() {
+        HCaptchaLog.d("HCaptcha.startVerification");
         handler.removeCallbacksAndMessages(null);
         assert captchaVerifier != null;
         captchaVerifier.startVerification(activity);

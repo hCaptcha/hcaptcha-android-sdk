@@ -141,6 +141,7 @@ The following list contains configuration properties to allows customization of 
 | `loading`         | Boolean                 | No       | True      | Show or hide the loading dialog.                                                                                                                                     |
 | `hideDialog`      | Boolean                 | No       | False     | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
 | `tokenExpiration` | long                    | No       | 120       | hCaptcha token expiration timeout (seconds).                                                                                                                         |
+| `diagnosticLog`   | Boolean                 | No       | False     | Emit detailed console logs for debugging                                                                                                          |
 
 ### Config Examples
 
@@ -188,6 +189,7 @@ The following is a list of possible error codes:
 
 Useful error messages are often rendered on the hCaptcha checkbox. For example, if the sitekey within your config is invalid, you'll see a message there. To quickly debug your local instance using this tool, set `.size(HCaptchaSize.NORMAL)`
 
+`HCaptchaConfigBuilder.diagnosticLog(true)` can help to get more detailed logs.
 
 ### Verify the completed challenge
 
@@ -197,19 +199,4 @@ After retrieving a `token`, you should pass it to your backend in order to verif
 
 ## For maintainers
 
-To see available gradle tasks run: `gradlew tasks`.
-
-### Testing
-There is automated testing for every `push` command through github actions (see `.github/workflows/ci.yml`).
-
-You can manually test before pushing by running both unit tests and instrumented tests:
-* ```gradlew test```
-* ```gradlew connectedDebugAndroidTest```
-
-### Publishing
-To publish a new version follow the next steps:
-1. Bump versions in the `sdk/build.gradle` file:
-   * `android.defaultConfig.versionCode`: increment by **1** (next integer)
-   * `android.defaultConfig.versionName`: [Semantic Versioning](https://semver.org)
-2. Create a [Github Release](https://docs.github.com/en/free-pro-team@latest/github/administering-a-repository/managing-releases-in-a-repository#creating-a-release) with the **SAME** version from step 1 (**without** a prefix such as `v`)
-   * JitPack's automatic process will be triggered upon first installation of the new package version
+If you plan to contribute to the repo, please see [MAINTAINERS.md](./MAINTAINERS.md) for detailed build, test, and release instructions.
