@@ -10,7 +10,6 @@ import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,6 +66,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             @NonNull final HCaptchaStateListener listener,
             @NonNull final IHCaptchaHtmlProvider htmlProvider
     ) {
+        HCaptchaLog.d("DialogFragment.newInstance");
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
         args.putParcelable(KEY_LISTENER, listener);
@@ -84,7 +84,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        HCaptchaLog.d("DialogFragment.onCreateView");
         final View rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+        HCaptchaLog.d("DialogFragment.onCreateView inflated");
         assert getArguments() != null;
         final HCaptchaStateListener listener;
         final IHCaptchaHtmlProvider htmlProvider;
@@ -94,6 +96,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             htmlProvider = (IHCaptchaHtmlProvider) getArguments().getSerializable(KEY_HTML);
             assert htmlProvider != null;
         } catch (BadParcelableException | ClassCastException e) {
+            HCaptchaLog.w("Cannot process getArguments(). Dismissing dialog...");
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back
             dismiss();
@@ -111,6 +114,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onDestroy() {
+        HCaptchaLog.d("DialogFragment.onDestroy");
         super.onDestroy();
         if (webViewHelper != null) {
             webViewHelper.destroy();
@@ -119,6 +123,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onStart() {
+        HCaptchaLog.d("DialogFragment.onStart");
         super.onStart();
         assert webViewHelper != null;
         final Dialog dialog = getDialog();
@@ -135,6 +140,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onCancel(@NonNull DialogInterface dialogInterface) {
+        HCaptchaLog.d("DialogFragment.onCancel");
         // User canceled the dialog through either `back` button or an outside touch
         super.onCancel(dialogInterface);
         this.onFailure(new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
@@ -197,7 +203,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         final FragmentManager fragmentManager = fragmentActivity.getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
         if (oldFragment != null && oldFragment.isAdded()) {
-            Log.w(TAG, "Skip. HCaptchaDialogFragment was already added.");
+            HCaptchaLog.w("DialogFragment was already added.");
             return;
         }
         show(fragmentManager, HCaptchaDialogFragment.TAG);

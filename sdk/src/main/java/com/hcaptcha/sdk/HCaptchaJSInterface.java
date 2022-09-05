@@ -35,6 +35,7 @@ class HCaptchaJSInterface implements Serializable {
 
     @JavascriptInterface
     public void onPass(final String token) {
+        HCaptchaLog.d("JSInterface.onPass");
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -45,6 +46,7 @@ class HCaptchaJSInterface implements Serializable {
 
     @JavascriptInterface
     public void onError(final int errCode) {
+        HCaptchaLog.d("JSInterface.onError %d", errCode);
         final HCaptchaError error = HCaptchaError.fromId(errCode);
         handler.post(new Runnable() {
             @Override
@@ -56,6 +58,7 @@ class HCaptchaJSInterface implements Serializable {
 
     @JavascriptInterface
     public void onLoaded() {
+        HCaptchaLog.d("JSInterface.onLoaded");
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -66,6 +69,7 @@ class HCaptchaJSInterface implements Serializable {
 
     @JavascriptInterface
     public void onOpen() {
+        HCaptchaLog.d("JSInterface.onOpen");
         handler.post(new Runnable() {
             @Override
             public void run() {
