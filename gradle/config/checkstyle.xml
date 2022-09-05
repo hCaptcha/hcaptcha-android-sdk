@@ -57,7 +57,7 @@ Description: https://source.android.com/source/code-style.html
     <module name="MethodName">
       <property name="format" value="^[a-z][a-z0-9]?[a-zA-Z0-9_]*$"/>
       <message key="name.invalidPattern"
-               value="Method name ''{0}'' must be at least one characters long."/>
+               value="Method name ''{0}'' must be at least one character long."/>
     </module>
 
     <!-- Require parameter names to be at least two characters long -->
