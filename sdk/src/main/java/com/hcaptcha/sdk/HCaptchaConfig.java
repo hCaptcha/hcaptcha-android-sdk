@@ -136,9 +136,11 @@ public class HCaptchaConfig implements Serializable {
      */
     public static class HCaptchaConfigBuilder {
         private IHCaptchaHtmlProvider htmlProvider$value;
+        private boolean htmlProvider$set;
 
         HCaptchaConfigBuilder htmlProvider(IHCaptchaHtmlProvider htmlProvider) {
             this.htmlProvider$value = htmlProvider;
+            this.htmlProvider$set = true;
             return this;
         }
     }
