@@ -80,6 +80,7 @@ public class HCaptchaJSInterfaceTest {
                 .resetOnTimeout(true)
                 .hideDialog(true)
                 .tokenExpiration(timeout)
+                .diagnosticLog(true)
                 .build();
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
@@ -101,6 +102,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("resetOnTimeout", true);
         expected.put("hideDialog", true);
         expected.put("tokenExpiration", timeout);
+        expected.put("diagnosticLog", true);
 
         JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
     }
@@ -139,6 +141,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("resetOnTimeout", false);
         expected.put("hideDialog", false);
         expected.put("tokenExpiration", defaultTimeout);
+        expected.put("diagnosticLog", false);
 
         JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
     }

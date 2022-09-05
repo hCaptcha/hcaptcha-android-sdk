@@ -119,4 +119,10 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     private long tokenExpiration = 120;
+
+    /**
+     * Enable diagnostics logs that helpful during troubleshooting
+     */
+    @Builder.Default
+    private Boolean diagnosticLog = false;
 }

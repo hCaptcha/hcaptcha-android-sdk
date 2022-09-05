@@ -28,6 +28,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
                             @NonNull final HCaptchaConfig config,
                             @NonNull final HCaptchaStateListener listener,
                             @NonNull final IHCaptchaHtmlProvider htmlProvider) {
+        HCaptchaLog.d("HeadlessWebView.init");
         this.config = config;
         this.listener = listener;
         final WebView webView = new WebView(activity);
