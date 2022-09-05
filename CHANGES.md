@@ -2,7 +2,7 @@
 
 # 3.3.2
 
-- Add `HCaptchaConfig.diagnosticLog` to enable diagnostics logs that helpful during troubleshooting
+- Add `HCaptchaConfig.diagnosticLog` to log diagnostics that are helpful during troubleshooting
 
 # 3.3.1
 

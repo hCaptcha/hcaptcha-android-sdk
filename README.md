@@ -141,7 +141,7 @@ The following list contains configuration properties to allows customization of 
 | `loading`         | Boolean                 | No       | True      | Show or hide the loading dialog.                                                                                                                                     |
 | `hideDialog`      | Boolean                 | No       | False     | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
 | `tokenExpiration` | long                    | No       | 120       | hCaptcha token expiration timeout (seconds).                                                                                                                         |
-| `diagnosticLog`   | Boolean                 | No       | False     | Enable diagnostics logs that helpful during troubleshooting                                                                                                          |
+| `diagnosticLog`   | Boolean                 | No       | False     | Emit detailed console logs for debugging                                                                                                          |
 
 ### Config Examples
 
@@ -199,4 +199,4 @@ After retrieving a `token`, you should pass it to your backend in order to verif
 
 ## For maintainers
 
-Check [MAINTAINERS.md](./MAINTAINERS.md)
+If you plan to contribute to the repo, please see [MAINTAINERS.md](./MAINTAINERS.md) for detailed build, test, and release instructions.
