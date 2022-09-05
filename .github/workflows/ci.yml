@@ -41,12 +41,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - api-level: 29
-            target: default
-          - api-level: 16
-            arch: armeabi-v7a
-            target: default
+        api-level: [29] # , 23, 21]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
