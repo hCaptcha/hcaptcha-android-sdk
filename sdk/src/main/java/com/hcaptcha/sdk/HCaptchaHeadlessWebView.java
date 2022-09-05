@@ -30,7 +30,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
                             @NonNull final IHCaptchaHtmlProvider htmlProvider) {
         this.config = config;
         this.listener = listener;
-        final WebView webView = new WebView(activity);
+        final WebView webView = new HCaptchaWebView(activity);
         webView.setId(R.id.webView);
         webView.setVisibility(View.GONE);
         if (webView.getParent() == null) {
