@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.3.4
+
+- Rename `ic_logo` drawable to avoid possible collisions with a host app's drawables
+
 # 3.3.3
 
 - Fix Android 10 WebView crash on onCheckIsTextEditor call
