@@ -16,9 +16,7 @@ import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -50,6 +48,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      */
     static final String KEY_LISTENER = "hCaptchaDialogListener";
     static final String KEY_HTML = "hCaptchaHtmlProvider";
+
+    static final long LOADING_HIDE_DELAY = 100;
+    static final long LOADING_HIDE_DURATION = 200;
 
     @Nullable
     private HCaptchaWebViewHelper webViewHelper;
@@ -154,8 +155,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (webViewHelper.getConfig().getLoading()) {
             loadingContainer.animate()
                     .alpha(0.0f)
-                    .setStartDelay(100)
-                    .setDuration(200)
+                    .setStartDelay(LOADING_HIDE_DELAY)
+                    .setDuration(LOADING_HIDE_DURATION)
                     .setListener(
                             new AnimatorListenerAdapter() {
                                 @Override
