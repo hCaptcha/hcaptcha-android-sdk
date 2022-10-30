@@ -17,6 +17,8 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
@@ -52,7 +54,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @Nullable
     private HCaptchaWebViewHelper webViewHelper;
 
-    private LinearLayout loadingContainer;
+    private RelativeLayout loadingContainer;
 
     /**
      * Creates a new instance
@@ -150,13 +152,17 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void onLoaded() {
         assert webViewHelper != null;
         if (webViewHelper.getConfig().getLoading()) {
-            loadingContainer.animate().alpha(0.0f).setDuration(200).setListener(
-                    new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            loadingContainer.setVisibility(View.GONE);
-                        }
-                    });
+            loadingContainer.animate()
+                    .alpha(0.0f)
+                    .setStartDelay(100)
+                    .setDuration(200)
+                    .setListener(
+                            new AnimatorListenerAdapter() {
+                                @Override
+                                public void onAnimationEnd(Animator animation) {
+                                    loadingContainer.setVisibility(View.GONE);
+                                }
+                            });
         } else {
             // Add back dialog shadow in case the checkbox or challenge is shown
             final Dialog dialog = getDialog();
