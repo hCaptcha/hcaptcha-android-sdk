@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.3.5
+
+- Prevent closing hCaptcha view on click on the loading container
+
 # 3.3.4
 
 - Rename `ic_logo` drawable to avoid possible collisions with a host app's drawables
