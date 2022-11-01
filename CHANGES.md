@@ -2,7 +2,7 @@
 
 # 3.3.5
 
-- Show loading screen until the challenge is open
+- Show loading screen until the challenge is open when size is `HCaptchaSize.INVISIBLE`
 
 # 3.3.4
 
