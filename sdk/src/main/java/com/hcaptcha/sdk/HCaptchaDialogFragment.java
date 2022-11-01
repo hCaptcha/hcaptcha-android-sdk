@@ -146,9 +146,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         this.onFailure(new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
     }
 
-    @Override
-    public void onLoaded() {
-        assert webViewHelper != null;
+    private void hideLoadingContainer() {
         if (webViewHelper.getConfig().getLoading()) {
             loadingContainer.animate().alpha(0.0f).setDuration(200).setListener(
                     new AnimatorListenerAdapter() {
@@ -167,8 +165,22 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
+    public void onLoaded() {
+        assert webViewHelper != null;
+
+        if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
+            hideLoadingContainer();
+        }
+    }
+
+    @Override
     public void onOpen() {
         assert webViewHelper != null;
+
+        if (webViewHelper.getConfig().getSize() == HCaptchaSize.INVISIBLE) {
+            hideLoadingContainer();
+        }
+
         webViewHelper.getListener().onOpen();
     }
 
