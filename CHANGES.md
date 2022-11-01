@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.3.5
+
+- Show loading screen until the challenge is open
+
 # 3.3.4
 
 - Rename `ic_logo` drawable to avoid possible collisions with a host app's drawables

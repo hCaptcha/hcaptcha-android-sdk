@@ -168,7 +168,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void onLoaded() {
         assert webViewHelper != null;
 
-        // If the size is `invisible` - wait until challenge is shown and handle it in the `onOpen` callback
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
             hideLoadingContainer();
         }
