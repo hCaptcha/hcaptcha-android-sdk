@@ -10,7 +10,6 @@ import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.animation.AccelerateInterpolator;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,11 +150,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void onLoaded() {
         assert webViewHelper != null;
         if (webViewHelper.getConfig().getLoading()) {
-            loadingContainer.animate()
-                    .alpha(0.0f)
-                    .setDuration(300)
-                    .setInterpolator(new AccelerateInterpolator(2))
-                    .setListener(
+            loadingContainer.animate().alpha(0.0f).setDuration(200).setListener(
                     new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationEnd(Animator animation) {

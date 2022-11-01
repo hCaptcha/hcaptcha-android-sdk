@@ -2,7 +2,7 @@
 
 # 3.3.5
 
-- Prevent closing hCaptcha view on click on the loading container
+- Prevent closing hCaptcha view on loading container click
 
 # 3.3.4
 
