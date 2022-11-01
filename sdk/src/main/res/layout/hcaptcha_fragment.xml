@@ -15,6 +15,8 @@
         android:layout_centerInParent="true"
         android:padding="20dp"
         android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
