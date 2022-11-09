@@ -1,3 +1,6 @@
+// Auto-generated. Don't edit it directly.
+// Modify sdk/src/main/html/hcaptcha.html instead and run `./gradlew build` instead
+
 package com.hcaptcha.sdk;
 
 import lombok.NonNull;
@@ -202,7 +205,7 @@ final class HCaptchaHtml implements IHCaptchaHtmlProvider {
                 + "    loadApi();\n"
                 + "</script>\n"
                 + "</body>\n"
-                + "</html>";
+                + "</html>\n";
     }
 
     @SuppressWarnings("java:S106")
