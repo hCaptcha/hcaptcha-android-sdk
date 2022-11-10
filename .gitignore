@@ -9,3 +9,6 @@
 .externalNativeBuild
 .cxx
 node_modules
+
+# Auto-generated
+sdk/src/main/java/com/hcaptcha/sdk/HCaptchaHtml.java
