@@ -132,7 +132,8 @@ public class HCaptchaConfig implements Serializable {
     private IHCaptchaHtmlProvider htmlProvider = new HCaptchaHtml();
 
     /**
-     * Builder class declared to keep htmlProvider package-private
+     * Overwrites lombok's Builder class.
+     * This is done to keep htmlProvider package-private.
      */
     public static class HCaptchaConfigBuilder {
         private IHCaptchaHtmlProvider htmlProvider$value;
