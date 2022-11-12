@@ -54,6 +54,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     private LinearLayout loadingContainer;
 
+    private float defaultDimAmount = 0.6f;
+
     /**
      * Creates a new instance
      *
@@ -130,6 +132,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (dialog != null) {
             final Window window = dialog.getWindow();
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            defaultDimAmount = window.getAttributes().dimAmount;
             if (!webViewHelper.getConfig().getLoading()) {
                 // Remove dialog shadow to appear completely invisible
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -160,6 +163,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             final Dialog dialog = getDialog();
             if (dialog != null) {
                 dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
+                dialog.getWindow().setDimAmount(defaultDimAmount);
             }
         }
     }
