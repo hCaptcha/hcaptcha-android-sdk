@@ -178,6 +178,11 @@ task checkstyle(type: Checkstyle) {
     maxWarnings = 0
 }
 
+pmd {
+    consoleOutput = true
+    toolVersion = "6.51.0"
+}
+
 task pmd(type: Pmd) {
     ruleSetFiles = files("${project.rootDir}/gradle/config/pmd.xml")
     ignoreFailures = false
