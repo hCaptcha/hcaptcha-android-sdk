@@ -44,6 +44,11 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     static final String KEY_CONFIG = "hCaptchaConfig";
 
     /**
+     * Key for passing settings to the dialog fragment
+     */
+    static final String KEY_SETTINGS = "hCaptchaSettings";
+
+    /**
      * Key for passing listener to the dialog fragment
      */
     static final String KEY_LISTENER = "hCaptchaDialogListener";
@@ -62,11 +67,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      */
     public static HCaptchaDialogFragment newInstance(
             @NonNull final HCaptchaConfig config,
+            @NonNull final HCaptchaSettings settings,
             @NonNull final HCaptchaStateListener listener
     ) {
         HCaptchaLog.d("DialogFragment.newInstance");
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
+        args.putSerializable(KEY_SETTINGS, settings);
         args.putParcelable(KEY_LISTENER, listener);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
@@ -98,11 +105,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         }
         final HCaptchaConfig config = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         assert config != null;
+        final HCaptchaSettings settings = (HCaptchaSettings) getArguments().getSerializable(KEY_SETTINGS);
+        assert settings != null;
         final WebView webView = rootView.findViewById(R.id.webView);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
         webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), requireContext(), config, this, listener, webView);
+                new Handler(Looper.getMainLooper()), requireContext(), config, settings,this, listener, webView);
         return rootView;
     }
 
@@ -133,7 +142,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public void onCancel(@NonNull DialogInterface dialogInterface) {
+    public void onCancel(@androidx.annotation.NonNull DialogInterface dialogInterface) {
         HCaptchaLog.d("DialogFragment.onCancel");
         // User canceled the dialog through either `back` button or an outside touch
         super.onCancel(dialogInterface);

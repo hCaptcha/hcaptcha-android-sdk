@@ -1,6 +1,5 @@
 package com.hcaptcha.sdk;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -126,23 +125,4 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     private Boolean diagnosticLog = false;
-
-    @JsonIgnore
-    @Builder.Default
-    private IHCaptchaHtmlProvider htmlProvider = new HCaptchaHtml();
-
-    /**
-     * Overwrites lombok's Builder class.
-     * This is done to keep htmlProvider package-private.
-     */
-    public static class HCaptchaConfigBuilder {
-        private IHCaptchaHtmlProvider htmlProvider$value;
-        private boolean htmlProvider$set;
-
-        HCaptchaConfigBuilder htmlProvider(IHCaptchaHtmlProvider htmlProvider) {
-            this.htmlProvider$value = htmlProvider;
-            this.htmlProvider$set = true;
-            return this;
-        }
-    }
 }

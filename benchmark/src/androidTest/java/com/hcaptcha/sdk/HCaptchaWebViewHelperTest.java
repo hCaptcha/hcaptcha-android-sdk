@@ -30,6 +30,9 @@ public class HCaptchaWebViewHelperTest {
             .siteKey("10000000-ffff-ffff-ffff-000000000001")
             .hideDialog(true)
             .loading(false)
+            .build();
+
+    final HCaptchaSettings settings = HCaptchaSettings.builder()
             .htmlProvider(new TestHCaptchaHtml())
             .build();
 
@@ -48,6 +51,7 @@ public class HCaptchaWebViewHelperTest {
                             handler,
                             activity,
                             config,
+                            settings,
                             new TestHCaptchaVerifier() {
                                 @Override
                                 public void onLoaded() {

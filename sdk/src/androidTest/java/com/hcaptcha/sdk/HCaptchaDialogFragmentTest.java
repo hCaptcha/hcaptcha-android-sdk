@@ -12,6 +12,7 @@ import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
 import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
+import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_SETTINGS;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -28,7 +29,6 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaDialogFragmentTest {
     private static final long AWAIT_CALLBACK_MS = 1000;
@@ -41,6 +41,9 @@ public class HCaptchaDialogFragmentTest {
             .loading(true)
             .size(HCaptchaSize.INVISIBLE)
             .theme(HCaptchaTheme.LIGHT)
+            .build();
+
+    final HCaptchaSettings settings = HCaptchaSettings.builder()
             .htmlProvider(new HCaptchaTestHtml())
             .build();
 
@@ -60,6 +63,7 @@ public class HCaptchaDialogFragmentTest {
                                                                            HCaptchaStateListener listener) {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, captchaConfig);
+        args.putSerializable(KEY_SETTINGS, settings);
         args.putParcelable(KEY_LISTENER, listener);
         return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, args);
     }

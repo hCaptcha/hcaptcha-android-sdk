@@ -47,6 +47,7 @@ final class HCaptchaWebViewHelper {
     HCaptchaWebViewHelper(@NonNull final Handler handler,
                           @NonNull final Context context,
                           @NonNull final HCaptchaConfig config,
+                          @NonNull final HCaptchaSettings settings,
                           @NonNull final IHCaptchaVerifier captchaVerifier,
                           @NonNull final HCaptchaStateListener listener,
                           @NonNull final WebView webView) {
@@ -55,7 +56,7 @@ final class HCaptchaWebViewHelper {
         this.captchaVerifier = captchaVerifier;
         this.listener = listener;
         this.webView = webView;
-        this.htmlProvider = config.getHtmlProvider();
+        this.htmlProvider = settings.getHtmlProvider();
         setupWebView(handler);
     }
 

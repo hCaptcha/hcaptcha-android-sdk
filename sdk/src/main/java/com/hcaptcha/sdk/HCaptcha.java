@@ -23,8 +23,12 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @Nullable
     private HCaptchaConfig config;
 
+    @NonNull
+    private HCaptchaSettings settings;
+
     private HCaptcha(@NonNull final Context context) {
         this.activity = (FragmentActivity) context;
+        this.settings = HCaptchaSettings.builder().build();
     }
 
     /**
@@ -91,12 +95,18 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                     .size(HCaptchaSize.INVISIBLE)
                     .loading(false)
                     .build();
-            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, listener);
+            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, settings, listener);
         } else {
-            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, listener);
+            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, settings, listener);
             this.config = inputConfig;
         }
         return this;
+    }
+
+    HCaptcha setup(@NonNull final HCaptchaConfig inputConfig,
+                   @NonNull final HCaptchaSettings inputSettings) {
+        this.settings = inputSettings;
+        return setup(inputConfig);
     }
 
     @Override
@@ -125,7 +135,18 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier == null || !inputConfig.equals(this.config)) {
             // Cold start at verification time.
             // Or new config detected, thus new setup is needed.
-            setup(inputConfig);
+            setup(inputConfig, settings);
+        }
+
+        return startVerification();
+    }
+
+    HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig inputConfig,
+                                @NonNull final HCaptchaSettings inputSettings) {
+        if (captchaVerifier == null || !inputConfig.equals(this.config) || !inputSettings.equals(this.settings)) {
+            // Cold start at verification time.
+            // Or new config detected, thus new setup is needed.
+            setup(inputConfig, inputSettings);
         }
 
         return startVerification();

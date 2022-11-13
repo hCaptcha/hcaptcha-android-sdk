@@ -24,6 +24,9 @@ public class HCaptchaTest {
             .siteKey("10000000-ffff-ffff-ffff-000000000001")
             .hideDialog(true)
             .tokenExpiration(1)
+            .build();
+
+    final HCaptchaSettings settings = HCaptchaSettings.builder()
             .htmlProvider(new HCaptchaTestHtml())
             .build();
 
@@ -34,7 +37,7 @@ public class HCaptchaTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config)
+                    .verifyWithHCaptcha(config, settings)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override
                         public void onSuccess(HCaptchaTokenResponse response) {
@@ -60,7 +63,7 @@ public class HCaptchaTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config)
+                    .verifyWithHCaptcha(config, settings)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override
                         public void onSuccess(HCaptchaTokenResponse response) {
