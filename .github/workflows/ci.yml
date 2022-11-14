@@ -91,7 +91,7 @@ jobs:
             ./gradlew lockClocks || true
             brew install parallel
             # NOTE bench:connectedCheck and bench:connectedAndroidTest leaves connected_android_test_additional_output empty
-            parallel --retries 3 ::: "./gradlew bench:connectedReleaseAndroidTest"
+            parallel --retries 3 ::: "./gradlew bench:connectedReleaseAndroidTest --debug"
       - uses: actions/upload-artifact@v3
         with:
           name: benchmark-json-output
