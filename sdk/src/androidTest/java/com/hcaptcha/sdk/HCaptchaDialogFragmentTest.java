@@ -11,8 +11,8 @@ import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
 import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
+import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_INTERNAL_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
-import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_SETTINGS;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -43,7 +43,7 @@ public class HCaptchaDialogFragmentTest {
             .theme(HCaptchaTheme.LIGHT)
             .build();
 
-    final HCaptchaSettings settings = HCaptchaSettings.builder()
+    final HCaptchaInternalConfig internalConfig = HCaptchaInternalConfig.builder()
             .htmlProvider(new HCaptchaTestHtml())
             .build();
 
@@ -63,7 +63,7 @@ public class HCaptchaDialogFragmentTest {
                                                                            HCaptchaStateListener listener) {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, captchaConfig);
-        args.putSerializable(KEY_SETTINGS, settings);
+        args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
         args.putParcelable(KEY_LISTENER, listener);
         return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, args);
     }

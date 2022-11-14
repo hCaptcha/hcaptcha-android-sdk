@@ -4,7 +4,6 @@ import static org.junit.Assert.fail;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.util.Log;
 import android.webkit.WebView;
 
 import androidx.benchmark.BenchmarkState;
@@ -32,7 +31,7 @@ public class HCaptchaWebViewHelperTest {
             .loading(false)
             .build();
 
-    final HCaptchaSettings settings = HCaptchaSettings.builder()
+    final HCaptchaInternalConfig internalConfig = HCaptchaInternalConfig.builder()
             .htmlProvider(new TestHCaptchaHtml())
             .build();
 
@@ -51,7 +50,7 @@ public class HCaptchaWebViewHelperTest {
                             handler,
                             activity,
                             config,
-                            settings,
+                            internalConfig,
                             new TestHCaptchaVerifier() {
                                 @Override
                                 public void onLoaded() {

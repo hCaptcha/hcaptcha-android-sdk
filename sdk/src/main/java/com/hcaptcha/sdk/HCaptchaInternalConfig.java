@@ -6,11 +6,11 @@ import lombok.Data;
 import java.io.Serializable;
 
 /**
- * hCaptcha settings keep internal settings, which should not be accessible by user
+ * hCaptcha internal config keep internal configuration, which should not be accessible by end user
  */
 @Data
 @Builder(toBuilder = true)
-class HCaptchaSettings implements Serializable {
+class HCaptchaInternalConfig implements Serializable {
 
     /**
      * HTML Provider

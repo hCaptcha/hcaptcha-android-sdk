@@ -26,7 +26,7 @@ public class HCaptchaTest {
             .tokenExpiration(1)
             .build();
 
-    final HCaptchaSettings settings = HCaptchaSettings.builder()
+    final HCaptchaInternalConfig internalConfig = HCaptchaInternalConfig.builder()
             .htmlProvider(new HCaptchaTestHtml())
             .build();
 
@@ -37,7 +37,7 @@ public class HCaptchaTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config, settings)
+                    .verifyWithHCaptcha(config, internalConfig)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override
                         public void onSuccess(HCaptchaTokenResponse response) {
@@ -63,7 +63,7 @@ public class HCaptchaTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config, settings)
+                    .verifyWithHCaptcha(config, internalConfig)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override
                         public void onSuccess(HCaptchaTokenResponse response) {

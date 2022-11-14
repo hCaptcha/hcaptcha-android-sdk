@@ -24,11 +24,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     private HCaptchaConfig config;
 
     @NonNull
-    private HCaptchaSettings settings;
+    private HCaptchaInternalConfig internalConfig;
 
     private HCaptcha(@NonNull final Context context) {
         this.activity = (FragmentActivity) context;
-        this.settings = HCaptchaSettings.builder().build();
+        this.internalConfig = HCaptchaInternalConfig.builder().build();
     }
 
     /**
@@ -95,17 +95,17 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                     .size(HCaptchaSize.INVISIBLE)
                     .loading(false)
                     .build();
-            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, settings, listener);
+            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
         } else {
-            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, settings, listener);
+            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
             this.config = inputConfig;
         }
         return this;
     }
 
     HCaptcha setup(@NonNull final HCaptchaConfig inputConfig,
-                   @NonNull final HCaptchaSettings inputSettings) {
-        this.settings = inputSettings;
+                   @NonNull final HCaptchaInternalConfig inputSettings) {
+        this.internalConfig = inputSettings;
         return setup(inputConfig);
     }
 
@@ -135,15 +135,15 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier == null || !inputConfig.equals(this.config)) {
             // Cold start at verification time.
             // Or new config detected, thus new setup is needed.
-            setup(inputConfig, settings);
+            setup(inputConfig, internalConfig);
         }
 
         return startVerification();
     }
 
     HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig inputConfig,
-                                @NonNull final HCaptchaSettings inputSettings) {
-        if (captchaVerifier == null || !inputConfig.equals(this.config) || !inputSettings.equals(this.settings)) {
+                                @NonNull final HCaptchaInternalConfig inputSettings) {
+        if (captchaVerifier == null || !inputConfig.equals(this.config) || !inputSettings.equals(this.internalConfig)) {
             // Cold start at verification time.
             // Or new config detected, thus new setup is needed.
             setup(inputConfig, inputSettings);

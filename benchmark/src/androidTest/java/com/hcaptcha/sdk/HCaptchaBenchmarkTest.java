@@ -28,7 +28,7 @@ public class HCaptchaBenchmarkTest {
             .loading(false)
             .build();
 
-    final HCaptchaSettings settings = HCaptchaSettings.builder()
+    final HCaptchaInternalConfig internalConfig = HCaptchaInternalConfig.builder()
             .htmlProvider(new TestHCaptchaHtml())
             .build();
 
@@ -37,7 +37,7 @@ public class HCaptchaBenchmarkTest {
         rule.getScenario().onActivity(activity -> {
             final BenchmarkState state = benchmarkRule.getState();
             while (state.keepRunning()) {
-                HCaptcha.getClient(activity).setup(config, settings);
+                HCaptcha.getClient(activity).setup(config, internalConfig);
             }
         });
     }
@@ -50,7 +50,7 @@ public class HCaptchaBenchmarkTest {
             final CountDownLatch latch = new CountDownLatch(1);
             try {
                 rule.getScenario().onActivity(activity -> {
-                    HCaptcha hCaptcha = HCaptcha.getClient(activity).setup(config, settings);
+                    HCaptcha hCaptcha = HCaptcha.getClient(activity).setup(config, internalConfig);
                     state.resumeTiming();
                     hCaptcha.verifyWithHCaptcha()
                             .addOnSuccessListener(response -> latch.countDown())
@@ -73,7 +73,7 @@ public class HCaptchaBenchmarkTest {
             try {
                 rule.getScenario().onActivity(activity -> {
                     state.resumeTiming();
-                    HCaptcha.getClient(activity).verifyWithHCaptcha(config, settings)
+                    HCaptcha.getClient(activity).verifyWithHCaptcha(config, internalConfig)
                             .addOnSuccessListener(response -> latch.countDown());
 
                 });

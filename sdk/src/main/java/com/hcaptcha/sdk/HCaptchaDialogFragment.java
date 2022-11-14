@@ -44,9 +44,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     static final String KEY_CONFIG = "hCaptchaConfig";
 
     /**
-     * Key for passing settings to the dialog fragment
+     * Key for passing internal config to the dialog fragment
      */
-    static final String KEY_SETTINGS = "hCaptchaSettings";
+    static final String KEY_INTERNAL_CONFIG = "hCaptchaInternalConfig";
 
     /**
      * Key for passing listener to the dialog fragment
@@ -67,13 +67,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      */
     public static HCaptchaDialogFragment newInstance(
             @NonNull final HCaptchaConfig config,
-            @NonNull final HCaptchaSettings settings,
+            @NonNull final HCaptchaInternalConfig internalConfig,
             @NonNull final HCaptchaStateListener listener
     ) {
         HCaptchaLog.d("DialogFragment.newInstance");
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
-        args.putSerializable(KEY_SETTINGS, settings);
+        args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
         args.putParcelable(KEY_LISTENER, listener);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
@@ -105,13 +105,14 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         }
         final HCaptchaConfig config = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
         assert config != null;
-        final HCaptchaSettings settings = (HCaptchaSettings) getArguments().getSerializable(KEY_SETTINGS);
-        assert settings != null;
+        final HCaptchaInternalConfig internalConfig = (HCaptchaInternalConfig) getArguments()
+                .getSerializable(KEY_INTERNAL_CONFIG);
+        assert internalConfig != null;
         final WebView webView = rootView.findViewById(R.id.webView);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
         webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), requireContext(), config, settings,this, listener, webView);
+                new Handler(Looper.getMainLooper()), requireContext(), config, internalConfig,this, listener, webView);
         return rootView;
     }
 

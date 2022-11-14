@@ -28,7 +28,7 @@ public class HCaptchaHeadlessWebViewTest {
             .hideDialog(true)
             .build();
 
-    final HCaptchaSettings settings = HCaptchaSettings.builder()
+    final HCaptchaInternalConfig internalConfig = HCaptchaInternalConfig.builder()
             .htmlProvider(new HCaptchaTestHtml())
             .build();
 
@@ -55,7 +55,7 @@ public class HCaptchaHeadlessWebViewTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
-                    activity, config, settings, listener);
+                    activity, config, internalConfig, listener);
             subject.startVerification(activity);
         });
 
@@ -81,7 +81,7 @@ public class HCaptchaHeadlessWebViewTest {
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
-                    activity, config, settings, listener);
+                    activity, config, internalConfig, listener);
             subject.startVerification(activity);
         });
 
