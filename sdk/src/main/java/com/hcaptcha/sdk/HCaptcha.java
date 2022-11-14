@@ -26,9 +26,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @NonNull
     private HCaptchaInternalConfig internalConfig;
 
-    private HCaptcha(@NonNull final Context context) {
+    private HCaptcha(@NonNull final Context context, final HCaptchaInternalConfig internalConfig) {
         this.activity = (FragmentActivity) context;
-        this.internalConfig = HCaptchaInternalConfig.builder().build();
+        this.internalConfig = internalConfig;
     }
 
     /**
@@ -38,7 +38,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
      * @return new {@link HCaptcha} object
      */
     public static HCaptcha getClient(@NonNull final Context context) {
-        return new HCaptcha(context);
+        return new HCaptcha(context, HCaptchaInternalConfig.builder().build());
+    }
+
+    static HCaptcha getClient(@NonNull final Context context, HCaptchaInternalConfig internalConfig) {
+        return new HCaptcha(context, internalConfig);
     }
 
     @Override
@@ -103,12 +107,6 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         return this;
     }
 
-    HCaptcha setup(@NonNull final HCaptchaConfig inputConfig,
-                   @NonNull final HCaptchaInternalConfig inputSettings) {
-        this.internalConfig = inputSettings;
-        return setup(inputConfig);
-    }
-
     @Override
     public HCaptcha verifyWithHCaptcha() {
         if (captchaVerifier == null) {
@@ -135,18 +133,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier == null || !inputConfig.equals(this.config)) {
             // Cold start at verification time.
             // Or new config detected, thus new setup is needed.
-            setup(inputConfig, internalConfig);
-        }
-
-        return startVerification();
-    }
-
-    HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig inputConfig,
-                                @NonNull final HCaptchaInternalConfig inputSettings) {
-        if (captchaVerifier == null || !inputConfig.equals(this.config) || !inputSettings.equals(this.internalConfig)) {
-            // Cold start at verification time.
-            // Or new config detected, thus new setup is needed.
-            setup(inputConfig, inputSettings);
+            setup(inputConfig);
         }
 
         return startVerification();

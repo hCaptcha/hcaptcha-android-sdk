@@ -36,8 +36,8 @@ public class HCaptchaTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config, internalConfig)
+            HCaptcha.getClient(activity, internalConfig)
+                    .verifyWithHCaptcha(config)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override
                         public void onSuccess(HCaptchaTokenResponse response) {
@@ -62,8 +62,8 @@ public class HCaptchaTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config, internalConfig)
+            HCaptcha.getClient(activity, internalConfig)
+                    .verifyWithHCaptcha(config)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override
                         public void onSuccess(HCaptchaTokenResponse response) {
