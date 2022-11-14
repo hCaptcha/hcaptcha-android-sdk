@@ -112,7 +112,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
         webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), requireContext(), config, internalConfig,this, listener, webView);
+                new Handler(Looper.getMainLooper()), requireContext(), config, internalConfig, this, listener, webView);
         return rootView;
     }
 
