@@ -17,14 +17,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-
-import lombok.NonNull;
-
 
 /**
  * HCaptcha Dialog Fragment Class.
@@ -66,9 +64,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      * @return a new instance
      */
     public static HCaptchaDialogFragment newInstance(
-            @NonNull final HCaptchaConfig config,
-            @NonNull final HCaptchaInternalConfig internalConfig,
-            @NonNull final HCaptchaStateListener listener
+            @lombok.NonNull final HCaptchaConfig config,
+            @lombok.NonNull final HCaptchaInternalConfig internalConfig,
+            @lombok.NonNull final HCaptchaStateListener listener
     ) {
         HCaptchaLog.d("DialogFragment.newInstance");
         final Bundle args = new Bundle();
@@ -143,7 +141,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public void onCancel(@androidx.annotation.NonNull DialogInterface dialogInterface) {
+    public void onCancel(@NonNull DialogInterface dialogInterface) {
         HCaptchaLog.d("DialogFragment.onCancel");
         // User canceled the dialog through either `back` button or an outside touch
         super.onCancel(dialogInterface);
