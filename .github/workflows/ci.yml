@@ -73,8 +73,8 @@ jobs:
         api-level: [29] # , 23, 21]
         target: [default] #, google_apis]
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
           java-version: '8'
           distribution: adopt
@@ -89,9 +89,8 @@ jobs:
             # https://developer.android.com/topic/performance/benchmarking/benchmarking-in-ci#clock-locking
             adb root
             ./gradlew lockClocks || true
-            brew install parallel
             # NOTE bench:connectedCheck and bench:connectedAndroidTest leaves connected_android_test_additional_output empty
-            parallel --retries 3 ::: "./gradlew bench:connectedReleaseAndroidTest --debug"
+            ./gradlew bench:connectedReleaseAndroidTest --debug
       - uses: actions/upload-artifact@v3
         with:
           name: benchmark-json-output
