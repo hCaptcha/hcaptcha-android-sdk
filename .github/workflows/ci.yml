@@ -90,7 +90,7 @@ jobs:
             adb root
             ./gradlew lockClocks || true
             # NOTE bench:connectedCheck and bench:connectedAndroidTest leaves connected_android_test_additional_output empty
-            ./gradlew bench:connectedReleaseAndroidTest --debug
+            ./gradlew --no-daemon bench:connectedReleaseAndroidTest --debug
       - uses: actions/upload-artifact@v3
         with:
           name: benchmark-json-output
