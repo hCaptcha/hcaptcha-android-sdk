@@ -2,6 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:ignore="ExtraText">
     <application>
-        <activity android:name=".TestActivity" android:theme="@style/Theme.AppCompat.Light" />
+        <activity android:name="com.hcaptcha.sdk.TestActivity" android:theme="@style/Theme.AppCompat.Light" />
     </application>
 </manifest>
