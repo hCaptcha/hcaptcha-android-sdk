@@ -1,6 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.hcaptcha.sdk"
     tools:ignore="ExtraText">
     <application>
         <activity android:name=".TestActivity" android:theme="@style/Theme.AppCompat.Light" />

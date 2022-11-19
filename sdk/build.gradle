@@ -9,12 +9,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
+    namespace 'com.hcaptcha.sdk'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 32
+        targetSdkVersion 33
 
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
