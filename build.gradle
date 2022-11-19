@@ -7,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.1'
-        classpath 'androidx.benchmark:benchmark-gradle-plugin:1.2.0-alpha07'
+        classpath 'androidx.benchmark:benchmark-gradle-plugin:1.1.1'
     }
 }
 

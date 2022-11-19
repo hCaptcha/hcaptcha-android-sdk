@@ -39,7 +39,7 @@ dependencies {
     androidTestImplementation 'androidx.test:runner:1.5.1'
     androidTestImplementation 'androidx.test.ext:junit:1.1.4'
     androidTestImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.benchmark:benchmark-junit4:1.2.0-alpha07'
+    androidTestImplementation 'androidx.benchmark:benchmark-junit4:1.1.1'
 
     implementation project(path: ':sdk')
     implementation 'androidx.appcompat:appcompat:1.5.1'
