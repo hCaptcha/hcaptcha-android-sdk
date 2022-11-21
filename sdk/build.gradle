@@ -9,12 +9,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'maven-publish'
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
+    namespace 'com.hcaptcha.sdk'
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 32
+        targetSdkVersion 33
 
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
@@ -47,6 +48,13 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
     }
+
+    publishing {
+        singleVariant('release') {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
 }
 
 dependencies {
@@ -75,20 +83,6 @@ dependencies {
     compileOnly 'com.google.code.findbugs:annotations:3.0.1'
 }
 
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    android.libraryVariants.all { variant ->
-        owner.classpath += variant.javaCompileProvider.get().classpath
-    }
-    exclude '**/R.html', '**/R.*.html', '**/index.html'
-}
-
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    archiveClassifier.set('javadoc')
-    from androidJavadocs.destinationDir
-}
-
 project.afterEvaluate {
     publishing {
         repositories {
@@ -97,9 +91,6 @@ project.afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-
-                // Adds javadocs
-                artifact androidJavadocsJar
 
                 groupId = 'com.hcaptcha'
                 artifactId = 'sdk'
@@ -166,6 +157,10 @@ android.libraryVariants.all { variant ->
     })
 }
 
+checkstyle {
+    toolVersion = '8.45.1'
+}
+
 task checkstyle(type: Checkstyle) {
     description 'Check code standard'
     group 'verification'
@@ -191,9 +186,9 @@ task pmd(type: Pmd) {
     include '**/*.java'
     exclude '**/gen/**'
     reports {
-        xml.enabled = false
-        html.enabled = true
-        html.destination = file("$project.buildDir/outputs/pmd/pmd.html")
+        xml.required = false
+        html.required = true
+        html.outputLocation = file("$project.buildDir/outputs/pmd/pmd.html")
     }
 }
 
