@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.3.6
+
+- Bugfix: always dim background if checkbox is visible ([#72](https://github.com/hCaptcha/hcaptcha-android-sdk/issues/72))
+
 # 3.3.5
 
 - Show loading screen until the challenge is open when size is `HCaptchaSize.INVISIBLE`
