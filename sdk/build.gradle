@@ -83,20 +83,6 @@ dependencies {
     compileOnly 'com.google.code.findbugs:annotations:3.0.1'
 }
 
-task androidJavadocs(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-    android.libraryVariants.all { variant ->
-        owner.classpath += variant.javaCompileProvider.get().classpath
-    }
-    exclude '**/R.html', '**/R.*.html', '**/index.html'
-}
-
-task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
-    archiveClassifier.set('javadoc')
-    from androidJavadocs.destinationDir
-}
-
 project.afterEvaluate {
     publishing {
         repositories {
@@ -105,9 +91,6 @@ project.afterEvaluate {
         publications {
             release(MavenPublication) {
                 from components.release
-
-                // Adds javadocs
-                artifact androidJavadocsJar
 
                 groupId = 'com.hcaptcha'
                 artifactId = 'sdk'
