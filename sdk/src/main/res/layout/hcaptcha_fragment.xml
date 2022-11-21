@@ -15,6 +15,8 @@
         android:layout_centerInParent="true"
         android:padding="20dp"
         android:background="@android:color/white"
+        android:clickable="true"
+        android:focusable="true"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
 
@@ -22,7 +24,7 @@
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:src="@drawable/ic_logo"
+            android:src="@drawable/ic_hcaptcha_logo"
             android:contentDescription="@string/logo_description" />
 
         <ProgressBar
