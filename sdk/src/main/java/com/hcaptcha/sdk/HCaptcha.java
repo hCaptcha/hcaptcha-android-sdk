@@ -49,9 +49,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     public HCaptcha setup() {
         final String siteKey;
         try {
-            final String packageName = activity.getPackageName();
-            final ApplicationInfo app = activity.getPackageManager().getApplicationInfo(
-                    packageName, PackageManager.GET_META_DATA);
+            final ApplicationInfo app = HCaptchaCompat.getApplicationInfo(activity);
             final Bundle bundle = app.metaData;
             siteKey = bundle.getString(META_SITE_KEY);
         } catch (PackageManager.NameNotFoundException e) {

@@ -92,7 +92,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         assert getArguments() != null;
         final HCaptchaStateListener listener;
         try {
-            listener = getArguments().getParcelable(KEY_LISTENER);
+            listener = HCaptchaCompat.getParcelable(getArguments(), KEY_LISTENER, HCaptchaStateListener.class);
             assert listener != null;
         } catch (BadParcelableException | ClassCastException e) {
             HCaptchaLog.w("Cannot process getArguments(). Dismissing dialog...");
@@ -101,10 +101,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             dismiss();
             return rootView;
         }
-        final HCaptchaConfig config = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
+        final HCaptchaConfig config = HCaptchaCompat.getSerializable(getArguments(), KEY_CONFIG, HCaptchaConfig.class);
         assert config != null;
-        final HCaptchaInternalConfig internalConfig = (HCaptchaInternalConfig) getArguments()
-                .getSerializable(KEY_INTERNAL_CONFIG);
+        final HCaptchaInternalConfig internalConfig = HCaptchaCompat.getSerializable(getArguments(),
+                KEY_INTERNAL_CONFIG, HCaptchaInternalConfig.class);
         assert internalConfig != null;
         final WebView webView = rootView.findViewById(R.id.webView);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
