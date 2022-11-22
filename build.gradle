@@ -17,3 +17,15 @@ allprojects {
         mavenCentral()
     }
 }
+
+gradle.afterProject {
+    def hookScript = new File(rootProject.rootDir, ".git/hooks/pre-commit")
+
+    if (!hookScript.exists()) {
+        hookScript.text = """\
+                          #!/bin/sh
+                          ./gradlew check
+                          """.stripIndent()
+        hookScript.setExecutable(true)
+    }
+}
