@@ -41,6 +41,7 @@ jobs:
           key: diffuse-${{ github.sha }}
 
   sonar:
+    if: false
     name: 'Sonar'
     runs-on: ubuntu-latest
     steps:
@@ -77,29 +78,33 @@ jobs:
           java-version: '11'
           distribution: adopt
       - uses: gradle/gradle-build-action@v2
-      - name: 'AVD cache'
+      - name: 'Cache AVD'
         uses: actions/cache@v3
         id: avd-cache
         with:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-${{ matrix.api-level }}
-      - name: 'Create AVD and generate snapshot for caching'
+          key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
+      - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
-          force-avd-creation: false
+          target: ${{ matrix.target }}
           emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: false
           disable-animations: false
+          arch: x86_64
+          profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
-      - uses: reactivecircus/android-emulator-runner@v2
+      - name: 'Tests'
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: false
           disable-animations: true
           arch: x86_64
           profile: Nexus 6
@@ -113,6 +118,7 @@ jobs:
           path: sdk/build/outputs/androidTest-results
 
   benchmark-tests:
+    if: false
     name: 'Android Benchmark'
     runs-on: macos-latest
     strategy:
@@ -146,7 +152,7 @@ jobs:
 
   size-report:
     name: 'Diffuse report'
-    if: github.event_name == 'pull_request'
+    if: false && github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
