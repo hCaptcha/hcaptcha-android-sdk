@@ -1,11 +1,12 @@
 package com.hcaptcha.sdk;
 
 import android.os.Handler;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
+import androidx.annotation.Nullable;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
 import lombok.NonNull;
 
 import java.io.Serializable;
@@ -14,23 +15,36 @@ import java.io.Serializable;
 /**
  * The JavaScript Interface which bridges the js and the java code
  */
-@AllArgsConstructor
 class HCaptchaJSInterface implements Serializable {
     public static final String JS_INTERFACE_TAG = "JSInterface";
 
     @NonNull
     private final Handler handler;
 
-    @NonNull
-    private final HCaptchaConfig config;
+    @Nullable
+    private final String config;
 
     @NonNull
     private final IHCaptchaVerifier captchaVerifier;
 
+    HCaptchaJSInterface(final Handler handler, final HCaptchaConfig config,
+                        final IHCaptchaVerifier captchaVerifier) {
+        this.handler = handler;
+        this.captchaVerifier = captchaVerifier;
+        String configJson = null;
+        try {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            configJson = objectMapper.writeValueAsString(config);
+        } catch (JsonProcessingException e) {
+            Log.w(JS_INTERFACE_TAG, "Cannot prepare config for passing to WebView."
+                    + " A fallback config will be used");
+        }
+        this.config = configJson;
+    }
+
     @JavascriptInterface
-    public String getConfig() throws JsonProcessingException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.writeValueAsString(this.config);
+    public String getConfig() {
+        return this.config;
     }
 
     @JavascriptInterface

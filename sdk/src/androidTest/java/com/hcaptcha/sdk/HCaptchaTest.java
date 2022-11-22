@@ -4,7 +4,6 @@ import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
-import android.app.Activity;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
@@ -13,7 +12,6 @@ import com.hcaptcha.sdk.tasks.OnSuccessListener;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.lang.reflect.Field;
 import java.util.concurrent.CountDownLatch;
 
 public class HCaptchaTest {
@@ -28,18 +26,9 @@ public class HCaptchaTest {
             .tokenExpiration(1)
             .build();
 
-    private HCaptcha getClient(Activity activity) {
-        final HCaptcha hcaptcha = HCaptcha.getClient(activity);
-        try {
-            final Field field = hcaptcha.getClass().getDeclaredField("htmlProvider");
-            field.setAccessible(true);
-            field.set(hcaptcha, new HCaptchaTestHtml());
-            field.setAccessible(false);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            fail("Cannot mock HTML");
-        }
-        return hcaptcha;
-    }
+    final HCaptchaInternalConfig internalConfig = HCaptchaInternalConfig.builder()
+            .htmlProvider(new HCaptchaTestHtml())
+            .build();
 
     @Test
     public void testExpiredAfterSuccess() throws Exception {
@@ -47,7 +36,7 @@ public class HCaptchaTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            getClient(activity)
+            HCaptcha.getClient(activity, internalConfig)
                     .verifyWithHCaptcha(config)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override
@@ -73,7 +62,7 @@ public class HCaptchaTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            getClient(activity)
+            HCaptcha.getClient(activity, internalConfig)
                     .verifyWithHCaptcha(config)
                     .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
                         @Override

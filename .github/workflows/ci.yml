@@ -1,5 +1,9 @@
 name: ci
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ main ]
@@ -16,7 +20,7 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/setup-java@v2
         with:
-          java-version: '8'
+          java-version: '11'
           distribution: adopt
           cache: 'gradle'
       - name: Assemble & Test
@@ -68,7 +72,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
         with:
-          java-version: '8'
+          java-version: '11'
           distribution: adopt
           cache: 'gradle'
       - uses: reactivecircus/android-emulator-runner@v2
@@ -79,7 +83,43 @@ jobs:
           profile: Nexus 6
           script: |
             brew install parallel
-            parallel --retries 3 ::: "./gradlew connectedCheck"
+            parallel --retries 3 ::: "./gradlew sdk:connectedCheck"
+      - if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: androidTest-results
+          path: sdk/build/outputs/androidTest-results
+  benchmark-tests:
+    name: Android Benchmark
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [29] # , 23, 21]
+        target: [default] #, google_apis]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: adopt
+          cache: 'gradle'
+      - uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            # https://developer.android.com/topic/performance/benchmarking/benchmarking-in-ci#clock-locking
+            adb root
+            ./gradlew lockClocks || true
+            # NOTE bench:connectedCheck and bench:connectedAndroidTest leaves connected_android_test_additional_output empty
+            ./gradlew --no-daemon --no-parallel bench:connectedReleaseAndroidTest --debug
+      - uses: actions/upload-artifact@v3
+        with:
+          name: benchmark-json-output
+          path: benchmark/build/outputs/connected_android_test_additional_output
   size-report:
     name: Diffuse report
     if: github.event_name == 'pull_request'
@@ -129,6 +169,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - compile: 33
+            target: 33
+            appcompat: 1.5.1
           - compile: 32
             target: 32
             appcompat: 1.4.2
@@ -142,7 +185,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-java@v2
         with:
-          java-version: '8'
+          java-version: '11'
           distribution: adopt
           cache: 'gradle'
       - run: |

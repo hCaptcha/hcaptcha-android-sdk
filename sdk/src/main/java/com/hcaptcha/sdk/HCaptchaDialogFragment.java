@@ -17,14 +17,12 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.webkit.WebView;
 import android.widget.LinearLayout;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
-
-import lombok.NonNull;
-
 
 /**
  * HCaptcha Dialog Fragment Class.
@@ -44,10 +42,14 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     static final String KEY_CONFIG = "hCaptchaConfig";
 
     /**
+     * Key for passing internal config to the dialog fragment
+     */
+    static final String KEY_INTERNAL_CONFIG = "hCaptchaInternalConfig";
+
+    /**
      * Key for passing listener to the dialog fragment
      */
     static final String KEY_LISTENER = "hCaptchaDialogListener";
-    static final String KEY_HTML = "hCaptchaHtmlProvider";
 
     @Nullable
     private HCaptchaWebViewHelper webViewHelper;
@@ -64,15 +66,15 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      * @return a new instance
      */
     public static HCaptchaDialogFragment newInstance(
-            @NonNull final HCaptchaConfig config,
-            @NonNull final HCaptchaStateListener listener,
-            @NonNull final IHCaptchaHtmlProvider htmlProvider
+            @lombok.NonNull final HCaptchaConfig config,
+            @lombok.NonNull final HCaptchaInternalConfig internalConfig,
+            @lombok.NonNull final HCaptchaStateListener listener
     ) {
         HCaptchaLog.d("DialogFragment.newInstance");
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
+        args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
         args.putParcelable(KEY_LISTENER, listener);
-        args.putSerializable(KEY_HTML, htmlProvider);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
         return hCaptchaDialogFragment;
@@ -91,12 +93,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         HCaptchaLog.d("DialogFragment.onCreateView inflated");
         assert getArguments() != null;
         final HCaptchaStateListener listener;
-        final IHCaptchaHtmlProvider htmlProvider;
         try {
-            listener = getArguments().getParcelable(KEY_LISTENER);
+            listener = HCaptchaCompat.getParcelable(getArguments(), KEY_LISTENER, HCaptchaStateListener.class);
             assert listener != null;
-            htmlProvider = (IHCaptchaHtmlProvider) getArguments().getSerializable(KEY_HTML);
-            assert htmlProvider != null;
         } catch (BadParcelableException | ClassCastException e) {
             HCaptchaLog.w("Cannot process getArguments(). Dismissing dialog...");
             // Happens when fragment tries to reconstruct because the activity was killed
@@ -104,13 +103,16 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             dismiss();
             return rootView;
         }
-        final HCaptchaConfig config = (HCaptchaConfig) getArguments().getSerializable(KEY_CONFIG);
+        final HCaptchaConfig config = HCaptchaCompat.getSerializable(getArguments(), KEY_CONFIG, HCaptchaConfig.class);
         assert config != null;
+        final HCaptchaInternalConfig internalConfig = HCaptchaCompat.getSerializable(getArguments(),
+                KEY_INTERNAL_CONFIG, HCaptchaInternalConfig.class);
+        assert internalConfig != null;
         final WebView webView = rootView.findViewById(R.id.webView);
         loadingContainer = rootView.findViewById(R.id.loadingContainer);
         loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
         webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), requireContext(), config, this, listener, webView, htmlProvider);
+                new Handler(Looper.getMainLooper()), requireContext(), config, internalConfig, this, listener, webView);
         return rootView;
     }
 
