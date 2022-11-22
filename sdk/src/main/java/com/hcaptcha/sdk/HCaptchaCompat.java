@@ -18,7 +18,7 @@ final class HCaptchaCompat {
     private HCaptchaCompat() {
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "deprecation" })
     static <T extends Serializable> T getSerializable(Bundle bundle, @Nullable String key, Class<T> clazz) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return bundle.getSerializable(key, clazz);
@@ -27,7 +27,7 @@ final class HCaptchaCompat {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked", "deprecation" })
     static <T extends Parcelable> T getParcelable(Bundle bundle, @Nullable String key, Class<T> clazz) {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             return bundle.getParcelable(key, clazz);
