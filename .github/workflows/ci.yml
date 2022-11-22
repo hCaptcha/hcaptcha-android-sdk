@@ -173,7 +173,7 @@ jobs:
           disable-animations: true
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew --no-daemon --no-parallel bench:connectedReleaseAndroidTest --debug
+          script: ./gradlew bench:connectedReleaseAndroidTest
       - uses: actions/upload-artifact@v3
         with:
           name: benchmark-json-output
@@ -181,6 +181,7 @@ jobs:
 
   sonar:
     name: 'Sonar'
+    needs: [ test ]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -205,6 +206,7 @@ jobs:
 
   size-report:
     name: 'Diffuse report'
+    needs: [ test ]
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
