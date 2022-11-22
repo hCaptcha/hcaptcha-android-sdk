@@ -1,4 +1,4 @@
-name: ci
+name: 'ci'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -14,7 +14,7 @@ on:
       - '**.md'
 jobs:
   build:
-    name: Build & Unit-test
+    name: 'Build & Unit-test'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,24 +23,25 @@ jobs:
           java-version: '11'
           distribution: adopt
           cache: 'gradle'
-      - name: Assemble & Test
+      - name: 'Assemble & Test'
         run: |
           ./gradlew build --stacktrace
           cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
-      - name: HTML ES5 test
+      - name: 'HTML ES5 test'
         run: |
           npm install -g jshint
           java -cp sdk/build/intermediates/javac/release/classes com.hcaptcha.sdk.HCaptchaHtml > sdk/build/hcaptcha-form.html
           jshint --extract=always sdk/build/hcaptcha-form.html
-      - name: JitPack Test
+      - name: 'JitPack Test'
         run: ./gradlew publishReleasePublicationToMavenLocal
       - if: github.event_name == 'push'
         uses: actions/cache@v3
         with:
           path: sdk-main.aar
           key: diffuse-${{ github.sha }}
+
   sonar:
-    name: Sonar
+    name: 'Sonar'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -60,8 +61,9 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: ./gradlew sonarqube --info
+
   ui-tests:
-    name: Android UI Tests
+    name: 'Android UI Tests'
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -75,10 +77,31 @@ jobs:
           java-version: '11'
           distribution: adopt
           cache: 'gradle'
+      - uses: gradle/gradle-build-action@v2
+      - name: 'AVD cache'
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-${{ matrix.api-level }}
+      - name: 'Create AVD and generate snapshot for caching'
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          force-avd-creation: false
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: false
+          script: echo "Generated AVD snapshot for caching."
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
           arch: x86_64
           profile: Nexus 6
           script: |
@@ -89,8 +112,9 @@ jobs:
         with:
           name: androidTest-results
           path: sdk/build/outputs/androidTest-results
+
   benchmark-tests:
-    name: Android Benchmark
+    name: 'Android Benchmark'
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -120,8 +144,9 @@ jobs:
         with:
           name: benchmark-json-output
           path: benchmark/build/outputs/connected_android_test_additional_output
+
   size-report:
-    name: Diffuse report
+    name: 'Diffuse report'
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
@@ -133,7 +158,7 @@ jobs:
         java-version: '11'
         distribution: adopt
         cache: 'gradle'
-    - name: Build sdk for PR and main branch
+    - name: 'Build sdk for PR and main branch'
       run: |
         ./gradlew build --stacktrace
         cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
@@ -161,8 +186,9 @@ jobs:
         comment-id: ${{ steps.find_comment.outputs.comment-id }}
         issue-number: ${{ github.event.pull_request.number }}
         token: ${{ secrets.GITHUB_TOKEN }}
+
   sdk-compile-test:
-    name: "Compile target:${{ matrix.target }} compile:${{ matrix.compile }} appcompat: ${{ matrix.appcompat }}"
+    name: 'Compile target:${{ matrix.target }} compile:${{ matrix.compile }} appcompat: ${{ matrix.appcompat }}'
     needs: [build]
     runs-on: ubuntu-latest
     strategy:
