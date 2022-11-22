@@ -36,6 +36,7 @@ final class HCaptchaCompat {
         }
     }
 
+    @SuppressWarnings({ "deprecation" })
     static ApplicationInfo getApplicationInfo(@NonNull Context context)
             throws PackageManager.NameNotFoundException {
         if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
