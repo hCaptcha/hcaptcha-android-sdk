@@ -47,16 +47,16 @@ final class HCaptchaWebViewHelper {
     HCaptchaWebViewHelper(@NonNull final Handler handler,
                           @NonNull final Context context,
                           @NonNull final HCaptchaConfig config,
+                          @NonNull final HCaptchaInternalConfig internalConfig,
                           @NonNull final IHCaptchaVerifier captchaVerifier,
                           @NonNull final HCaptchaStateListener listener,
-                          @NonNull final WebView webView,
-                          @NonNull final IHCaptchaHtmlProvider htmlProvider) {
+                          @NonNull final WebView webView) {
         this.context = context;
         this.config = config;
         this.captchaVerifier = captchaVerifier;
         this.listener = listener;
         this.webView = webView;
-        this.htmlProvider = htmlProvider;
+        this.htmlProvider = internalConfig.getHtmlProvider();
         setupWebView(handler);
     }
 
@@ -74,7 +74,7 @@ final class HCaptchaWebViewHelper {
         final WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setLoadWithOverviewMode(true);
-        settings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
         settings.setGeolocationEnabled(false);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);

@@ -85,7 +85,7 @@ final class HCaptchaDebugInfo implements Serializable {
         }
     }
 
-    private List<String> debugInfo(String packageName, String packageCode)
+    List<String> debugInfo(String packageName, String packageCode)
             throws IOException, NoSuchAlgorithmException {
         final List<String> result = new ArrayList<>(512);
         final MessageDigest androidMd5 = MessageDigest.getInstance("MD5");
@@ -116,7 +116,7 @@ final class HCaptchaDebugInfo implements Serializable {
         return result;
     }
 
-    private Map<String, String> roBuildProps() throws IOException {
+    Map<String, String> roBuildProps() throws IOException {
         Process getpropProcess = null;
         final Map<String, String> props = new HashMap<>();
         try {

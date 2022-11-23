@@ -11,6 +11,7 @@ def prop(name, fallback) {
 android {
     compileSdkVersion intProp("exampleCompileSdkVersion", 32)
     buildToolsVersion "30.0.3"
+    namespace 'com.hcaptcha.example'
 
     defaultConfig {
         applicationId "com.hcaptcha.example"
@@ -33,6 +34,10 @@ android {
         release {
             minifyEnabled true
         }
+    }
+
+    lint {
+        disable 'UsingOnClickInXml'
     }
 }
 

@@ -24,10 +24,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     private HCaptchaConfig config;
 
     @NonNull
-    private final IHCaptchaHtmlProvider htmlProvider = new HCaptchaHtml();
+    private final HCaptchaInternalConfig internalConfig;
 
-    private HCaptcha(@NonNull final Context context) {
+    private HCaptcha(@NonNull final Context context, final HCaptchaInternalConfig internalConfig) {
         this.activity = (FragmentActivity) context;
+        this.internalConfig = internalConfig;
     }
 
     /**
@@ -37,16 +38,18 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
      * @return new {@link HCaptcha} object
      */
     public static HCaptcha getClient(@NonNull final Context context) {
-        return new HCaptcha(context);
+        return new HCaptcha(context, HCaptchaInternalConfig.builder().build());
+    }
+
+    static HCaptcha getClient(@NonNull final Context context, HCaptchaInternalConfig internalConfig) {
+        return new HCaptcha(context, internalConfig);
     }
 
     @Override
     public HCaptcha setup() {
         final String siteKey;
         try {
-            final String packageName = activity.getPackageName();
-            final ApplicationInfo app = activity.getPackageManager().getApplicationInfo(
-                    packageName, PackageManager.GET_META_DATA);
+            final ApplicationInfo app = HCaptchaCompat.getApplicationInfo(activity);
             final Bundle bundle = app.metaData;
             siteKey = bundle.getString(META_SITE_KEY);
         } catch (PackageManager.NameNotFoundException e) {
@@ -94,9 +97,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                     .size(HCaptchaSize.INVISIBLE)
                     .loading(false)
                     .build();
-            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, listener, htmlProvider);
+            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
         } else {
-            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, listener, htmlProvider);
+            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
             this.config = inputConfig;
         }
         return this;
