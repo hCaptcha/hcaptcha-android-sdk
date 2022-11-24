@@ -2,6 +2,7 @@ package com.hcaptcha.sdk;
 
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import androidx.test.core.app.ActivityScenario;
@@ -13,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class HCaptchaTest {
     private static final long AWAIT_CALLBACK_MS = 5000;
@@ -80,5 +82,57 @@ public class HCaptchaTest {
         });
 
         waitHCaptchaWebViewToken(latch, AWAIT_CALLBACK_MS);
+    }
+
+    @Test
+    public void e2eWithDebugTokenFragmentDialog() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            HCaptcha.getClient(activity)
+                    .verifyWithHCaptcha(config.toBuilder().hideDialog(false).build())
+                    .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
+                        @Override
+                        public void onSuccess(HCaptchaTokenResponse response) {
+                            response.markUsed();
+                            latch.countDown();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(HCaptchaException exception) {
+                            fail("No errors expected");
+                        }
+                    });
+        });
+
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void e2eWithDebugTokenHeadlessWebView() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            HCaptcha.getClient(activity)
+                    .verifyWithHCaptcha(config.toBuilder().hideDialog(true).build())
+                    .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
+                        @Override
+                        public void onSuccess(HCaptchaTokenResponse response) {
+                            response.markUsed();
+                            latch.countDown();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(HCaptchaException exception) {
+                            fail("No errors expected");
+                        }
+                    });
+        });
+
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }
