@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HCaptchaTest {
     private static final long AWAIT_CALLBACK_MS = 5000;
+    private static final long E2E_AWAIT_CALLBACK_MS = AWAIT_CALLBACK_MS * 2;
 
     @Rule
     public ActivityScenarioRule<TestActivity> rule = new ActivityScenarioRule<>(TestActivity.class);
@@ -107,7 +108,7 @@ public class HCaptchaTest {
                     });
         });
 
-        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+        assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
@@ -133,6 +134,6 @@ public class HCaptchaTest {
                     });
         });
 
-        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+        assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }
