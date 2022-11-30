@@ -6,7 +6,7 @@
 
 ###### [Installation](#installation) | [Requirements](#requirements) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
 
-This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com), and is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
+This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com). It is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
 
 
 ## Installation
