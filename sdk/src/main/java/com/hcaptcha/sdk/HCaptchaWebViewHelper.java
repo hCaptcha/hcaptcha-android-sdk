@@ -106,6 +106,10 @@ final class HCaptchaWebViewHelper {
         webView.destroy();
     }
 
+    public void resetAndExecute() {
+        webView.loadUrl("javascript:resetAndExecute();");
+    }
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class HCaptchaWebClient extends WebViewClient {
 

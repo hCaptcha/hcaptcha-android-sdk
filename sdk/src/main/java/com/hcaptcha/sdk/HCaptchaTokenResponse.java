@@ -22,5 +22,4 @@ public class HCaptchaTokenResponse {
     public void markUsed() {
         handler.removeCallbacksAndMessages(null);
     }
-
 }

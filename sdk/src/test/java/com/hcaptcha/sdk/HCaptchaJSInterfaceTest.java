@@ -39,6 +39,9 @@ public class HCaptchaJSInterfaceTest {
     @Captor
     ArgumentCaptor<HCaptchaException> exceptionCaptor;
 
+    @Captor
+    ArgumentCaptor<HCaptchaError> errorCaptor;
+
     HCaptchaConfig testConfig = HCaptchaConfig.builder().siteKey("0000-1111-2222-3333").build();
 
     @Before
@@ -174,8 +177,8 @@ public class HCaptchaJSInterfaceTest {
         final HCaptchaError error = HCaptchaError.CHALLENGE_CLOSED;
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, testConfig, captchaVerifier);
         jsInterface.onError(error.getErrorId());
-        verify(captchaVerifier, times(1)).onFailure(exceptionCaptor.capture());
-        assertEquals(error.getMessage(), exceptionCaptor.getValue().getMessage());
-        assertNotNull(exceptionCaptor.getValue());
+        verify(captchaVerifier, times(1)).onError(errorCaptor.capture());
+        assertEquals(error.getMessage(), errorCaptor.getValue().getMessage());
+        assertNotNull(errorCaptor.getValue());
     }
 }

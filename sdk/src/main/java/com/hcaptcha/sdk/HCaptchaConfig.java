@@ -32,6 +32,7 @@ public class HCaptchaConfig implements Serializable {
      * Show / Hide loading dialog.
      */
     @Builder.Default
+    @NonNull
     private Boolean loading = true;
 
     /**
