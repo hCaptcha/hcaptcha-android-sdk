@@ -18,4 +18,5 @@ interface IHCaptchaVerifier extends
      * Starts the human verification process.
      */
     void startVerification(@NonNull FragmentActivity activity);
+
 }
