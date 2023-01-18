@@ -23,4 +23,8 @@ public class TestHCaptchaVerifier implements IHCaptchaVerifier {
     public void onSuccess(String s) {
         // no implementation need for performance measurement
     }
+
+    public void onFailure(HCaptchaException e) {
+        // no implementation need for performance measurement
+    }
 }
