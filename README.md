@@ -186,7 +186,7 @@ The following is a list of possible error codes:
 
 ### Retry failed challenge
 
-Inside `OnFailureListener.onFaulure(HCaptchaException e)` you can request SDK to do retry:
+Inside `OnFailureListener.onFailure(HCaptchaException e)` you can request SDK to retry:
 ```java
 ...
 hCaptcha.verifyWithHCaptcha()
