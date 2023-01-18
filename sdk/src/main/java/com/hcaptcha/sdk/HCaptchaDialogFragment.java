@@ -148,7 +148,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         HCaptchaLog.d("DialogFragment.onCancel");
         // User canceled the dialog through either `back` button or an outside touch
         super.onCancel(dialogInterface);
-        this.onError(HCaptchaError.CHALLENGE_CLOSED);
+        this.onFailure(new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED, null));
     }
 
     private void hideLoadingContainer() {
@@ -191,23 +191,12 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public void onError(@NonNull final HCaptchaError error) {
-        final HCaptchaConfig config = webViewHelper != null ? webViewHelper.getConfig() : null;
-        final HCaptchaRetryer retryer = new HCaptchaRetryer(config, error);
-
+    public void onFailure(@NonNull final HCaptchaException exception) {
         if (webViewHelper != null) {
-            if (retryer.shouldRetry()) {
-                webViewHelper.resetAndExecute();
-            } else {
-                webViewHelper.getListener().onFailure(new HCaptchaException(error, retryer));
-
-                if (retryer.shouldRetry()) {
-                    webViewHelper.resetAndExecute();
-                }
-            }
+            webViewHelper.retryIfRequested(exception);
         }
 
-        if (isAdded() && !retryer.shouldRetry()) {
+        if (isAdded() && !exception.shouldRetry()) {
             dismissAllowingStateLoss();
         }
     }

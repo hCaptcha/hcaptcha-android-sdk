@@ -10,11 +10,6 @@ public class TestHCaptchaVerifier implements IHCaptchaVerifier {
     }
 
     @Override
-    public void onError(HCaptchaError error) {
-        // no implementation need for performance measurement
-    }
-
-    @Override
     public void onLoaded() {
         // no implementation need for performance measurement
     }

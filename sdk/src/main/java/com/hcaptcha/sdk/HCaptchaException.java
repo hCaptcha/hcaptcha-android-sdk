@@ -66,4 +66,8 @@ public class HCaptchaException extends Exception {
 
         retryer.retry();
     }
+
+    boolean shouldRetry() {
+        return retryer != null && retryer.shouldRetry();
+    }
 }

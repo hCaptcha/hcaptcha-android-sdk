@@ -21,8 +21,11 @@ class HCaptchaJSInterface implements Serializable {
     @NonNull
     private final Handler handler;
 
+    @NonNull
+    private final HCaptchaConfig config;
+
     @Nullable
-    private final String config;
+    private final String configJson;
 
     @NonNull
     private final IHCaptchaVerifier captchaVerifier;
@@ -30,21 +33,22 @@ class HCaptchaJSInterface implements Serializable {
     HCaptchaJSInterface(final Handler handler, final HCaptchaConfig config,
                         final IHCaptchaVerifier captchaVerifier) {
         this.handler = handler;
+        this.config = config;
         this.captchaVerifier = captchaVerifier;
-        String configJson = null;
+        String json = null;
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-            configJson = objectMapper.writeValueAsString(config);
+            json = objectMapper.writeValueAsString(config);
         } catch (JsonProcessingException e) {
             Log.w(JS_INTERFACE_TAG, "Cannot prepare config for passing to WebView."
                     + " A fallback config will be used");
         }
-        this.config = configJson;
+        this.configJson = json;
     }
 
     @JavascriptInterface
     public String getConfig() {
-        return this.config;
+        return this.configJson;
     }
 
     @JavascriptInterface
@@ -65,7 +69,9 @@ class HCaptchaJSInterface implements Serializable {
         handler.post(new Runnable() {
             @Override
             public void run() {
-                captchaVerifier.onError(error);
+                final HCaptchaException exception = new HCaptchaException(error,
+                        new HCaptchaRetryer(config, error));
+                captchaVerifier.onFailure(exception);
             }
         });
     }

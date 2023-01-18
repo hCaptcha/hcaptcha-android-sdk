@@ -110,6 +110,18 @@ final class HCaptchaWebViewHelper {
         webView.loadUrl("javascript:resetAndExecute();");
     }
 
+    public void retryIfRequested(HCaptchaException exception) {
+        if (exception.shouldRetry()) {
+            resetAndExecute();
+        } else {
+            listener.onFailure(exception);
+
+            if (exception.shouldRetry()) {
+                resetAndExecute();
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class HCaptchaWebClient extends WebViewClient {
 
