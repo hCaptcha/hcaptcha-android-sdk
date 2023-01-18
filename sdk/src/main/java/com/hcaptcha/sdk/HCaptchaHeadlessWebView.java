@@ -56,12 +56,12 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     public void onError(@NonNull final HCaptchaError error) {
         final HCaptchaRetryer retryer = new HCaptchaRetryer(config, error);
 
-        if (retryer.isRetry()) {
+        if (retryer.shouldRetry()) {
             webViewHelper.resetAndExecute();
         } else {
             listener.onFailure(new HCaptchaException(error, retryer));
 
-            if (retryer.isRetry()) {
+            if (retryer.shouldRetry()) {
                 webViewHelper.resetAndExecute();
             }
         }

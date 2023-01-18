@@ -18,32 +18,32 @@ public class HCaptchaException extends Exception {
      * The hCaptcha error object
      */
     @NonNull
-    private final HCaptchaError error;
+    private final HCaptchaError hCaptchaError;
 
     @Nullable
-    private final HCaptchaRetryer retryer;
+    private final transient HCaptchaRetryer retryer;
 
     public HCaptchaException(HCaptchaError error) {
         this(error, null);
     }
 
     HCaptchaException(@NonNull HCaptchaError error, @Nullable HCaptchaRetryer retryer) {
-        this.error = error;
+        this.hCaptchaError = error;
         this.retryer = retryer;
     }
 
     /**
      * @return The {@link HCaptchaError} error
      */
-    public HCaptchaError getError() {
-        return this.error;
+    public HCaptchaError gethCaptchaError() {
+        return this.hCaptchaError;
     }
 
     /**
      * @return The error id
      */
     public int getStatusCode() {
-        return this.error.getErrorId();
+        return this.hCaptchaError.getErrorId();
     }
 
     /**
@@ -52,7 +52,7 @@ public class HCaptchaException extends Exception {
     @Nullable
     @Override
     public String getMessage() {
-        return this.error.getMessage();
+        return this.hCaptchaError.getMessage();
     }
 
     /**

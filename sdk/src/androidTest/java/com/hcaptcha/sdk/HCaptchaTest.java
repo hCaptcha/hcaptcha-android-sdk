@@ -47,7 +47,7 @@ public class HCaptchaTest {
                     .addOnFailureListener(new OnFailureListener() {
                         @Override
                         public void onFailure(HCaptchaException exception) {
-                            assertEquals(HCaptchaError.TOKEN_TIMEOUT, exception.getError());
+                            assertEquals(HCaptchaError.TOKEN_TIMEOUT, exception.gethCaptchaError());
                             latch.countDown();
                         }
                     });

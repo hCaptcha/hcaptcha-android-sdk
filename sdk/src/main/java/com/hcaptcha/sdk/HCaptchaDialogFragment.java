@@ -196,18 +196,18 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         final HCaptchaRetryer retryer = new HCaptchaRetryer(config, error);
 
         if (webViewHelper != null) {
-            if (retryer.isRetry()) {
+            if (retryer.shouldRetry()) {
                 webViewHelper.resetAndExecute();
             } else {
                 webViewHelper.getListener().onFailure(new HCaptchaException(error, retryer));
 
-                if (retryer.isRetry()) {
+                if (retryer.shouldRetry()) {
                     webViewHelper.resetAndExecute();
                 }
             }
         }
 
-        if (isAdded() && !retryer.isRetry()) {
+        if (isAdded() && !retryer.shouldRetry()) {
             dismissAllowingStateLoss();
         }
     }

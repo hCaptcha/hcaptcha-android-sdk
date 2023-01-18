@@ -121,7 +121,7 @@ public class HCaptchaDialogFragmentTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException exception) {
-                assertEquals(HCaptchaError.CHALLENGE_ERROR, exception.getError());
+                assertEquals(HCaptchaError.CHALLENGE_ERROR, exception.gethCaptchaError());
                 latch.countDown();
             }
         };
