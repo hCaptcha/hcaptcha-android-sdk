@@ -14,7 +14,7 @@ public class HCaptchaExceptionTest {
         } catch (HCaptchaException hCaptchaException1) {
             assertEquals(error.getErrorId(), hCaptchaException1.getStatusCode());
             assertEquals(error.getMessage(), hCaptchaException1.getMessage());
-            assertEquals(error, hCaptchaException1.gethCaptchaError());
+            assertEquals(error, hCaptchaException1.getHCaptchaError());
         }
     }
 }

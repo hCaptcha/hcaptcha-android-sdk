@@ -35,7 +35,7 @@ public class HCaptchaException extends Exception {
     /**
      * @return The {@link HCaptchaError} error
      */
-    public HCaptchaError gethCaptchaError() {
+    public HCaptchaError getHCaptchaError() {
         return this.hCaptchaError;
     }
 
