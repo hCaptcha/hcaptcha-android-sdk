@@ -115,7 +115,7 @@ hCaptcha.setup().verifyWithHCaptcha()
 ### Good to know
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
    1. the same client is used to invoke multiple verifications
-   2. the config option `resetOnTimeout(true)` is used which will automatically trigger a new verification when the current token expired. This will result in a new success or error callback.
+   2. the config option `resetOnTimeout(true)` is used which will automatically trigger a new verification when the current token expired. This will result in a new success or error callback. Also you can [retry failed challenges with `HCaptchaException.retry`](#retry-failed-challenge)
    3. `onFailure` with `TOKEN_TIMEOUT` will be called once the token is expired. To prevent this you can call `HCaptchaTokenResponse.markUsed` once the token is utilized. Also, you can change expiration timeout with `HCaptchaConfigBuilder.tokenExpiration(timeout)` (default 2 min.)
 
 ## Config Params
@@ -184,6 +184,23 @@ The following is a list of possible error codes:
 | `INVALID_CUSTOM_THEME` | 32    | Invalid custom theme.                              |
 | `ERROR`                | 29    | General failure.                                   |
 
+### Retry failed challenge
+
+Setup `HCaptcha.setOnFailureRetryDecider(OnFailureRetryDecider decider)` you can request SDK to retry:
+```java
+...
+hCaptcha.verifyWithHCaptcha()
+  .addOnSuccessListener(...)
+  .setOnFailureRetryDecider(new OnFailureRetryDecider() {
+    @Override
+    public boolean shouldRetry(HCaptchaError result) {
+      if (weNeedRetryOnThisError) {
+        return true;
+      }
+      return false;
+    }
+  });
+```
 
 ## Debugging Tips
 

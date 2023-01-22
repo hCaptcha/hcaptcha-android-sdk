@@ -11,6 +11,8 @@ abstract class HCaptchaStateListener implements Parcelable {
 
     abstract void onOpen();
 
+    abstract boolean shouldRetry(HCaptchaError error);
+
     @Override
     public int describeContents() {
         return 0;

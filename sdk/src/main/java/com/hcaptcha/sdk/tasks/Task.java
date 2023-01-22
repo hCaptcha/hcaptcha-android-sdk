@@ -5,6 +5,7 @@ import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.hcaptcha.sdk.HCaptchaConfig;
 import com.hcaptcha.sdk.HCaptchaError;
 import com.hcaptcha.sdk.HCaptchaException;
 
@@ -34,6 +35,9 @@ public abstract class Task<TResult> {
 
     private final List<OnOpenListener> onOpenListeners;
 
+    @Nullable
+    private OnFailureRetryDecider onFailureRetryDecider;
+
     protected final Handler handler = new Handler(Looper.getMainLooper());
 
     /**
@@ -43,6 +47,7 @@ public abstract class Task<TResult> {
         this.onSuccessListeners = new ArrayList<>();
         this.onFailureListeners = new ArrayList<>();
         this.onOpenListeners = new ArrayList<>();
+        this.onFailureRetryDecider = null;
         this.reset();
     }
 
@@ -116,6 +121,13 @@ public abstract class Task<TResult> {
         }
     }
 
+    protected boolean shouldRetry(HCaptchaConfig config, HCaptchaError error) {
+        if (onFailureRetryDecider == null) {
+            return config.getResetOnTimeout() && error == HCaptchaError.SESSION_TIMEOUT;
+        }
+        return onFailureRetryDecider.shouldRetry(error);
+    }
+
     /**
      * Schedule timer to expire the token.
      * @param tokenExpiration - token expiration timeout (seconds)
@@ -163,6 +175,18 @@ public abstract class Task<TResult> {
      */
     public Task<TResult> addOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
         this.onOpenListeners.add(onOpenListener);
+        tryCb();
+        return this;
+    }
+
+    /**
+     * Set a hCaptcha retry decider triggered when the hCaptcha error happens, and possible to retry
+     *
+     * @param decider the retry decider to be asked
+     * @return current object
+     */
+    public Task<TResult> setOnFailureRetryDecider(@NonNull final OnFailureRetryDecider decider) {
+        this.onFailureRetryDecider = decider;
         tryCb();
         return this;
     }

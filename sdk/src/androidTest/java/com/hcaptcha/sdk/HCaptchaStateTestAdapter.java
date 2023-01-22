@@ -15,4 +15,9 @@ public class HCaptchaStateTestAdapter extends HCaptchaStateListener {
     void onFailure(HCaptchaException exception) {
         // empty default implementation to reduce amount of boilerplate code in tests
     }
+
+    @Override
+    boolean shouldRetry(HCaptchaError error) {
+        return false;
+    }
 }

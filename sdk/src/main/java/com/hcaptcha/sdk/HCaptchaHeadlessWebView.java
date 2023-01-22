@@ -46,25 +46,15 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     public void startVerification(@NonNull FragmentActivity activity) {
         if (webViewLoaded) {
             // Safe to execute
-            resetAndExecute();
+            webViewHelper.resetAndExecute();
         } else {
             shouldExecuteOnLoad = true;
         }
     }
 
-    private void resetAndExecute() {
-        webViewHelper.getWebView().loadUrl("javascript:resetAndExecute();");
-    }
-
     @Override
-    public void onFailure(final HCaptchaException exception) {
-        final boolean silentRetry = webViewHelper.getConfig().getResetOnTimeout()
-                && exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
-        if (silentRetry) {
-            resetAndExecute();
-        } else {
-            listener.onFailure(exception);
-        }
+    public void onFailure(@NonNull final HCaptchaException exception) {
+        webViewHelper.retryIfRequested(exception);
     }
 
     @Override
@@ -77,7 +67,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
         webViewLoaded = true;
         if (shouldExecuteOnLoad) {
             shouldExecuteOnLoad = false;
-            resetAndExecute();
+            webViewHelper.resetAndExecute();
         }
     }
 
