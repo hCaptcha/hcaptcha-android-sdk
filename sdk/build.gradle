@@ -162,6 +162,35 @@ android.libraryVariants.all { variant ->
             }
         }
     })
+
+    def packageName = "com.hcaptcha.sdk"
+    def outputDir = file("${project.buildDir}/generated/source/hcaptcha/${variant.name}/${packageName.replaceAll('\\.', '/')}")
+    def generateTask = project.task("genarate${variantName}JavaClassFromStaticHtml") {
+        group 'Generate'
+        description "Generate HTML java class"
+
+        doFirst {
+            def outputJavaClass = file("$outputDir/HCaptchaHtml.java")
+            def template = file("$projectDir/src/main/html/HCaptchaHtml.java.tml").text
+            def html = file("$projectDir/src/main/html/hcaptcha.html")
+                    .readLines()
+                    .stream()
+                    .map({l -> "\"${l.replaceAll('"', '\\\\"')}\\n\""})
+                    .collect(java.util.stream.Collectors.joining("\n${' ' * 16}+ "))
+
+            def engine = new groovy.text.SimpleTemplateEngine()
+            def src = engine.createTemplate(template).make([
+                    "htmlContent": html,
+                    "packageName": packageName
+            ])
+
+            outputDir.mkdirs()
+            outputJavaClass.write(src.toString())
+        }
+    }
+
+    // preBuild.dependsOn generateTask
+    variant.registerJavaGeneratingTask(generateTask, outputDir)
 }
 
 checkstyle {
