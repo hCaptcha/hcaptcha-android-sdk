@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.3.7
+
+- Bugfix: handle Failed to load WebView provider: No WebView installed
+
 # 3.3.6
 
 - Bugfix: always dim background if checkbox is visible ([#72](https://github.com/hCaptcha/hcaptcha-android-sdk/issues/72))

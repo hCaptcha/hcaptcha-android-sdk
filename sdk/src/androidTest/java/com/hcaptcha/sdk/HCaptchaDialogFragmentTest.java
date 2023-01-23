@@ -16,8 +16,14 @@ import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
+import android.util.AndroidRuntimeException;
+import android.view.LayoutInflater;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.test.espresso.web.webdriver.DriverAtoms;
 import androidx.test.espresso.web.webdriver.Locator;
@@ -154,5 +160,54 @@ public class HCaptchaDialogFragmentTest {
 
         launchCaptchaFragment(listener);
         waitForWebViewToEmitToken(latch);
+    }
+
+    @Test
+    public void testClassCastExceptionHandled() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final Bundle bundle = new Bundle();
+        bundle.putSerializable(KEY_CONFIG, config);
+        bundle.putSerializable(KEY_INTERNAL_CONFIG, "invalid config class");
+        bundle.putParcelable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
+            @Override
+            void onFailure(HCaptchaException exception) {
+                assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
+                latch.countDown();
+            }
+        });
+
+        FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, bundle);
+
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void webViewNotInstalled() throws InterruptedException {
+        final LayoutInflater inflater = mock(LayoutInflater.class);
+        when(inflater.inflate(eq(R.layout.hcaptcha_fragment), any(), eq(false)))
+                .thenThrow(AndroidRuntimeException.class);
+
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final Bundle bundle = new Bundle();
+        bundle.putSerializable(KEY_CONFIG, config);
+        bundle.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
+        bundle.putParcelable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
+            @Override
+            void onFailure(HCaptchaException exception) {
+                assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
+                latch.countDown();
+            }
+        });
+
+        try (FragmentScenario<HCaptchaDialogFragment> scenario = FragmentScenario
+                .launchInContainer(HCaptchaDialogFragment.class, bundle)) {
+            scenario.onFragment(fragment -> {
+                fragment.onCreateView(inflater, null, bundle);
+            });
+        }
+
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }
