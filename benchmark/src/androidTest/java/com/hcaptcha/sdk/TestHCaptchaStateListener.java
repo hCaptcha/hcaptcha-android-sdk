@@ -15,9 +15,4 @@ public class TestHCaptchaStateListener extends HCaptchaStateListener {
     void onOpen() {
         // no implementation need for performance measurement
     }
-
-    @Override
-    boolean shouldRetry(HCaptchaError error) {
-        return false;
-    }
 }

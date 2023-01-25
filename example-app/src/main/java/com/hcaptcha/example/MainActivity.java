@@ -14,7 +14,6 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
 import com.hcaptcha.sdk.tasks.OnFailureListener;
-import com.hcaptcha.sdk.tasks.OnFailureRetryDecider;
 import com.hcaptcha.sdk.tasks.OnOpenListener;
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
@@ -131,12 +130,6 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 public void onOpen() {
                     Toast.makeText(MainActivity.this, "hCaptcha shown", Toast.LENGTH_SHORT).show();
-                }
-            })
-            .setOnFailureRetryDecider(new OnFailureRetryDecider() {
-                @Override
-                public boolean shouldRetry(HCaptchaError result) {
-                    return false;
                 }
             });
     }
