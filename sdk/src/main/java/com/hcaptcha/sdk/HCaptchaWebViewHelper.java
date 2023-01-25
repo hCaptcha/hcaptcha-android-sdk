@@ -111,17 +111,12 @@ final class HCaptchaWebViewHelper {
     }
 
     public boolean retryIfRequested(HCaptchaException exception) {
-        final HCaptchaError error = exception.getHCaptchaError();
-        if (listener.shouldRetry(error)) {
+        final IHCaptchaRetryPredicate retryPredicate = config.getRetryPredicate();
+        if (retryPredicate != null && retryPredicate.shouldRetry(config, exception)) {
             resetAndExecute();
             return true;
         } else {
             listener.onFailure(exception);
-
-            if (listener.shouldRetry(error)) {
-                resetAndExecute();
-                return true;
-            }
         }
         return false;
     }

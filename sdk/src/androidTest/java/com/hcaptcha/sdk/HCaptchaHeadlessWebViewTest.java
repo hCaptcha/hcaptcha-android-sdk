@@ -1,7 +1,9 @@
 package com.hcaptcha.sdk;
 
+import static com.hcaptcha.sdk.AssertUtil.failAsNonReachable;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewError;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import androidx.test.core.app.ActivityScenario;
@@ -13,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaHeadlessWebViewTest {
@@ -48,7 +51,7 @@ public class HCaptchaHeadlessWebViewTest {
 
             @Override
             void onFailure(HCaptchaException exception) {
-                fail("Should not be called for this test");
+                failAsNonReachable();
             }
         };
 
@@ -69,7 +72,7 @@ public class HCaptchaHeadlessWebViewTest {
 
             @Override
             void onSuccess(String token) {
-                fail("Should not be called for this test");
+                failAsNonReachable();
             }
 
             @Override
@@ -86,5 +89,77 @@ public class HCaptchaHeadlessWebViewTest {
         });
 
         waitHCaptchaWebViewError(latch, HCaptchaError.ERROR, AWAIT_CALLBACK_MS);
+    }
+
+    @Test
+    public void testRetryPredicate() throws Exception {
+        final CountDownLatch failureLatch = new CountDownLatch(1);
+        final CountDownLatch successLatch = new CountDownLatch(1);
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+
+            @Override
+            void onSuccess(String token) {
+                successLatch.countDown();
+            }
+
+            @Override
+            void onFailure(HCaptchaException exception) {
+                failAsNonReachable();
+            }
+        };
+
+        final HCaptchaConfig updatedWithRetry = config.toBuilder()
+                .retryPredicate((c, e) -> {
+                    failureLatch.countDown();
+                    return e.getHCaptchaError() == HCaptchaError.NETWORK_ERROR;
+                })
+                .build();
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
+                    activity, updatedWithRetry, internalConfig, listener);
+            subject.startVerification(activity);
+        });
+
+        waitHCaptchaWebViewError(failureLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);
+
+        waitHCaptchaWebViewToken(successLatch, AWAIT_CALLBACK_MS);
+    }
+
+    @Test
+    public void testNotRetryPredicate() throws Exception {
+        final CountDownLatch failureLatch = new CountDownLatch(1);
+        final CountDownLatch retryLatch = new CountDownLatch(1);
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+
+            @Override
+            void onSuccess(String token) {
+                failAsNonReachable();
+            }
+
+            @Override
+            void onFailure(HCaptchaException exception) {
+                failureLatch.countDown();
+            }
+        };
+
+        final HCaptchaConfig updatedWithRetry = config.toBuilder()
+                .retryPredicate((c, e) -> {
+                    retryLatch.countDown();
+                    return e.getHCaptchaError() != HCaptchaError.NETWORK_ERROR;
+                })
+                .build();
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
+                    activity, updatedWithRetry, internalConfig, listener);
+            subject.startVerification(activity);
+        });
+
+        waitHCaptchaWebViewError(retryLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);
+
+        assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }

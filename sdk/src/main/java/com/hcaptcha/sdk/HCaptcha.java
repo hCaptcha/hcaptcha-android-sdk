@@ -86,11 +86,6 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
 
             @Override
-            boolean shouldRetry(HCaptchaError error) {
-                return HCaptcha.this.shouldRetry(config, error);
-            }
-
-            @Override
             void onFailure(final HCaptchaException exception) {
                 HCaptchaLog.d("HCaptcha.onFailure");
                 setException(exception);

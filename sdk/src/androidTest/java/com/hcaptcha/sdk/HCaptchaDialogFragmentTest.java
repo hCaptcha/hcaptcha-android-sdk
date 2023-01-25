@@ -8,6 +8,9 @@ import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.clearElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
+import static com.hcaptcha.sdk.AssertUtil.failAsNonReachable;
+import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewErrorByInput;
+import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
 import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
@@ -127,19 +130,8 @@ public class HCaptchaDialogFragmentTest {
         };
 
         launchCaptchaFragment(listener);
-        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
 
-        onWebView(withId(R.id.webView)).forceJavascriptEnabled();
-
-        onWebView().withElement(findElement(Locator.ID, "input-text"))
-                .perform(clearElement())
-                .perform(DriverAtoms.webKeys(
-                        String.valueOf(HCaptchaError.CHALLENGE_ERROR.getErrorId())));
-
-        onWebView().withElement(findElement(Locator.ID, "on-error"))
-                .perform(webClick());
-
-        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS)); // wait for callback
+        waitHCaptchaWebViewErrorByInput(latch, HCaptchaError.CHALLENGE_ERROR, AWAIT_CALLBACK_MS);
     }
 
     @Test
@@ -154,5 +146,68 @@ public class HCaptchaDialogFragmentTest {
 
         launchCaptchaFragment(listener);
         waitForWebViewToEmitToken(latch);
+    }
+
+
+    @Test
+    public void testRetryPredicate() throws Exception {
+        final CountDownLatch failureLatch = new CountDownLatch(1);
+        final CountDownLatch successLatch = new CountDownLatch(1);
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+
+            @Override
+            void onSuccess(String token) {
+                successLatch.countDown();
+            }
+
+            @Override
+            void onFailure(HCaptchaException exception) {
+                failAsNonReachable();
+            }
+        };
+
+        final HCaptchaConfig updatedWithRetry = config.toBuilder()
+                .retryPredicate((c, e) -> {
+                    failureLatch.countDown();
+                    return e.getHCaptchaError() == HCaptchaError.NETWORK_ERROR;
+                })
+                .build();
+
+        launchCaptchaFragment(updatedWithRetry, listener);
+
+        waitHCaptchaWebViewErrorByInput(failureLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);
+
+        waitHCaptchaWebViewToken(successLatch, AWAIT_CALLBACK_MS);
+    }
+
+    @Test
+    public void testNotRetryPredicate() throws Exception {
+        final CountDownLatch failureLatch = new CountDownLatch(1);
+        final CountDownLatch retryLatch = new CountDownLatch(1);
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+
+            @Override
+            void onSuccess(String token) {
+                failAsNonReachable();
+            }
+
+            @Override
+            void onFailure(HCaptchaException exception) {
+                failureLatch.countDown();
+            }
+        };
+
+        final HCaptchaConfig updatedWithRetry = config.toBuilder()
+                .retryPredicate((c, e) -> {
+                    retryLatch.countDown();
+                    return e.getHCaptchaError() != HCaptchaError.NETWORK_ERROR;
+                })
+                .build();
+
+        launchCaptchaFragment(updatedWithRetry, listener);
+
+        waitHCaptchaWebViewErrorByInput(retryLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);
+
+        assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }

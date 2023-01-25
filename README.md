@@ -186,20 +186,13 @@ The following is a list of possible error codes:
 
 ### Retry failed challenge
 
-Setup `HCaptcha.setOnFailureRetryDecider(OnFailureRetryDecider decider)` you can request SDK to retry:
+Setup `HCaptchaConfig.retryPredicate((config, exception) -> true)` lambda you can request SDK to retry:
 ```java
+final HCaptchaConfig config = HCaptchaConfig.builder()
+        ...
+        .retryPredicate((config, exception) -> true)
+        .build();
 ...
-hCaptcha.verifyWithHCaptcha()
-  .addOnSuccessListener(...)
-  .setOnFailureRetryDecider(new OnFailureRetryDecider() {
-    @Override
-    public boolean shouldRetry(HCaptchaError result) {
-      if (weNeedRetryOnThisError) {
-        return true;
-      }
-      return false;
-    }
-  });
 ```
 
 ## Debugging Tips
