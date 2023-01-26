@@ -115,7 +115,7 @@ hCaptcha.setup().verifyWithHCaptcha()
 ### Good to know
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
    1. the same client is used to invoke multiple verifications
-   2. the config option `resetOnTimeout(true)` is used which will automatically trigger a new verification when the current token expired. This will result in a new success or error callback. Also you can [retry failed challenges with `HCaptchaException.retry`](#retry-failed-challenge)
+   2. the config option `HCaptchaConfig.retryPredicate`](#retry-failed-challenge) is used to retry a challenge trigger a new verification when some error occurs, it's up to develope how to implement it. If `HCaptchaConfig.retryPredicate` returns `true`, this will result in a new success or error callback. `HCaptchaConfig.resetOnTimeout` is deprecated now.
    3. `onFailure` with `TOKEN_TIMEOUT` will be called once the token is expired. To prevent this you can call `HCaptchaTokenResponse.markUsed` once the token is utilized. Also, you can change expiration timeout with `HCaptchaConfigBuilder.tokenExpiration(timeout)` (default 2 min.)
 
 ## Config Params
