@@ -222,12 +222,12 @@ jobs:
         cache-read-only: false
     - name: 'Build'
       run: |
-        ./gradlew build --stacktrace
+        ./gradlew clean build --stacktrace
         cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
     - name: 'Build main'
       run: |
         git checkout origin/main
-        ./gradlew build --stacktrace
+        ./gradlew clean build --stacktrace
         cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
     - id: diffuse
       uses: usefulness/diffuse-action@v1

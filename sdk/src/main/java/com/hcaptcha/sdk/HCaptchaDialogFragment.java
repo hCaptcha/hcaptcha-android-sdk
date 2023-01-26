@@ -6,10 +6,10 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.util.AndroidRuntimeException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,30 +89,36 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HCaptchaLog.d("DialogFragment.onCreateView");
-        final View rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
-        HCaptchaLog.d("DialogFragment.onCreateView inflated");
-        assert getArguments() != null;
-        final HCaptchaStateListener listener;
+        HCaptchaStateListener listener = null;
+        View rootView = null;
         try {
-            listener = HCaptchaCompat.getParcelable(getArguments(), KEY_LISTENER, HCaptchaStateListener.class);
+            final Bundle args = getArguments();
+            assert args != null;
+            listener = HCaptchaCompat.getParcelable(args, KEY_LISTENER, HCaptchaStateListener.class);
             assert listener != null;
-        } catch (BadParcelableException | ClassCastException e) {
-            HCaptchaLog.w("Cannot process getArguments(). Dismissing dialog...");
+            final HCaptchaConfig config = HCaptchaCompat.getSerializable(args, KEY_CONFIG, HCaptchaConfig.class);
+            assert config != null;
+            final HCaptchaInternalConfig internalConfig = HCaptchaCompat.getSerializable(args,
+                    KEY_INTERNAL_CONFIG, HCaptchaInternalConfig.class);
+            assert internalConfig != null;
+
+            rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+            HCaptchaLog.d("DialogFragment.onCreateView inflated");
+
+            final WebView webView = rootView.findViewById(R.id.webView);
+            loadingContainer = rootView.findViewById(R.id.loadingContainer);
+            loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
+            webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
+                    requireContext(), config, internalConfig, this, listener, webView);
+        } catch (AndroidRuntimeException | ClassCastException e) {
+            HCaptchaLog.w("Cannot create view. Dismissing dialog...");
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back
             dismiss();
-            return rootView;
+            if (listener != null) {
+                listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
+            }
         }
-        final HCaptchaConfig config = HCaptchaCompat.getSerializable(getArguments(), KEY_CONFIG, HCaptchaConfig.class);
-        assert config != null;
-        final HCaptchaInternalConfig internalConfig = HCaptchaCompat.getSerializable(getArguments(),
-                KEY_INTERNAL_CONFIG, HCaptchaInternalConfig.class);
-        assert internalConfig != null;
-        final WebView webView = rootView.findViewById(R.id.webView);
-        loadingContainer = rootView.findViewById(R.id.loadingContainer);
-        loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
-        webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), requireContext(), config, internalConfig, this, listener, webView);
         return rootView;
     }
 
@@ -129,9 +135,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void onStart() {
         HCaptchaLog.d("DialogFragment.onStart");
         super.onStart();
-        assert webViewHelper != null;
         final Dialog dialog = getDialog();
-        if (dialog != null) {
+        if (dialog != null && webViewHelper != null) {
             final Window window = dialog.getWindow();
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             defaultDimAmount = window.getAttributes().dimAmount;
