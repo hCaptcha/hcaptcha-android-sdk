@@ -54,8 +54,8 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
 
     @Override
     public void onFailure(@NonNull final HCaptchaException exception) {
-        final boolean shouldRetry = webViewHelper.shouldRetry(exception);
-        if (shouldRetry) {
+        final boolean silentRetry = webViewHelper.shouldRetry(exception);
+        if (silentRetry) {
             webViewHelper.resetAndExecute();
         } else {
             listener.onFailure(exception);

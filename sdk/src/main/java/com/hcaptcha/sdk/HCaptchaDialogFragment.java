@@ -197,18 +197,16 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onFailure(@NonNull final HCaptchaException exception) {
-        boolean shouldRetry = false;
+        final boolean silentRetry = webViewHelper != null && webViewHelper.shouldRetry(exception);
+        if (isAdded() && !silentRetry) {
+            dismissAllowingStateLoss();
+        }
         if (webViewHelper != null) {
-            shouldRetry = webViewHelper.shouldRetry(exception);
-            if (shouldRetry) {
+            if (silentRetry) {
                 webViewHelper.resetAndExecute();
             } else {
                 webViewHelper.getListener().onFailure(exception);
             }
-        }
-
-        if (isAdded() && !shouldRetry) {
-            dismissAllowingStateLoss();
         }
     }
 
