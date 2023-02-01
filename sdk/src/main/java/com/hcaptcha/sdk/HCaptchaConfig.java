@@ -1,7 +1,5 @@
 package com.hcaptcha.sdk;
 
-import androidx.annotation.Nullable;
-
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -122,12 +120,14 @@ public class HCaptchaConfig implements Serializable {
      * The lambda will decide should we retry or not
      */
     @Builder.Default
-    @Nullable
-    private IHCaptchaRetryPredicate retryPredicate = (HCaptchaConfig config, HCaptchaException exception) -> {
-        if (Boolean.TRUE.equals(config.resetOnTimeout)) {
-            return exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+    private IHCaptchaRetryPredicate retryPredicate = new IHCaptchaRetryPredicate() {
+        @Override
+        public boolean shouldRetry(HCaptchaConfig config, com.hcaptcha.sdk.HCaptchaException exception) {
+            if (Boolean.TRUE.equals(config.resetOnTimeout)) {
+                return exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+            }
+            return false;
         }
-        return false;
     };
 
     /**

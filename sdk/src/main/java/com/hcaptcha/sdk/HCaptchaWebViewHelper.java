@@ -110,15 +110,8 @@ final class HCaptchaWebViewHelper {
         webView.loadUrl("javascript:resetAndExecute();");
     }
 
-    public boolean retryIfRequested(HCaptchaException exception) {
-        final IHCaptchaRetryPredicate retryPredicate = config.getRetryPredicate();
-        if (retryPredicate != null && retryPredicate.shouldRetry(config, exception)) {
-            resetAndExecute();
-            return true;
-        } else {
-            listener.onFailure(exception);
-        }
-        return false;
+    public boolean shouldRetry(HCaptchaException exception) {
+        return config.getRetryPredicate().shouldRetry(config, exception);
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)

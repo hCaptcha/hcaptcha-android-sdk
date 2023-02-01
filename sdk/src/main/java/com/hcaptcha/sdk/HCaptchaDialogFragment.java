@@ -199,7 +199,12 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void onFailure(@NonNull final HCaptchaException exception) {
         boolean shouldRetry = false;
         if (webViewHelper != null) {
-            shouldRetry = webViewHelper.retryIfRequested(exception);
+            shouldRetry = webViewHelper.shouldRetry(exception);
+            if (shouldRetry) {
+                webViewHelper.resetAndExecute();
+            } else {
+                webViewHelper.getListener().onFailure(exception);
+            }
         }
 
         if (isAdded() && !shouldRetry) {
