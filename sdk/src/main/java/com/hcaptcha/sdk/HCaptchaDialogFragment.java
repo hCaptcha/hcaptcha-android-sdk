@@ -11,6 +11,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
 import android.view.LayoutInflater;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -103,6 +104,15 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             assert internalConfig != null;
 
             rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+            rootView.setFocusableInTouchMode(true);
+            rootView.requestFocus();
+            rootView.setOnKeyListener((view, keyCode, event) -> {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    return webViewHelper != null &&
+                            webViewHelper.shouldRetry(new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
+                }
+                return false;
+            });
             HCaptchaLog.d("DialogFragment.onCreateView inflated");
 
             final WebView webView = rootView.findViewById(R.id.webView);
