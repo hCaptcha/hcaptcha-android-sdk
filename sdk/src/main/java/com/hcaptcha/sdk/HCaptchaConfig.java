@@ -122,14 +122,11 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     @JsonIgnore
-    private IHCaptchaRetryPredicate retryPredicate = new IHCaptchaRetryPredicate() {
-        @Override
-        public boolean shouldRetry(HCaptchaConfig config, com.hcaptcha.sdk.HCaptchaException exception) {
-            if (Boolean.TRUE.equals(config.resetOnTimeout)) {
-                return exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
-            }
-            return false;
+    private IHCaptchaRetryPredicate retryPredicate = (config, exception) -> {
+        if (Boolean.TRUE.equals(config.resetOnTimeout)) {
+            return exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
         }
+        return false;
     };
 
     /**

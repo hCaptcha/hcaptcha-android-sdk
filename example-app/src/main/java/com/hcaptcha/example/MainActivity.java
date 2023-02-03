@@ -68,12 +68,7 @@ public class MainActivity extends AppCompatActivity {
                 .hideDialog(hideDialog.isChecked())
                 .tokenExpiration(10)
                 .diagnosticLog(true)
-                .retryPredicate(new IHCaptchaRetryPredicate() {
-                    @Override
-                    public boolean shouldRetry(HCaptchaConfig config, HCaptchaException exception) {
-                        return exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
-                    }
-                })
+                .retryPredicate((config, exception) -> exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT)
                 .build();
     }
 
