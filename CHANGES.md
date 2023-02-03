@@ -1,5 +1,10 @@
 # Changelog
 
+# 3.4.0
+
+- Feat: new `HCaptchaConfig.retryPredicate` which allows conditional automatic retry
+- Deprecated: `HCaptchaConfig.resetOnTimeout` replaced by more generic `HCaptchaConfig.retryPredicate` option
+
 # 3.3.7
 
 - Bugfix: handle Failed to load WebView provider: No WebView installed

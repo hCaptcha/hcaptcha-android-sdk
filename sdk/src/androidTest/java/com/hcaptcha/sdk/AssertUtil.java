@@ -7,9 +7,13 @@ import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.web.assertion.WebViewAssertions.webMatches;
 import static androidx.test.espresso.web.model.Atoms.getCurrentUrl;
 import static androidx.test.espresso.web.sugar.Web.onWebView;
+import static androidx.test.espresso.web.webdriver.DriverAtoms.clearElement;
+import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
+import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static org.hamcrest.CoreMatchers.any;
 import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -19,6 +23,8 @@ import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
 import androidx.test.espresso.util.HumanReadables;
 import androidx.test.espresso.util.TreeIterables;
+import androidx.test.espresso.web.webdriver.DriverAtoms;
+import androidx.test.espresso.web.webdriver.Locator;
 
 import org.hamcrest.Matcher;
 
@@ -171,5 +177,28 @@ public final class AssertUtil {
         onView(withId(R.id.webView)).perform(evaluateJavascript(
                 "onError(" + error.getErrorId() + ")"));
         assertTrue(latch.await(timeout, TimeUnit.MILLISECONDS));
+    }
+
+    public static void waitHCaptchaWebViewErrorByInput(final CountDownLatch latch,
+                                                       final HCaptchaError error,
+                                                       final long timeout)
+            throws InterruptedException {
+        onView(withId(R.id.webView)).perform(waitToBeDisplayed());
+
+        onWebView(withId(R.id.webView)).forceJavascriptEnabled();
+
+        onWebView().withElement(findElement(Locator.ID, "input-text"))
+                .perform(clearElement())
+                .perform(DriverAtoms.webKeys(
+                        String.valueOf(error.getErrorId())));
+
+        onWebView().withElement(findElement(Locator.ID, "on-error"))
+                .perform(webClick());
+
+        assertTrue(latch.await(timeout, TimeUnit.MILLISECONDS)); // wait for callback
+    }
+
+    public static void failAsNonReachable() {
+        fail("Should not be called for this test");
     }
 }

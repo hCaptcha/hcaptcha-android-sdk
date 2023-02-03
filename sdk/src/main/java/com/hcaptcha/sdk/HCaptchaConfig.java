@@ -1,5 +1,6 @@
 package com.hcaptcha.sdk;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -110,9 +111,23 @@ public class HCaptchaConfig implements Serializable {
 
     /**
      * Reset hCaptcha on timeout
+     * @deprecated use {@link #retryPredicate} to implement desired retry logic
      */
     @Builder.Default
+    @Deprecated
     private Boolean resetOnTimeout = false;
+
+    /**
+     * The lambda will decide should we retry or not
+     */
+    @Builder.Default
+    @JsonIgnore
+    private IHCaptchaRetryPredicate retryPredicate = (config, exception) -> {
+        if (Boolean.TRUE.equals(config.resetOnTimeout)) {
+            return exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+        }
+        return false;
+    };
 
     /**
      * hCaptcha token expiration timeout (seconds)

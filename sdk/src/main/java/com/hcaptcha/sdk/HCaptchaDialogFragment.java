@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -103,6 +104,15 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             assert internalConfig != null;
 
             rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+            rootView.setFocusableInTouchMode(true);
+            rootView.requestFocus();
+            rootView.setOnKeyListener((view, keyCode, event) -> {
+                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                    return webViewHelper != null && webViewHelper.shouldRetry(
+                            new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
+                }
+                return false;
+            });
             HCaptchaLog.d("DialogFragment.onCreateView inflated");
 
             final WebView webView = rootView.findViewById(R.id.webView);
@@ -197,15 +207,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onFailure(@NonNull final HCaptchaException exception) {
-        final boolean silentRetry = webViewHelper != null
-                && webViewHelper.getConfig().getResetOnTimeout()
-                && exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
+        final boolean silentRetry = webViewHelper != null && webViewHelper.shouldRetry(exception);
         if (isAdded() && !silentRetry) {
             dismissAllowingStateLoss();
         }
         if (webViewHelper != null) {
             if (silentRetry) {
-                webViewHelper.getWebView().loadUrl("javascript:resetAndExecute();");
+                webViewHelper.resetAndExecute();
             } else {
                 webViewHelper.getListener().onFailure(exception);
             }

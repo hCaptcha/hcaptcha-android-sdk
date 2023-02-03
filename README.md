@@ -116,6 +116,8 @@ hCaptcha.setup().verifyWithHCaptcha()
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
    1. the same client is used to invoke multiple verifications
    2. the config option `resetOnTimeout(true)` is used which will automatically trigger a new verification when the current token expired. This will result in a new success or error callback.
+      * deprecated, please use [`HCaptchaConfig.retryPredicate`](#retry-failed-verification)
+   2. the config option [`HCaptchaConfig.retryPredicate`](#retry-failed-verification) is used to automatically trigger a new verification when some error occurs. If `HCaptchaConfig.retryPredicate` returns `true`, this will result in a new success or error callback.
    3. `onFailure` with `TOKEN_TIMEOUT` will be called once the token is expired. To prevent this you can call `HCaptchaTokenResponse.markUsed` once the token is utilized. Also, you can change expiration timeout with `HCaptchaConfigBuilder.tokenExpiration(timeout)` (default 2 min.)
 
 ## Config Params
@@ -128,7 +130,8 @@ The following list contains configuration properties to allows customization of 
 | `size`            | Enum                    | No       | INVISIBLE | This specifies the "size" of the checkbox component. By default, the checkbox is invisible and the challenge is shown automatically.                                 |
 | `theme`           | Enum                    | No       | LIGHT     | hCaptcha supports light, dark, and contrast themes.                                                                                                                  |
 | `locale`          | String (ISO 639-1 code) | No       | AUTO      | You can enforce a specific language or let hCaptcha auto-detect the local language based on user's device.                                                           |
-| `resetOnTimeout`  | Boolean                 | No       | False     | Automatically reload to fetch new challenge if user does not submit challenge. (Matches iOS SDK behavior.)                                                           |
+| `resetOnTimeout`  | Boolean                 | No       | False     | (DEPRECATED, use `retryPredicate`) Automatically reload to fetch new challenge if user does not submit challenge. (Matches iOS SDK behavior.)                        |
+| `retryPredicate`  | Lambda                  | No       | -         | Automatically trigger a new verification when some error occurs.                                                                                                     |
 | `sentry`          | Boolean                 | No       | True      | See Enterprise docs.                                                                                                                                                 |
 | `rqdata`          | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
 | `apiEndpoint`     | String                  | No       | -         | See Enterprise docs.                                                                                                                                                 |
@@ -141,7 +144,7 @@ The following list contains configuration properties to allows customization of 
 | `loading`         | Boolean                 | No       | True      | Show or hide the loading dialog.                                                                                                                                     |
 | `hideDialog`      | Boolean                 | No       | False     | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
 | `tokenExpiration` | long                    | No       | 120       | hCaptcha token expiration timeout (seconds).                                                                                                                         |
-| `diagnosticLog`   | Boolean                 | No       | False     | Emit detailed console logs for debugging                                                                                                          |
+| `diagnosticLog`   | Boolean                 | No       | False     | Emit detailed console logs for debugging                                                                                                                             |
 
 ### Config Examples
 
@@ -157,7 +160,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
 2. Set a specific language, use a dark theme and a compact checkbox.
 ```java
 final HCaptchaConfig config = HCaptchaConfig.builder()
-                .siteKey(YOUR_API_SITE_KEY)
+                .siteKey("YOUR_API_SITE_KEY")
                 .locale("ro")
                 .size(HCaptchaSize.COMPACT)
                 .theme(HCaptchaTheme.DARK)
@@ -184,6 +187,22 @@ The following is a list of possible error codes:
 | `INVALID_CUSTOM_THEME` | 32    | Invalid custom theme.                              |
 | `ERROR`                | 29    | General failure.                                   |
 
+### Retry Failed Verification
+
+You can indicate an automatic verification retry by setting the lambda config `HCaptchaConfig.retryPredicate`.
+
+One must be careful to not introduce infinite retries and thus blocking the user from error recovering.
+
+Example below will automatically retry in case of `CHALLENGE_CLOSED` error:
+```java
+final HCaptchaConfig config = HCaptchaConfig.builder()
+        .siteKey("YOUR_API_SITE_KEY")
+        .retryPredicate((config, hCaptchaException) -> {
+            return hCaptchaException.getHCaptchaError() == HCaptchaError.CHALLENGE_CLOSED;
+        })
+        .build();
+...
+```
 
 ## Debugging Tips
 

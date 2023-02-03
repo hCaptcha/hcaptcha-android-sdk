@@ -70,9 +70,9 @@
     };
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
     var hCaptchaID = null;
-    function execute() {
-        hcaptcha.execute(hCaptchaID);
-    }
+    /**
+     * Called programmatically from HCaptchaWebViewHelper.
+     */
     function resetAndExecute() {
         hcaptcha.reset();
         hcaptcha.execute(hCaptchaID);
