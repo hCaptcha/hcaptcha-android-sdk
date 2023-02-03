@@ -10,8 +10,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.AndroidRuntimeException;
-import android.view.LayoutInflater;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
@@ -108,8 +108,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             rootView.requestFocus();
             rootView.setOnKeyListener((view, keyCode, event) -> {
                 if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    return webViewHelper != null &&
-                            webViewHelper.shouldRetry(new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
+                    return webViewHelper != null && webViewHelper.shouldRetry(
+                            new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
                 }
                 return false;
             });
