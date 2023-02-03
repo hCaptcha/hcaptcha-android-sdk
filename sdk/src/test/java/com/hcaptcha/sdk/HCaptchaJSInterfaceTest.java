@@ -81,12 +81,6 @@ public class HCaptchaJSInterfaceTest {
                 .hideDialog(true)
                 .tokenExpiration(timeout)
                 .diagnosticLog(true)
-                .retryPredicate(new IHCaptchaRetryPredicate() {
-                    @Override
-                    public boolean shouldRetry(HCaptchaConfig config, HCaptchaException exception) {
-                        return exception.getHCaptchaError() == HCaptchaError.CHALLENGE_CLOSED;
-                    }
-                })
                 .build();
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
@@ -109,7 +103,6 @@ public class HCaptchaJSInterfaceTest {
         expected.put("hideDialog", true);
         expected.put("tokenExpiration", timeout);
         expected.put("diagnosticLog", true);
-        expected.put("retryPredicate", new JSONObject());
 
         JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
     }

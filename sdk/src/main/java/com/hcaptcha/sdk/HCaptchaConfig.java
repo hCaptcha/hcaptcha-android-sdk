@@ -1,5 +1,6 @@
 package com.hcaptcha.sdk;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
@@ -120,6 +121,7 @@ public class HCaptchaConfig implements Serializable {
      * The lambda will decide should we retry or not
      */
     @Builder.Default
+    @JsonIgnore
     private IHCaptchaRetryPredicate retryPredicate = new IHCaptchaRetryPredicate() {
         @Override
         public boolean shouldRetry(HCaptchaConfig config, com.hcaptcha.sdk.HCaptchaException exception) {
