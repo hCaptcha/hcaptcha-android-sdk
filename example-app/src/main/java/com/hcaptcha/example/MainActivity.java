@@ -110,27 +110,16 @@ public class MainActivity extends AppCompatActivity {
 
     private void setupClient(final HCaptcha hCaptcha) {
         hCaptcha
-            .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
-                @Override
-                public void onSuccess(HCaptchaTokenResponse response) {
-                    tokenResponse = response;
-                    String userResponseToken = response.getTokenResult();
-                    setTokenTextView(userResponseToken);
-                }
+            .addOnSuccessListener(response -> {
+                tokenResponse = response;
+                String userResponseToken = response.getTokenResult();
+                setTokenTextView(userResponseToken);
             })
-            .addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(HCaptchaException e) {
-                    Log.d(TAG, "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")");
-                    setErrorTextView(e.getMessage());
-                    tokenResponse = null;
-                }
+            .addOnFailureListener(e -> {
+                Log.d(TAG, "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")");
+                setErrorTextView(e.getMessage());
+                tokenResponse = null;
             })
-            .addOnOpenListener(new OnOpenListener() {
-                @Override
-                public void onOpen() {
-                    Toast.makeText(MainActivity.this, "hCaptcha shown", Toast.LENGTH_SHORT).show();
-                }
-            });
+            .addOnOpenListener(() -> Toast.makeText(MainActivity.this, "hCaptcha shown", Toast.LENGTH_SHORT).show());
     }
 }

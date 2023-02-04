@@ -19,16 +19,17 @@ class HCaptchaJSInterface implements Serializable {
     public static final String JS_INTERFACE_TAG = "JSInterface";
 
     @NonNull
-    private final Handler handler;
+    private final transient Handler handler;
 
     @Nullable
     private final String config;
 
     @NonNull
-    private final IHCaptchaVerifier captchaVerifier;
+    private final transient IHCaptchaVerifier captchaVerifier;
 
-    HCaptchaJSInterface(final Handler handler, final HCaptchaConfig config,
-                        final IHCaptchaVerifier captchaVerifier) {
+    HCaptchaJSInterface(@NonNull final Handler handler,
+                        @NonNull final HCaptchaConfig config,
+                        @NonNull final IHCaptchaVerifier captchaVerifier) {
         this.handler = handler;
         this.captchaVerifier = captchaVerifier;
         String configJson = null;
@@ -42,6 +43,7 @@ class HCaptchaJSInterface implements Serializable {
         this.config = configJson;
     }
 
+    @Nullable
     @JavascriptInterface
     public String getConfig() {
         return this.config;
@@ -50,45 +52,25 @@ class HCaptchaJSInterface implements Serializable {
     @JavascriptInterface
     public void onPass(final String token) {
         HCaptchaLog.d("JSInterface.onPass");
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                captchaVerifier.onSuccess(token);
-            }
-        });
+        handler.post(() -> captchaVerifier.onSuccess(token));
     }
 
     @JavascriptInterface
     public void onError(final int errCode) {
         HCaptchaLog.d("JSInterface.onError %d", errCode);
         final HCaptchaError error = HCaptchaError.fromId(errCode);
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                captchaVerifier.onFailure(new HCaptchaException(error));
-            }
-        });
+        handler.post(() -> captchaVerifier.onFailure(new HCaptchaException(error)));
     }
 
     @JavascriptInterface
     public void onLoaded() {
         HCaptchaLog.d("JSInterface.onLoaded");
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                captchaVerifier.onLoaded();
-            }
-        });
+        handler.post(captchaVerifier::onLoaded);
     }
 
     @JavascriptInterface
     public void onOpen() {
         HCaptchaLog.d("JSInterface.onOpen");
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                captchaVerifier.onOpen();
-            }
-        });
+        handler.post(captchaVerifier::onOpen);
     }
 }

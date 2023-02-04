@@ -8,8 +8,6 @@ import static org.junit.Assert.fail;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
-import com.hcaptcha.sdk.tasks.OnFailureListener;
-import com.hcaptcha.sdk.tasks.OnSuccessListener;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,23 +36,13 @@ public class HCaptchaTest {
         final CountDownLatch latch = new CountDownLatch(2);
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
-        scenario.onActivity(activity -> {
-            HCaptcha.getClient(activity, internalConfig)
-                    .verifyWithHCaptcha(config)
-                    .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
-                        @Override
-                        public void onSuccess(HCaptchaTokenResponse response) {
-                            latch.countDown();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(HCaptchaException exception) {
-                            assertEquals(HCaptchaError.TOKEN_TIMEOUT, exception.getHCaptchaError());
-                            latch.countDown();
-                        }
-                    });
-        });
+        scenario.onActivity(activity -> HCaptcha.getClient(activity, internalConfig)
+                .verifyWithHCaptcha(config)
+                .addOnSuccessListener(response -> latch.countDown())
+                .addOnFailureListener(exception -> {
+                    assertEquals(HCaptchaError.TOKEN_TIMEOUT, exception.getHCaptchaError());
+                    latch.countDown();
+                }));
 
         waitHCaptchaWebViewToken(latch, AWAIT_CALLBACK_MS);
     }
@@ -64,23 +52,13 @@ public class HCaptchaTest {
         final CountDownLatch latch = new CountDownLatch(1);
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
-        scenario.onActivity(activity -> {
-            HCaptcha.getClient(activity, internalConfig)
-                    .verifyWithHCaptcha(config)
-                    .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
-                        @Override
-                        public void onSuccess(HCaptchaTokenResponse response) {
-                            response.markUsed();
-                            latch.countDown();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(HCaptchaException exception) {
-                            fail("Session timeout should not be happened");
-                        }
-                    });
-        });
+        scenario.onActivity(activity -> HCaptcha.getClient(activity, internalConfig)
+                .verifyWithHCaptcha(config)
+                .addOnSuccessListener(response -> {
+                    response.markUsed();
+                    latch.countDown();
+                })
+                .addOnFailureListener(exception -> fail("Session timeout should not be happened")));
 
         waitHCaptchaWebViewToken(latch, AWAIT_CALLBACK_MS);
     }
@@ -90,23 +68,13 @@ public class HCaptchaTest {
         final CountDownLatch latch = new CountDownLatch(1);
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
-        scenario.onActivity(activity -> {
-            HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config.toBuilder().hideDialog(false).build())
-                    .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
-                        @Override
-                        public void onSuccess(HCaptchaTokenResponse response) {
-                            response.markUsed();
-                            latch.countDown();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(HCaptchaException exception) {
-                            fail("No errors expected");
-                        }
-                    });
-        });
+        scenario.onActivity(activity -> HCaptcha.getClient(activity)
+                .verifyWithHCaptcha(config.toBuilder().hideDialog(false).build())
+                .addOnSuccessListener(response -> {
+                    response.markUsed();
+                    latch.countDown();
+                })
+                .addOnFailureListener(exception -> fail("No errors expected")));
 
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
@@ -116,23 +84,13 @@ public class HCaptchaTest {
         final CountDownLatch latch = new CountDownLatch(1);
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
-        scenario.onActivity(activity -> {
-            HCaptcha.getClient(activity)
-                    .verifyWithHCaptcha(config.toBuilder().hideDialog(true).build())
-                    .addOnSuccessListener(new OnSuccessListener<HCaptchaTokenResponse>() {
-                        @Override
-                        public void onSuccess(HCaptchaTokenResponse response) {
-                            response.markUsed();
-                            latch.countDown();
-                        }
-                    })
-                    .addOnFailureListener(new OnFailureListener() {
-                        @Override
-                        public void onFailure(HCaptchaException exception) {
-                            fail("No errors expected");
-                        }
-                    });
-        });
+        scenario.onActivity(activity -> HCaptcha.getClient(activity)
+                .verifyWithHCaptcha(config.toBuilder().hideDialog(true).build())
+                .addOnSuccessListener(response -> {
+                    response.markUsed();
+                    latch.countDown();
+                })
+                .addOnFailureListener(exception -> fail("No errors expected")));
 
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }

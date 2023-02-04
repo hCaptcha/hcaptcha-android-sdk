@@ -26,7 +26,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @NonNull
     private final HCaptchaInternalConfig internalConfig;
 
-    private HCaptcha(@NonNull final Context context, final HCaptchaInternalConfig internalConfig) {
+    private HCaptcha(@NonNull final Context context, @NonNull final HCaptchaInternalConfig internalConfig) {
         this.activity = (FragmentActivity) context;
         this.internalConfig = internalConfig;
     }
@@ -41,7 +41,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         return new HCaptcha(context, HCaptchaInternalConfig.builder().build());
     }
 
-    static HCaptcha getClient(@NonNull final Context context, HCaptchaInternalConfig internalConfig) {
+    static HCaptcha getClient(@NonNull final Context context, @NonNull HCaptchaInternalConfig internalConfig) {
         return new HCaptcha(context, internalConfig);
     }
 
