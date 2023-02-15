@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.4.1
+
+- Deprecated: `HCaptchaConfig.apiEndpoint` replaced with `HCaptchaConfig.jsSrc` option
+
 # 3.4.0
 
 - Feat: new `HCaptchaConfig.retryPredicate` which allows conditional automatic retry
