@@ -50,9 +50,19 @@ public class HCaptchaConfig implements Serializable {
     /**
      * The url of api.js
      * Default: https://js.hcaptcha.com/1/api.js (Override only if using first-party hosting feature.)
+     * @deprecated use {@link #jsSrc} property instead
      */
     @Builder.Default
+    @JsonIgnore
+    @Deprecated
     private String apiEndpoint = "https://js.hcaptcha.com/1/api.js";
+
+    /**
+     * The url of api.js
+     * Default: https://js.hcaptcha.com/1/api.js (Override only if using first-party hosting feature.)
+     */
+    @Builder.Default
+    private String jsSrc = "https://js.hcaptcha.com/1/api.js";
 
     /**
      * Point hCaptcha JS Ajax Requests to alternative API Endpoint.
@@ -140,4 +150,23 @@ public class HCaptchaConfig implements Serializable {
      */
     @Builder.Default
     private Boolean diagnosticLog = false;
+
+    /**
+     * @deprecated use {@link #getJsSrc()} getter instead
+     */
+    @Deprecated
+    public String getApiEndpoint() {
+        return jsSrc;
+    }
+
+    public static class HCaptchaConfigBuilder {
+        /**
+         * @deprecated use {@link #jsSrc} setter instead
+         */
+        @Deprecated
+        public HCaptchaConfigBuilder apiEndpoint(String url) {
+            this.jsSrc(url);
+            return this;
+        }
+    }
 }

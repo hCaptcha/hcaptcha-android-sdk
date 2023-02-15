@@ -25,7 +25,7 @@ public class HCaptchaConfigTest {
         assertEquals(HCaptchaSize.INVISIBLE, config.getSize());
         assertEquals(HCaptchaTheme.LIGHT, config.getTheme());
         assertEquals(Locale.getDefault().getLanguage(), config.getLocale());
-        assertEquals("https://js.hcaptcha.com/1/api.js", config.getApiEndpoint());
+        assertEquals("https://js.hcaptcha.com/1/api.js", config.getJsSrc());
         assertEquals(null, config.getCustomTheme());
         assertNull(config.getRqdata());
     }
@@ -45,7 +45,7 @@ public class HCaptchaConfigTest {
 
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(MOCK_SITE_KEY)
-                .apiEndpoint(customEndpoint)
+                .jsSrc(customEndpoint)
                 .locale(customLocale)
                 .rqdata(customRqdata)
                 .sentry(sentry)
@@ -59,7 +59,7 @@ public class HCaptchaConfigTest {
         assertEquals(hCaptchaTheme, config.getTheme());
         assertEquals(customLocale, config.getLocale());
         assertEquals(customRqdata, config.getRqdata());
-        assertEquals(customEndpoint, config.getApiEndpoint());
+        assertEquals(customEndpoint, config.getJsSrc());
         assertEquals(customTheme, config.getCustomTheme());
     }
 

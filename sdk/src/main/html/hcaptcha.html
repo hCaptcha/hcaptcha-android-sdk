@@ -48,7 +48,7 @@
                 theme: 'dark',
                 sentry: true,
                 rqdata: null,
-                apiEndpoint: 'https://js.hcaptcha.com/1/api.js',
+                jsSrc: 'https://js.hcaptcha.com/1/api.js',
                 endpoint: null,
                 assethost: null,
                 imghost: null,
@@ -158,13 +158,13 @@
         var siteKey = bridgeConfig.siteKey;
         var locale = bridgeConfig.locale;
         var sentry = bridgeConfig.sentry;
-        var apiEndpoint = bridgeConfig.apiEndpoint;
+        var jsSrc = bridgeConfig.jsSrc;
         var endpoint = bridgeConfig.endpoint;
         var assethost = bridgeConfig.assethost;
         var imghost = bridgeConfig.imghost;
         var reportapi = bridgeConfig.reportapi;
         var host = bridgeConfig.host || siteKey + '.android-sdk.hcaptcha.com';
-        var scriptSrc = apiEndpoint + '?render=explicit&onload=' + onHcaptchaLoaded.name;
+        var scriptSrc = jsSrc + '?render=explicit&onload=' + onHcaptchaLoaded.name;
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'recaptchacompat', 'off');
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'hl', locale);
         scriptSrc = addQueryParamIfDefined(scriptSrc, 'host', host);
