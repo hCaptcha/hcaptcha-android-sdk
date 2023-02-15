@@ -55,7 +55,7 @@ public class HCaptchaConfig implements Serializable {
     @Builder.Default
     @JsonIgnore
     @Deprecated
-    private String apiEndpoint = "https://js.hcaptcha.com/1/api.js";
+    private String apiEndpoint = "https://js.hcaptcha.com/1/api.js"; //NOSONAR
 
     /**
      * The url of api.js
@@ -155,7 +155,7 @@ public class HCaptchaConfig implements Serializable {
      * @deprecated use {@link #getJsSrc()} getter instead
      */
     @Deprecated
-    public String getApiEndpoint() {
+    public String getApiEndpoint() { //NOSONAR
         return jsSrc;
     }
 
@@ -164,7 +164,7 @@ public class HCaptchaConfig implements Serializable {
          * @deprecated use {@link #jsSrc} setter instead
          */
         @Deprecated
-        public HCaptchaConfigBuilder apiEndpoint(String url) {
+        public HCaptchaConfigBuilder apiEndpoint(String url) { //NOSONAR
             this.jsSrc(url);
             return this;
         }
