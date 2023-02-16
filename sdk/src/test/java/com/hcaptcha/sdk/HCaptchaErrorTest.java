@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
-import org.junit.function.ThrowingRunnable;
 
 public class HCaptchaErrorTest {
 
@@ -40,11 +39,6 @@ public class HCaptchaErrorTest {
     @Test
     @SuppressWarnings("checkstyle:MagicNumber")
     public void get_enum_from_invalid_id_throws() {
-        assertThrows(RuntimeException.class, new ThrowingRunnable() {
-            @Override
-            public void run() {
-                HCaptchaError.fromId(-999);
-            }
-        });
+        assertThrows(RuntimeException.class, () -> HCaptchaError.fromId(-999));
     }
 }

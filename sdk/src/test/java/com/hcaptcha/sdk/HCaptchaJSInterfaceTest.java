@@ -9,7 +9,6 @@ import static org.mockito.Mockito.when;
 
 import android.os.Handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -19,9 +18,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Spy;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -43,17 +40,14 @@ public class HCaptchaJSInterfaceTest {
 
     @Before
     public void init() {
-        when(handler.post(any(Runnable.class))).thenAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                invocation.getArgument(0, Runnable.class).run();
-                return null;
-            }
+        when(handler.post(any(Runnable.class))).thenAnswer(invocation -> {
+            invocation.getArgument(0, Runnable.class).run();
+            return null;
         });
     }
 
     @Test
-    public void full_config_serialization() throws JsonProcessingException, JSONException {
+    public void full_config_serialization() throws JSONException {
         final String siteKey = "0000-1111-2222-3333";
         final String locale = "ro";
         final HCaptchaSize size = HCaptchaSize.NORMAL;
@@ -108,7 +102,7 @@ public class HCaptchaJSInterfaceTest {
     }
 
     @Test
-    public void subset_config_serialization() throws JsonProcessingException, JSONException {
+    public void subset_config_serialization() throws JSONException {
         final String siteKey = "0000-1111-2222-3333";
         final String locale = "ro";
         final HCaptchaSize size = HCaptchaSize.NORMAL;
