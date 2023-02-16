@@ -1,6 +1,6 @@
 # Changelog
 
-# 3.4.1
+# 3.5.0
 
 - Deprecated: `HCaptchaConfig.apiEndpoint` replaced with `HCaptchaConfig.jsSrc` option
 
