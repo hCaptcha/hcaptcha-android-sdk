@@ -58,7 +58,7 @@ public class HCaptchaJSInterfaceTest {
         final String locale = "ro";
         final HCaptchaSize size = HCaptchaSize.NORMAL;
         final String rqdata = "custom rqdata";
-        final String apiEndpoint = "127.0.0.1/api.js";
+        final String jsSrc = "127.0.0.1/api.js";
         final String endpoint = "https://example.com/endpoint";
         final String assethost = "https://example.com/assethost";
         final String imghost = "https://example.com/imghost";
@@ -71,7 +71,7 @@ public class HCaptchaJSInterfaceTest {
                 .size(size)
                 .theme(HCaptchaTheme.DARK)
                 .rqdata(rqdata)
-                .apiEndpoint(apiEndpoint)
+                .jsSrc(jsSrc)
                 .endpoint(endpoint)
                 .assethost(assethost)
                 .imghost(imghost)
@@ -89,7 +89,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("sentry", true);
         expected.put("loading", true);
         expected.put("rqdata", rqdata);
-        expected.put("apiEndpoint", apiEndpoint);
+        expected.put("jsSrc", jsSrc);
         expected.put("endpoint", endpoint);
         expected.put("reportapi", reportapi);
         expected.put("assethost", assethost);
@@ -128,7 +128,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("sentry", true);
         expected.put("loading", true);
         expected.put("rqdata", rqdata);
-        expected.put("apiEndpoint", "https://js.hcaptcha.com/1/api.js");
+        expected.put("jsSrc", "https://js.hcaptcha.com/1/api.js");
         expected.put("endpoint", JSONObject.NULL);
         expected.put("reportapi", JSONObject.NULL);
         expected.put("assethost", JSONObject.NULL);
