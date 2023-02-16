@@ -30,8 +30,8 @@ public class HCaptchaWebView extends WebView {
     /**
      * Workaround for crash in WebViewChromium
      * Details:
-     *  - <a href="https://stackoverflow.com/questions/58519749">...</a>
-     *  - <a href="https://github.com/zulip/zulip-mobile/issues/4051#issuecomment-616855833">...</a>
+     *  - <a href="https://stackoverflow.com/questions/58519749">stackoverflow</a>
+     *  - <a href="https://github.com/zulip/zulip-mobile/issues/4051#issuecomment-616855833">github issues</a>
      */
     @Override
     public boolean onCheckIsTextEditor() {
