@@ -125,7 +125,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: androidTest-results
-          path: sdk/build/outputs/androidTest-results
+          path: |
+            sdk/build/outputs/androidTest-results
+            sdk/build/reports/androidTests
 
   test-benchmark:
     name: 'Test Benchmark'
