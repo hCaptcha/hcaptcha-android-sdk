@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.5.1
+
+- Bugfix: Parcelable encountered IOException writing serializable object (name = com.hcaptcha.sdk.HCaptchaConfig) ([#94](https://github.com/hCaptcha/hcaptcha-android-sdk/issues/94))
+
 # 3.5.0
 
 - Deprecated: `HCaptchaConfig.apiEndpoint` replaced with `HCaptchaConfig.jsSrc` option
