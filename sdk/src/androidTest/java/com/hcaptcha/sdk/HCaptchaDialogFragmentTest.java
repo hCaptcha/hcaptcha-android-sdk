@@ -28,6 +28,7 @@ import android.os.Bundle;
 import android.util.AndroidRuntimeException;
 import android.view.LayoutInflater;
 import androidx.fragment.app.testing.FragmentScenario;
+import androidx.lifecycle.Lifecycle;
 import androidx.test.espresso.web.webdriver.DriverAtoms;
 import androidx.test.espresso.web.webdriver.Locator;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -263,5 +264,43 @@ public class HCaptchaDialogFragmentTest {
         waitHCaptchaWebViewErrorByInput(retryLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);
 
         assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testPauseResumeFragment() throws Exception {
+        final CountDownLatch successLatch = new CountDownLatch(1);
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+
+            @Override
+            void onSuccess(String token) {
+                successLatch.countDown();
+            }
+        };
+
+        final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(config, listener);
+        scenario.moveToState(Lifecycle.State.STARTED).moveToState(Lifecycle.State.RESUMED);
+
+        waitHCaptchaWebViewToken(successLatch, AWAIT_CALLBACK_MS);
+
+        assertTrue(successLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testActivityRecreate() throws Exception {
+        final CountDownLatch successLatch = new CountDownLatch(1);
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+
+            @Override
+            void onSuccess(String token) {
+                successLatch.countDown();
+            }
+        };
+
+        final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(config, listener);
+        scenario.recreate();
+
+        waitHCaptchaWebViewToken(successLatch, AWAIT_CALLBACK_MS);
+
+        assertTrue(successLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }

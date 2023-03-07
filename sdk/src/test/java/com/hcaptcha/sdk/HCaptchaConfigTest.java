@@ -5,6 +5,10 @@ import static org.junit.Assert.assertNull;
 
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 public class HCaptchaConfigTest {
@@ -63,5 +67,19 @@ public class HCaptchaConfigTest {
         assertEquals(customTheme, config.getCustomTheme());
     }
 
+    @Test
+    public void serialization() throws Exception {
+        final HCaptchaConfig config = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).build();
+
+        final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        final ObjectOutputStream oos = new ObjectOutputStream(bos);
+        oos.writeObject(config);
+        final ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
+        final ObjectInputStream ois = new ObjectInputStream(bis);
+        final HCaptchaConfig deserializedObject = (HCaptchaConfig) ois.readObject();
+
+        assertEquals(config.toBuilder().retryPredicate(null).build(),
+                deserializedObject.toBuilder().retryPredicate(null).build());
+    }
 
 }
