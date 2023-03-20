@@ -8,6 +8,7 @@ import static org.junit.Assert.fail;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
+import com.hcaptcha.sdk.tasks.OnSuccessListener;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -59,6 +60,30 @@ public class HCaptchaTest {
                     latch.countDown();
                 })
                 .addOnFailureListener(exception -> fail("Session timeout should not be happened")));
+
+        waitHCaptchaWebViewToken(latch, AWAIT_CALLBACK_MS);
+    }
+
+    @Test
+    public void removedListenerShouldNotBeCalled() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final OnSuccessListener<HCaptchaTokenResponse> listener1 = response -> {
+            fail("Listener1 should never be called");
+        };
+
+        final OnSuccessListener<HCaptchaTokenResponse> listener2 = response -> {
+            response.markUsed();
+            latch.countDown();
+        };
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> HCaptcha.getClient(activity, internalConfig)
+                .verifyWithHCaptcha(config)
+                .addOnSuccessListener(listener1)
+                .addOnFailureListener(exception -> fail("Session timeout should not be happened"))
+                .removeOnSuccessListener(listener1)
+                .addOnSuccessListener(listener2));
 
         waitHCaptchaWebViewToken(latch, AWAIT_CALLBACK_MS);
     }
