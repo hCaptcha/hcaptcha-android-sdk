@@ -112,6 +112,31 @@ hCaptcha.setup().verifyWithHCaptcha()
 </manifest>
 ```
 
+Also in case if you want to reuse `hCaptcha` instance with different `on[Success|Failure|Open]Listener,
+you an remove previously added listeners via `HCaptcha.removeOn[Success|Failure|Open]Listener` or
+`HCaptcha.removeAllListener`
+
+```java
+...
+OnSuccessListener<HCaptchaTokenResponse> firstListener = new OnSuccessListener<HCaptchaTokenResponse>() {
+    @Override
+    public void onSuccess(HCaptchaTokenResponse response) {
+        ...
+    }
+};
+hCaptcha.addOnSuccessListener(firstListener).verifyWithHCaptcha();
+...
+OnSuccessListener<HCaptchaTokenResponse> secondListener = new OnSuccessListener<HCaptchaTokenResponse>() {
+    @Override
+    public void onSuccess(HCaptchaTokenResponse response) {
+        ...
+    }
+};
+hCaptcha.removeOnSuccessListener(firstListener)
+    .addOnSuccessListener(secondListener)
+    .verifyWithHCaptcha();
+```
+
 ### Good to know
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
    1. the same client is used to invoke multiple verifications

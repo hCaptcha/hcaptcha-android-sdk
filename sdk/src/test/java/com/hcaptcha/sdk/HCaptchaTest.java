@@ -18,6 +18,9 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import androidx.fragment.app.FragmentActivity;
 
+import com.hcaptcha.sdk.tasks.OnFailureListener;
+import com.hcaptcha.sdk.tasks.OnOpenListener;
+import com.hcaptcha.sdk.tasks.OnSuccessListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +47,15 @@ public class HCaptchaTest {
 
     @Mock
     HCaptchaDialogFragment fragment;
+
+    @Mock
+    OnSuccessListener<HCaptchaTokenResponse> onSuccessListener;
+
+    @Mock
+    OnFailureListener onFailureListener;
+
+    @Mock
+    OnOpenListener onOpenListener;
 
     @Captor
     ArgumentCaptor<HCaptchaConfig> hCaptchaConfigCaptor;
@@ -218,5 +230,27 @@ public class HCaptchaTest {
                         any(HCaptchaStateListener.class)));
 
         assertEquals(HCaptchaConfigTest.MOCK_SITE_KEY, hCaptchaConfigCaptor.getValue().getSiteKey());
+    }
+
+    @Test
+    public void test_remove_listener() {
+        HCaptcha.getClient(fragmentActivity)
+                .addOnSuccessListener(onSuccessListener)
+                .removeOnSuccessListener(onSuccessListener);
+    }
+
+    @Test
+    public void test_remove_non_existing_listener() {
+        HCaptcha.getClient(fragmentActivity)
+                .removeOnSuccessListener(onSuccessListener);
+    }
+
+    @Test
+    public void test_clear_all_listener() {
+        HCaptcha.getClient(fragmentActivity)
+                .addOnSuccessListener(onSuccessListener)
+                .addOnFailureListener(onFailureListener)
+                .addOnOpenListener(onOpenListener)
+                .removeAllListeners();
     }
 }
