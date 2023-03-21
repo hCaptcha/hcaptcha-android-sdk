@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.6.0
+
+- Feat: new `HCaptcha.removeAllListener` and `HCaptcha.removeOn[Success|Failure|Open]Listener(listener)` to remove all or specific listener.
+
 # 3.5.2
 
 - Bugfix: java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState, on `verifyWithHCaptcha`
