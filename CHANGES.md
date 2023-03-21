@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.5.2
+
+- Bugfix: java.lang.IllegalStateException: Can not perform this action after onSaveInstanceState, on `verifyWithHCaptcha`
+
 # 3.5.1
 
 - Bugfix: Parcelable encountered IOException writing serializable object (name = com.hcaptcha.sdk.HCaptchaConfig) ([#94](https://github.com/hCaptcha/hcaptcha-android-sdk/issues/94))

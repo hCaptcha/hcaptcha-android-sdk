@@ -1,6 +1,6 @@
 package com.hcaptcha.sdk;
 
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentActivity;
 
-public class TestActivity extends AppCompatActivity {
+public class TestActivity extends FragmentActivity {
 }
