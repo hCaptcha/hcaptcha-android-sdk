@@ -237,6 +237,16 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             HCaptchaLog.w("DialogFragment was already added.");
             return;
         }
-        show(fragmentManager, HCaptchaDialogFragment.TAG);
+
+        try {
+            show(fragmentManager, HCaptchaDialogFragment.TAG);
+        } catch (IllegalStateException e) {
+            HCaptchaLog.w("DialogFragment.startVerification " + e.getMessage());
+            // https://stackoverflow.com/q/14262312/902217
+            // Happens if Fragment is stopped i.e. activity is about to destroy on show call
+            if (webViewHelper != null) {
+                webViewHelper.getListener().onFailure(new HCaptchaException(HCaptchaError.ERROR));
+            }
+        }
     }
 }

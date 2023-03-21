@@ -29,6 +29,7 @@ import android.util.AndroidRuntimeException;
 import android.view.LayoutInflater;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
+import androidx.test.core.app.ActivityScenario;
 import androidx.test.espresso.web.webdriver.DriverAtoms;
 import androidx.test.espresso.web.webdriver.Locator;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -71,11 +72,18 @@ public class HCaptchaDialogFragmentTest {
 
     private FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(final HCaptchaConfig captchaConfig,
                                                                            HCaptchaStateListener listener) {
+        return launchCaptchaFragment(captchaConfig, listener, Lifecycle.State.RESUMED);
+    }
+
+    private FragmentScenario<HCaptchaDialogFragment> launchCaptchaFragment(final HCaptchaConfig captchaConfig,
+                                                                           HCaptchaStateListener listener,
+                                                                           Lifecycle.State initialState) {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, captchaConfig);
         args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
         args.putParcelable(KEY_LISTENER, listener);
-        return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, args);
+        return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class,
+                args, R.style.HCaptchaDialogTheme, initialState);
     }
 
     private void waitForWebViewToEmitToken(final CountDownLatch latch)
@@ -302,5 +310,19 @@ public class HCaptchaDialogFragmentTest {
         waitHCaptchaWebViewToken(successLatch, AWAIT_CALLBACK_MS);
 
         assertTrue(successLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testVerifyOnStoppedFragmentNoException() throws InterruptedException {
+        final CountDownLatch latch = new CountDownLatch(1);
+        try (ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class)) {
+            scenario.moveToState(Lifecycle.State.CREATED).onActivity(activity -> {
+                HCaptchaDialogFragment.newInstance(config, internalConfig,
+                                new HCaptchaStateTestAdapter())
+                        .startVerification(activity);
+                latch.countDown();
+            });
+        }
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }
