@@ -7,6 +7,7 @@ import androidx.annotation.Nullable;
 
 import com.hcaptcha.sdk.HCaptchaError;
 import com.hcaptcha.sdk.HCaptchaException;
+import com.hcaptcha.sdk.HCaptchaLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -144,6 +145,18 @@ public abstract class Task<TResult> {
     }
 
     /**
+     * Remove a success listener
+     * @param onSuccessListener the success listener to be removed
+     * @return current object
+     */
+    public Task<TResult> removeOnSuccessListener(@NonNull final OnSuccessListener<TResult> onSuccessListener) {
+        if (!onSuccessListeners.remove(onSuccessListener)) {
+            HCaptchaLog.d("removeOnSuccessListener: %1 not found and cannot be removed", onSuccessListener);
+        }
+        return this;
+    }
+
+    /**
      * Add a failure listener triggered when the task finishes with an exception
      *
      * @param onFailureListener the failure listener to be triggered
@@ -156,6 +169,18 @@ public abstract class Task<TResult> {
     }
 
     /**
+     * Remove a failure listener
+     * @param onFailureListener to be removed
+     * @return current object
+     */
+    public Task<TResult> removeOnFailureListener(@NonNull final OnFailureListener onFailureListener) {
+        if (!onFailureListeners.remove(onFailureListener)) {
+            HCaptchaLog.d("removeOnFailureListener: %1 not found and cannot be removed", onFailureListener);
+        }
+        return this;
+    }
+
+    /**
      * Add a hCaptcha open listener triggered when the hCaptcha View is displayed
      *
      * @param onOpenListener the open listener to be triggered
@@ -164,6 +189,29 @@ public abstract class Task<TResult> {
     public Task<TResult> addOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
         this.onOpenListeners.add(onOpenListener);
         tryCb();
+        return this;
+    }
+
+    /**
+     * Remove a open listener
+     * @param onOpenListener to be removed
+     * @return current object
+     */
+    public Task<TResult> removeOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
+        if (!onOpenListeners.remove(onOpenListener)) {
+            HCaptchaLog.d("removeOnOpenListener: %1 not found and cannot be removed", onOpenListener);
+        }
+        return this;
+    }
+
+    /**
+     * Remove all listeners: success, failure and open listeners
+     * @return current object
+     */
+    public Task<TResult> removeAllListeners() {
+        onSuccessListeners.clear();
+        onFailureListeners.clear();
+        onOpenListeners.clear();
         return this;
     }
 
