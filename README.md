@@ -112,9 +112,9 @@ hCaptcha.setup().verifyWithHCaptcha()
 </manifest>
 ```
 
-Also in case if you want to reuse `hCaptcha` instance with different `on[Success|Failure|Open]Listener,
-you an remove previously added listeners via `HCaptcha.removeOn[Success|Failure|Open]Listener` or
-`HCaptcha.removeAllListener`
+To remove a specific listener you may use `HCaptcha.removeOn[Success|Failure|Open]Listener(listener)`.
+
+To remove all listeners you may use `HCaptcha.removeAllListener()`.
 
 ```java
 ...
