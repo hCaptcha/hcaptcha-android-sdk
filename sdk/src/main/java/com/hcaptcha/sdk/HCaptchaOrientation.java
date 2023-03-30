@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk;
 
 import androidx.annotation.NonNull;
+
 import com.fasterxml.jackson.annotation.JsonValue;
 
 import java.io.Serializable;
