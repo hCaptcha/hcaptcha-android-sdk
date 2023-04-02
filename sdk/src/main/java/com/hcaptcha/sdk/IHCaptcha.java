@@ -84,4 +84,8 @@ public interface IHCaptcha {
      */
     HCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config);
 
+    /**
+     * Force stop verification and release resources.
+     */
+    void clear();
 }

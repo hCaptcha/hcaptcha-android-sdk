@@ -106,8 +106,12 @@ final class HCaptchaWebViewHelper {
         webView.destroy();
     }
 
-    public void resetAndExecute() {
+    void resetAndExecute() {
         webView.loadUrl("javascript:resetAndExecute();");
+    }
+
+    void reset() {
+        webView.loadUrl("javascript:reset();");
     }
 
     public boolean shouldRetry(HCaptchaException exception) {

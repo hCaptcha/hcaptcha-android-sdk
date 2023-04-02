@@ -119,4 +119,20 @@ public class HCaptchaTest {
 
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
+
+    @Test
+    public void clearAPI() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> HCaptcha.getClient(activity)
+                .verifyWithHCaptcha(config.toBuilder().hideDialog(true).build())
+                .addOnFailureListener(exception -> {
+                    assertEquals(HCaptchaError.CHALLENGE_CLOSED, exception.getHCaptchaError());
+                    latch.countDown();
+                })
+                .addOnFailureListener(exception -> fail("No errors expected")));
+
+        assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
 }

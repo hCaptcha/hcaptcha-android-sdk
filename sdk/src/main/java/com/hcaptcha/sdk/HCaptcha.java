@@ -137,6 +137,16 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         return startVerification();
     }
 
+    @Override
+    public void clear() {
+        if (captchaVerifier == null) {
+            return;
+        }
+
+        captchaVerifier.clear();
+        captchaVerifier = null;
+    }
+
     private HCaptcha startVerification() {
         HCaptchaLog.d("HCaptcha.startVerification");
         handler.removeCallbacksAndMessages(null);

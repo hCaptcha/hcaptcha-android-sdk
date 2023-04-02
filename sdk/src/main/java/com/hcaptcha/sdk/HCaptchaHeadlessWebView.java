@@ -80,4 +80,13 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     public void onOpen() {
         listener.onOpen();
     }
+
+    @Override
+    public void clear() {
+        webViewHelper.reset();
+        final WebView webView = webViewHelper.getWebView();
+        if (webView.getParent() != null) {
+            ((ViewGroup) webView.getParent()).removeView(webView);
+        }
+    }
 }

@@ -83,6 +83,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickClear(final View v) {
+        if (hCaptcha != null) {
+            hCaptcha.clear();
+        }
         setTokenTextView("-");
         hCaptcha = null;
     }
@@ -103,6 +106,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMarkUsed(final View v) {
+        if (tokenResponse != null) {
+            tokenResponse.markUsed();
+        }
+    }
+
+    public void onClear(final View v) {
         if (tokenResponse != null) {
             tokenResponse.markUsed();
         }

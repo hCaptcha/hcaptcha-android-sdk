@@ -19,4 +19,8 @@ interface IHCaptchaVerifier extends
      */
     void startVerification(@NonNull FragmentActivity activity);
 
+    /**
+     * Force stop verification and release resources.
+     */
+    void clear();
 }
