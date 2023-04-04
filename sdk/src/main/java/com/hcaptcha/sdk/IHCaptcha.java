@@ -87,5 +87,5 @@ public interface IHCaptcha {
     /**
      * Force stop verification and release resources.
      */
-    void clear();
+    void reset();
 }

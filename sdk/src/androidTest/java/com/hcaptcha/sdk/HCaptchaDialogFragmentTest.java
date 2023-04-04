@@ -325,4 +325,15 @@ public class HCaptchaDialogFragmentTest {
         }
         assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testReset() {
+        final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(
+                config, new HCaptchaStateTestAdapter());
+
+        scenario.onFragment(HCaptchaDialogFragment::reset);
+
+        // The fragment has been removed from the FragmentManager already.
+        scenario.onFragment(fragment -> assertTrue(fragment.isDetached()));
+    }
 }

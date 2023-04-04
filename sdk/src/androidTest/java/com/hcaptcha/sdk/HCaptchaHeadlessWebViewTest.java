@@ -6,6 +6,9 @@ import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import android.view.View;
+import android.view.ViewGroup;
+import androidx.annotation.NonNull;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -161,5 +164,33 @@ public class HCaptchaHeadlessWebViewTest {
         waitHCaptchaWebViewError(retryLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);
 
         assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testReset() throws Exception {
+        final CountDownLatch latch = new CountDownLatch(1);
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
+                    activity, config, internalConfig, new HCaptchaStateTestAdapter());
+
+            final ViewGroup rootView = (ViewGroup) activity.getWindow().getDecorView().getRootView();
+            final View webView = rootView.findViewById(R.id.webView);
+            webView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+                @Override
+                public void onViewAttachedToWindow(@NonNull View view) {
+                    // will not be fired because attached already
+                }
+
+                @Override
+                public void onViewDetachedFromWindow(@NonNull View view) {
+                    latch.countDown();
+                }
+            });
+            subject.reset();
+        });
+
+        assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 }

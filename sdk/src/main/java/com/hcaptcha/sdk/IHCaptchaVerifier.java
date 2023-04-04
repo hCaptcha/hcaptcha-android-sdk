@@ -22,5 +22,5 @@ interface IHCaptchaVerifier extends
     /**
      * Force stop verification and release resources.
      */
-    void clear();
+    void reset();
 }

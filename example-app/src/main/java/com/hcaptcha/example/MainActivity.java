@@ -13,9 +13,6 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import com.hcaptcha.sdk.*;
-import com.hcaptcha.sdk.tasks.OnFailureListener;
-import com.hcaptcha.sdk.tasks.OnOpenListener;
-import com.hcaptcha.sdk.tasks.OnSuccessListener;
 
 import java.util.Arrays;
 
@@ -84,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickClear(final View v) {
         if (hCaptcha != null) {
-            hCaptcha.clear();
+            hCaptcha.reset();
         }
         setTokenTextView("-");
         hCaptcha = null;
