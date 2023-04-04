@@ -28,4 +28,9 @@ public class TestHCaptchaVerifier implements IHCaptchaVerifier {
     public void onSuccess(String s) {
         // no implementation need for performance measurement
     }
+
+    @Override
+    public void reset() {
+        // no implementation need for performance measurement
+    }
 }
