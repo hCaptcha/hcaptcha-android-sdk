@@ -50,6 +50,7 @@ public class HCaptchaJSInterfaceTest {
     public void full_config_serialization() throws JSONException {
         final String siteKey = "0000-1111-2222-3333";
         final String locale = "ro";
+        final HCaptchaOrientation orientation = HCaptchaOrientation.PORTRAIT;
         final HCaptchaSize size = HCaptchaSize.NORMAL;
         final String rqdata = "custom rqdata";
         final String jsSrc = "127.0.0.1/api.js";
@@ -63,6 +64,7 @@ public class HCaptchaJSInterfaceTest {
                 .siteKey(siteKey)
                 .locale(locale)
                 .size(size)
+                .orientation(orientation)
                 .theme(HCaptchaTheme.DARK)
                 .rqdata(rqdata)
                 .jsSrc(jsSrc)
@@ -90,6 +92,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("imghost", imghost);
         expected.put("locale", locale);
         expected.put("size", size.toString());
+        expected.put("orientation", orientation.toString());
         expected.put("theme", HCaptchaTheme.DARK.toString());
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", host);
@@ -106,12 +109,14 @@ public class HCaptchaJSInterfaceTest {
         final String siteKey = "0000-1111-2222-3333";
         final String locale = "ro";
         final HCaptchaSize size = HCaptchaSize.NORMAL;
+        final HCaptchaOrientation orientation = HCaptchaOrientation.LANDSCAPE;
         final String rqdata = "custom rqdata";
         final long defaultTimeout = 120;
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(siteKey)
                 .locale(locale)
                 .size(size)
+                .orientation(orientation)
                 .theme(HCaptchaTheme.DARK)
                 .rqdata(rqdata)
                 .build();
@@ -129,6 +134,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("imghost", JSONObject.NULL);
         expected.put("locale", locale);
         expected.put("size", size.toString());
+        expected.put("orientation", orientation.toString());
         expected.put("theme", HCaptchaTheme.DARK.toString());
         expected.put("customTheme", JSONObject.NULL);
         expected.put("host", JSONObject.NULL);

@@ -102,6 +102,12 @@ public class HCaptchaConfig implements Serializable {
     private HCaptchaSize size = HCaptchaSize.INVISIBLE;
 
     /**
+     * The orientation of the challenge. Default is {@link HCaptchaOrientation#PORTRAIT}.
+     */
+    @Builder.Default
+    private HCaptchaOrientation orientation = HCaptchaOrientation.PORTRAIT;
+
+    /**
      * The theme. Default is {@link HCaptchaTheme#LIGHT}.
      */
     @Builder.Default

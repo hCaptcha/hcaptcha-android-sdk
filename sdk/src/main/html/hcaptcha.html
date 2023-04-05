@@ -45,6 +45,7 @@
                 siteKey: '10000000-ffff-ffff-ffff-000000000001',
                 locale: 'ro',
                 size: 'compact',
+                orientation: 'portrait',
                 theme: 'dark',
                 sentry: true,
                 rqdata: null,
@@ -97,6 +98,7 @@
         return {
             sitekey: bridgeConfig.siteKey,
             size: bridgeConfig.size,
+            orientation: bridgeConfig.orientation,
             theme: getTheme(bridgeConfig),
             callback: function callback(token) {
                 return BridgeObject.onPass(token);
