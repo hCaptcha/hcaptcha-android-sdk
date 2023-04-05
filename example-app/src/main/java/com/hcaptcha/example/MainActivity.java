@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         errorTextView.setText(error);
     }
 
-    public void onClickClear(final View v) {
+    public void onClickReset(final View view) {
         if (hCaptcha != null) {
             hCaptcha.reset();
         }
@@ -103,12 +103,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onMarkUsed(final View v) {
-        if (tokenResponse != null) {
-            tokenResponse.markUsed();
-        }
-    }
-
-    public void onClear(final View v) {
         if (tokenResponse != null) {
             tokenResponse.markUsed();
         }
