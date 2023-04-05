@@ -137,7 +137,7 @@ hCaptcha.removeOnSuccessListener(firstListener)
     .verifyWithHCaptcha();
 ```
 
-To release all resources you may use `HCaptcha.reset()` call
+To release all resources you may call `HCaptcha.reset()`.
 
 ### Good to know
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
