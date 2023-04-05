@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.8.0
+
+- Feat: new `HCaptcha.reset` to force stop verification and release all resources.
+
 # 3.7.0
 
 - Feat: new `HCaptchaConfig.orientation` to set either `portrait` or `landscape` challenge orientation.
