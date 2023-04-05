@@ -249,4 +249,14 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             }
         }
     }
+
+    @Override
+    public void reset() {
+        if (webViewHelper != null) {
+            webViewHelper.reset();
+        }
+        if (isAdded()) {
+            dismissAllowingStateLoss();
+        }
+    }
 }

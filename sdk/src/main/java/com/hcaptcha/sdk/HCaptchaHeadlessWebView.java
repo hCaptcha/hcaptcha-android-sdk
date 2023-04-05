@@ -23,6 +23,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
 
     private boolean webViewLoaded;
     private boolean shouldExecuteOnLoad;
+    private boolean shouldResetOnLoad;
 
     HCaptchaHeadlessWebView(@NonNull final FragmentActivity activity,
                             @NonNull final HCaptchaConfig config,
@@ -70,7 +71,10 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     @Override
     public void onLoaded() {
         webViewLoaded = true;
-        if (shouldExecuteOnLoad) {
+        if (shouldResetOnLoad) {
+            shouldResetOnLoad = false;
+            reset();
+        } else if (shouldExecuteOnLoad) {
             shouldExecuteOnLoad = false;
             webViewHelper.resetAndExecute();
         }
@@ -79,5 +83,18 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     @Override
     public void onOpen() {
         listener.onOpen();
+    }
+
+    @Override
+    public void reset() {
+        if (webViewLoaded) {
+            webViewHelper.reset();
+            final WebView webView = webViewHelper.getWebView();
+            if (webView.getParent() != null) {
+                ((ViewGroup) webView.getParent()).removeView(webView);
+            }
+        } else {
+            shouldResetOnLoad = true;
+        }
     }
 }
