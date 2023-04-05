@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.7.0
+
+- Feat: new `HCaptchaConfig.orientation` to set either `portrait` or `landscape` challenge orientation.
+
 # 3.6.0
 
 - Feat: new `HCaptcha.removeAllListener` and `HCaptcha.removeOn[Success|Failure|Open]Listener(listener)` to remove all or specific listener.

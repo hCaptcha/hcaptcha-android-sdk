@@ -22,11 +22,12 @@ public class HCaptchaConfigTest {
     }
 
     @Test
-    public void default_confis() {
+    public void default_config() {
         final HCaptchaConfig config = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).build();
         assertEquals(MOCK_SITE_KEY, config.getSiteKey());
         assertEquals(true, config.getSentry());
         assertEquals(HCaptchaSize.INVISIBLE, config.getSize());
+        assertEquals(HCaptchaOrientation.PORTRAIT, config.getOrientation());
         assertEquals(HCaptchaTheme.LIGHT, config.getTheme());
         assertEquals(Locale.getDefault().getLanguage(), config.getLocale());
         assertEquals("https://js.hcaptcha.com/1/api.js", config.getJsSrc());
@@ -36,6 +37,7 @@ public class HCaptchaConfigTest {
 
     @Test
     public void custom_config() {
+        final HCaptchaOrientation hCaptchaOrientation = HCaptchaOrientation.LANDSCAPE;
         final HCaptchaSize hCaptchaSize = HCaptchaSize.COMPACT;
         final HCaptchaTheme hCaptchaTheme = HCaptchaTheme.DARK;
         final String customRqdata = "custom rqdata value";
@@ -55,11 +57,13 @@ public class HCaptchaConfigTest {
                 .sentry(sentry)
                 .theme(hCaptchaTheme)
                 .size(hCaptchaSize)
+                .orientation(hCaptchaOrientation)
                 .customTheme(customTheme)
                 .build();
         assertEquals(MOCK_SITE_KEY, config.getSiteKey());
         assertEquals(sentry, config.getSentry());
         assertEquals(hCaptchaSize, config.getSize());
+        assertEquals(hCaptchaOrientation, config.getOrientation());
         assertEquals(hCaptchaTheme, config.getTheme());
         assertEquals(customLocale, config.getLocale());
         assertEquals(customRqdata, config.getRqdata());
