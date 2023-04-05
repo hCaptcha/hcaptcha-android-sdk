@@ -1,6 +1,5 @@
 package com.hcaptcha.sdk;
 
-import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -26,23 +25,23 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @NonNull
     private final HCaptchaInternalConfig internalConfig;
 
-    private HCaptcha(@NonNull final Context context, @NonNull final HCaptchaInternalConfig internalConfig) {
-        this.activity = (FragmentActivity) context;
+    private HCaptcha(@NonNull final FragmentActivity activity, @NonNull final HCaptchaInternalConfig internalConfig) {
+        this.activity = activity;
         this.internalConfig = internalConfig;
     }
 
     /**
      * Constructs a new client which allows to display a challenge dialog
      *
-     * @param context The current context
+     * @param activity The current activity
      * @return new {@link HCaptcha} object
      */
-    public static HCaptcha getClient(@NonNull final Context context) {
-        return new HCaptcha(context, HCaptchaInternalConfig.builder().build());
+    public static HCaptcha getClient(@NonNull final FragmentActivity activity) {
+        return getClient(activity, HCaptchaInternalConfig.builder().build());
     }
 
-    static HCaptcha getClient(@NonNull final Context context, @NonNull HCaptchaInternalConfig internalConfig) {
-        return new HCaptcha(context, internalConfig);
+    static HCaptcha getClient(@NonNull final FragmentActivity activity, @NonNull HCaptchaInternalConfig internalConfig) {
+        return new HCaptcha(activity, internalConfig);
     }
 
     @Override
