@@ -2,7 +2,7 @@
 
 # 3.8.1
 
-- Bugfix: handle Failed to load WebView provider: No WebView installed (fix improved since 3.3.7)
+- Bugfix: report error when missing WebView provider
 
 # 3.8.0
 
