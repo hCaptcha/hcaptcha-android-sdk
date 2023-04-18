@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.8.1
+
+- Bugfix: report error when missing WebView provider
+
 # 3.8.0
 
 - Feat: new `HCaptcha.reset` to force stop verification and release all resources.
