@@ -25,7 +25,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.os.Bundle;
-import android.util.AndroidRuntimeException;
+import android.view.InflateException;
 import android.view.LayoutInflater;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
@@ -187,7 +187,7 @@ public class HCaptchaDialogFragmentTest {
     public void webViewNotInstalled() throws InterruptedException {
         final LayoutInflater inflater = mock(LayoutInflater.class);
         when(inflater.inflate(eq(R.layout.hcaptcha_fragment), any(), eq(false)))
-                .thenThrow(AndroidRuntimeException.class);
+                .thenThrow(InflateException.class);
 
         final CountDownLatch latch = new CountDownLatch(1);
 

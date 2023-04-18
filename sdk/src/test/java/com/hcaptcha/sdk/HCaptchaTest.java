@@ -7,15 +7,18 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.withSettings;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.AndroidRuntimeException;
 import androidx.fragment.app.FragmentActivity;
 
 import com.hcaptcha.sdk.tasks.OnFailureListener;
@@ -28,6 +31,7 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
+import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -247,5 +251,31 @@ public class HCaptchaTest {
                 .addOnFailureListener(onFailureListener)
                 .addOnOpenListener(onOpenListener)
                 .removeAllListeners();
+    }
+
+    @Test
+    public void test_webview_not_installed() throws Exception {
+        final ApplicationInfo applicationInfo = mock(ApplicationInfo.class);
+        final Bundle bundle = mock(Bundle.class);
+        when(bundle.getString(META_SITE_KEY)).thenReturn(HCaptchaConfigTest.MOCK_SITE_KEY);
+        bundle.putString(META_SITE_KEY, HCaptchaConfigTest.MOCK_SITE_KEY);
+        applicationInfo.metaData = bundle;
+
+        when(fragmentActivity.getPackageName()).thenReturn(TEST_PACKAGE_NAME);
+        when(fragmentActivity.getPackageManager()).thenReturn(packageManager);
+        when(packageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
+                .thenReturn(applicationInfo);
+
+        try (MockedConstruction<HCaptchaWebView> mock = mockConstruction(HCaptchaWebView.class,
+                withSettings().defaultAnswer(invocation -> {
+                    throw new AndroidRuntimeException(
+                            "android.webkit.WebViewFactory$MissingWebViewPackageException");
+                })
+        )) {
+            HCaptcha.getClient(fragmentActivity)
+                    .setup(config.toBuilder().hideDialog(true).build())
+                    .verifyWithHCaptcha()
+                    .addOnFailureListener(e -> assertEquals(HCaptchaError.ERROR, e.getHCaptchaError()));
+        }
     }
 }

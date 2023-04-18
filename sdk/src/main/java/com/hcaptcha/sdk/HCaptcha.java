@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.AndroidRuntimeException;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
@@ -91,16 +92,20 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                 setException(exception);
             }
         };
-        if (inputConfig.getHideDialog()) {
-            // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
-            this.config = inputConfig.toBuilder()
-                    .size(HCaptchaSize.INVISIBLE)
-                    .loading(false)
-                    .build();
-            captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
-        } else {
-            captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
-            this.config = inputConfig;
+        try {
+            if (inputConfig.getHideDialog()) {
+                // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
+                this.config = inputConfig.toBuilder()
+                        .size(HCaptchaSize.INVISIBLE)
+                        .loading(false)
+                        .build();
+                captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
+            } else {
+                captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
+                this.config = inputConfig;
+            }
+        } catch (AndroidRuntimeException e) {
+            listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
         }
         return this;
     }
@@ -148,8 +153,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     private HCaptcha startVerification() {
         HCaptchaLog.d("HCaptcha.startVerification");
         handler.removeCallbacksAndMessages(null);
-        assert captchaVerifier != null;
-        captchaVerifier.startVerification(activity);
+        if (captchaVerifier == null) {
+            setException(new HCaptchaException(HCaptchaError.ERROR));
+        } else {
+            captchaVerifier.startVerification(activity);
+        }
         return this;
     }
 }
