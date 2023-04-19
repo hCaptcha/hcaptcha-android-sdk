@@ -37,7 +37,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
      * @return new {@link HCaptcha} object
      */
     public static HCaptcha getClient(@NonNull final FragmentActivity activity) {
-        return getClient(activity, HCaptchaInternalConfig.builder().build());
+        return new HCaptcha(activity, HCaptchaInternalConfig.builder().build());
     }
 
     static HCaptcha getClient(@NonNull final FragmentActivity activity,
