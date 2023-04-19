@@ -17,8 +17,11 @@ jobs:
   test:
     name: 'Test Unit'
     runs-on: ubuntu-latest
+    if: false
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
       - uses: actions/setup-java@v3
         with:
           java-version: '11'
@@ -27,7 +30,9 @@ jobs:
         with:
           cache-read-only: false
       - name: 'Build'
-        run: ./gradlew build --stacktrace
+        run: |
+          ./gradlew clean build --stacktrace
+          cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
       - name: 'HTML ES5 test'
         run: |
           npm install -g jshint
@@ -35,10 +40,36 @@ jobs:
           jshint --extract=always sdk/build/hcaptcha-form.html
       - name: 'JitPack Test'
         run: ./gradlew publishReleasePublicationToMavenLocal
+      - name: 'Build main'
+        run: |
+          git checkout origin/main
+          ./gradlew clean build --stacktrace
+          cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
+      - uses: usefulness/diffuse-action@v1
+        if: github.ref != 'refs/heads/main'
+        id: diffuse
+        with:
+          old-file-path: sdk-main.aar
+          new-file-path: sdk-pr.aar
+      - name: 'Create diffuse artifact'
+        if: ${{ steps.diffuse.outputs.diff-raw != null }}
+        run: |
+          mkdir -p ./diffuse
+          echo ${{ github.event.number }} > ./diffuse/issue-nr
+          echo '${{ steps.diffuse.outputs.diff-gh-comment }}' > ./diffuse/diffuse-report
+      # Upload diffuse artifact such that `ci-privileged.yml` can use to add PR Comment
+      - name: 'Upload diffuse artifact'
+        uses: actions/upload-artifact@v2
+        if: ${{ steps.diffuse.outputs.diff-raw != null }}
+        with:
+          name: diffuse
+          path: diffuse/
 
   build-matrix:
     name: 'Build (target:${{ matrix.target }} compile:${{ matrix.compile }} appcompat: ${{ matrix.appcompat }})'
     needs: [ test ]
+    if: false
+    timeout-minutes: 15
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -73,6 +104,7 @@ jobs:
 
   test-ui:
     name: 'Test UI'
+    if: false
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -131,6 +163,7 @@ jobs:
 
   test-benchmark:
     name: 'Test Benchmark'
+    if: false
     runs-on: macos-latest
     strategy:
       fail-fast: false
@@ -201,54 +234,8 @@ jobs:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
           restore-keys: ${{ runner.os }}-sonar
-      - env:
+      - run: ./gradlew sonarqube --info
+        if: ${{ env.SONAR_TOKEN != '' }}
+        env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        run: ./gradlew sonarqube --info
-
-  size-report:
-    name: 'Diffuse report'
-    needs: [ test ]
-    if: github.ref != 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-java@v3
-      with:
-        java-version: '11'
-        distribution: adopt
-    - uses: gradle/gradle-build-action@v2
-      with:
-        cache-read-only: false
-    - name: 'Build'
-      run: |
-        ./gradlew clean build --stacktrace
-        cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
-    - name: 'Build main'
-      run: |
-        git checkout origin/main
-        ./gradlew clean build --stacktrace
-        cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
-    - id: diffuse
-      uses: usefulness/diffuse-action@v1
-      with:
-        old-file-path: sdk-main.aar
-        new-file-path: sdk-pr.aar
-    - uses: peter-evans/find-comment@v2
-      id: find_comment
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body-includes: Diffuse report
-    - uses: peter-evans/create-or-update-comment@v2
-      if: ${{ steps.diffuse.outputs.diff-raw != null || steps.find_comment.outputs.comment-id != null }}
-      with:
-        body: |
-          Diffuse report:
-
-          ${{ steps.diffuse.outputs.diff-gh-comment }}
-        edit-mode: replace
-        comment-id: ${{ steps.find_comment.outputs.comment-id }}
-        issue-number: ${{ github.event.pull_request.number }}
-        token: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,105 @@
+# IMPORTANT
+# This pipeline has access to secrets since the trigger is "workflow_run".
+# It is required for it to operate only on artifacts and never build or execute source code.
+# The sole purpose of it is to comment with diffuse reports on PRs.
+# See more about security concerns here: https://securitylab.github.com/research/github-actions-preventing-pwn-requests/
+
+name: 'ci-privileged'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+#  workflow_run:
+#    workflows: [ ci ]
+#    types:
+#      - completed
+
+jobs:
+  comment-on-pr:
+    name: 'Comment on PR'
+#    if: ${{ github.ref != 'refs/heads/main' && github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-java@v3
+        with:
+          java-version: '11'
+          distribution: adopt
+      - uses: gradle/gradle-build-action@v2
+        with:
+          cache-read-only: false
+      - name: 'Build'
+        run: |
+          ./gradlew clean build --stacktrace
+          cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
+      - name: 'Build main'
+        run: |
+          git checkout origin/main
+          ./gradlew clean build --stacktrace
+          cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
+      - uses: usefulness/diffuse-action@v1
+        if: github.ref != 'refs/heads/main'
+        id: diffuse
+        with:
+          old-file-path: sdk-main.aar
+          new-file-path: sdk-pr.aar
+      - name: 'Create diffuse artifact'
+        if: ${{ steps.diffuse.outputs.diff-raw != null }}
+        run: |
+          mkdir -p ./diffuse
+          echo ${{ github.event.number }} > ./diffuse/issue-nr
+          echo '${{ steps.diffuse.outputs.diff-gh-comment }}' > ./diffuse/diffuse-report
+      # Upload diffuse artifact such that `ci-privileged.yml` can use to add PR Comment
+      - name: 'Upload diffuse artifact'
+        uses: actions/upload-artifact@v3
+        if: ${{ steps.diffuse.outputs.diff-raw != null }}
+        with:
+          name: diffuse
+          path: diffuse/
+      - name: 'Download artifact'
+        if: false
+        uses: actions/github-script@v6
+        with:
+          script: |
+            var artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: '${{github.event.workflow_run.id }}'
+            });
+            var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "diffuse"
+            })[0];
+            var download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip'
+            });
+            var fs = require('fs');
+            fs.writeFileSync('${{github.workspace}}/diffuse.zip', Buffer.from(download.data));
+      - run: unzip diffuse.zip
+        if: false
+      - name: 'Comment on PR'
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            var fs = require('fs');
+            var issueNr = Number(fs.readFileSync('./diffuse/issue-nr'));
+            var diffuseReport = fs.readFileSync('./diffuse/diffuse-report');
+            await github.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNr,
+              body: `
+                Diffuse report:
+                
+                ${diffuseReport}`
+            });
