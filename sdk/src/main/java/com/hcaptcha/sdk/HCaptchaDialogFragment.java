@@ -2,6 +2,7 @@ package com.hcaptcha.sdk;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.app.Activity;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
@@ -16,7 +17,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.webkit.WebView;
 import android.widget.LinearLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -59,6 +59,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     private float defaultDimAmount = 0.6f;
 
+    private boolean loaded = false;
+
     /**
      * Creates a new instance
      *
@@ -88,10 +90,11 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@Nullable LayoutInflater inflater,
+                             @Nullable final ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
         HCaptchaLog.d("DialogFragment.onCreateView");
         HCaptchaStateListener listener = null;
-        View rootView = null;
         try {
             final Bundle args = getArguments();
             assert args != null;
@@ -103,23 +106,20 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                     KEY_INTERNAL_CONFIG, HCaptchaInternalConfig.class);
             assert internalConfig != null;
 
-            rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
-            rootView.setFocusableInTouchMode(true);
-            rootView.requestFocus();
-            rootView.setOnKeyListener((view, keyCode, event) -> {
-                if (event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                    return webViewHelper != null && webViewHelper.shouldRetry(
-                            new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
-                }
-                return false;
-            });
+            if (inflater == null) {
+                throw new InflateException("inflater == null");
+            }
+            final View rootView = prepareRootView(inflater, container, config);
             HCaptchaLog.d("DialogFragment.onCreateView inflated");
 
-            final WebView webView = rootView.findViewById(R.id.webView);
+            final HCaptchaWebView webView = prepareWebView(rootView, config);
+
             loadingContainer = rootView.findViewById(R.id.loadingContainer);
-            loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
+            loadingContainer.setVisibility(Boolean.TRUE.equals(config.getLoading()) ? View.VISIBLE : View.GONE);
+
             webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
                     requireContext(), config, internalConfig, this, listener, webView);
+            return rootView;
         } catch (InflateException | ClassCastException e) {
             HCaptchaLog.w("Cannot create view. Dismissing dialog...");
             // Happens when fragment tries to reconstruct because the activity was killed
@@ -129,7 +129,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
             }
         }
-        return rootView;
+        return null;
     }
 
     @Override
@@ -150,7 +150,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             final Window window = dialog.getWindow();
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             defaultDimAmount = window.getAttributes().dimAmount;
-            if (!webViewHelper.getConfig().getLoading()) {
+            if (Boolean.FALSE.equals(webViewHelper.getConfig().getLoading())) {
                 // Remove dialog shadow to appear completely invisible
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                 window.setDimAmount(0);
@@ -167,7 +167,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     private void hideLoadingContainer() {
-        if (webViewHelper.getConfig().getLoading()) {
+        if (webViewHelper != null && Boolean.TRUE.equals(webViewHelper.getConfig().getLoading())) {
             loadingContainer.animate().alpha(0.0f).setDuration(200).setListener(
                     new AnimatorListenerAdapter() {
                         @Override
@@ -192,6 +192,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
             hideLoadingContainer();
         }
+
+        loaded = true;
     }
 
     @Override
@@ -258,5 +260,42 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (isAdded()) {
             dismissAllowingStateLoss();
         }
+    }
+
+    private View prepareRootView(@NonNull LayoutInflater inflater,
+                                 @Nullable ViewGroup container,
+                                 @NonNull HCaptchaConfig config) {
+        final View rootView = inflater.inflate(R.layout.hcaptcha_fragment, container, false);
+        rootView.setFocusableInTouchMode(true);
+        rootView.requestFocus();
+        rootView.setOnKeyListener((view, keyCode, event) -> {
+            if (!loaded && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
+                if (Boolean.TRUE.equals(config.getLoading())) {
+                    return false;
+                }
+                return webViewHelper != null && webViewHelper.shouldRetry(
+                        new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
+            }
+            return false;
+        });
+
+        return rootView;
+    }
+
+    private HCaptchaWebView prepareWebView(@NonNull View rootView, @NonNull HCaptchaConfig config) {
+        final HCaptchaWebView webView = rootView.findViewById(R.id.webView);
+        if (Boolean.FALSE.equals(config.getLoading())) {
+            webView.setOnTouchListener((view, event) -> {
+                if (!loaded && isAdded()) {
+                    final Activity activity = getActivity();
+                    if (activity != null) {
+                        activity.dispatchTouchEvent(event);
+                        return true;
+                    }
+                }
+                return view.performClick();
+            });
+        }
+        return webView;
     }
 }

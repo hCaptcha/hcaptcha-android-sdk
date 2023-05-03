@@ -108,6 +108,11 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void onHitTest(final View v) {
+        Toast.makeText(this, "Hit Test!", Toast.LENGTH_SHORT).show();
+        Log.d(TAG, "onHitTest");
+    }
+
     private void setupClient(final HCaptcha hCaptcha) {
         hCaptcha
             .addOnSuccessListener(response -> {
