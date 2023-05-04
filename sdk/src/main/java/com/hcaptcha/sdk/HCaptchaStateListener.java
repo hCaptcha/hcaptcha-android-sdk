@@ -1,23 +1,12 @@
 package com.hcaptcha.sdk;
 
-import android.os.Parcel;
-import android.os.Parcelable;
+import java.io.Serializable;
 
-abstract class HCaptchaStateListener implements Parcelable {
+abstract class HCaptchaStateListener implements Serializable {
 
     abstract void onSuccess(String token);
 
     abstract void onFailure(HCaptchaException exception);
 
     abstract void onOpen();
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        // nothing to persist
-    }
 }

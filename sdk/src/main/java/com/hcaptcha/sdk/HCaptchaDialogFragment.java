@@ -75,7 +75,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
         args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
-        args.putParcelable(KEY_LISTENER, listener);
+        args.putSerializable(KEY_LISTENER, listener);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
         return hCaptchaDialogFragment;
@@ -95,7 +95,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         try {
             final Bundle args = getArguments();
             assert args != null;
-            listener = HCaptchaCompat.getParcelable(args, KEY_LISTENER, HCaptchaStateListener.class);
+            listener = HCaptchaCompat.getSerializable(args, KEY_LISTENER, HCaptchaStateListener.class);
             assert listener != null;
             final HCaptchaConfig config = HCaptchaCompat.getSerializable(args, KEY_CONFIG, HCaptchaConfig.class);
             assert config != null;

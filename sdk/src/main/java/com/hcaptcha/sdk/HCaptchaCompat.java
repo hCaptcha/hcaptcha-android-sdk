@@ -5,7 +5,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -24,15 +23,6 @@ final class HCaptchaCompat {
             return bundle.getSerializable(key, clazz);
         } else {
             return (T) bundle.getSerializable(key);
-        }
-    }
-
-    @SuppressWarnings({ "unchecked", "deprecation" })
-    static <T extends Parcelable> T getParcelable(Bundle bundle, @Nullable String key, Class<T> clazz) {
-        if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            return bundle.getParcelable(key, clazz);
-        } else {
-            return (T) bundle.getParcelable(key);
         }
     }
 
