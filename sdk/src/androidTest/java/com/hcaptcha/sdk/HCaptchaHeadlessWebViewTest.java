@@ -43,17 +43,17 @@ public class HCaptchaHeadlessWebViewTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onOpen() {
+            public void onOpen() {
                 fail("Should never be called for HCaptchaHeadlessWebView");
             }
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 latch.countDown();
             }
 
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 failAsNonReachable();
             }
         };
@@ -74,12 +74,12 @@ public class HCaptchaHeadlessWebViewTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 failAsNonReachable();
             }
 
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 latch.countDown();
             }
         };
@@ -101,12 +101,12 @@ public class HCaptchaHeadlessWebViewTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 successLatch.countDown();
             }
 
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 failAsNonReachable();
             }
         };
@@ -137,12 +137,12 @@ public class HCaptchaHeadlessWebViewTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 failAsNonReachable();
             }
 
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 failureLatch.countDown();
             }
         };

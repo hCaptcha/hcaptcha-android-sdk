@@ -75,19 +75,19 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
-            void onOpen() {
+            public void onOpen() {
                 captchaOpened();
             }
 
             @Override
-            void onSuccess(final String token) {
+            public void onSuccess(final String token) {
                 HCaptchaLog.d("HCaptcha.onSuccess");
                 scheduleCaptchaExpired(HCaptcha.this.config.getTokenExpiration());
                 setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));
             }
 
             @Override
-            void onFailure(final HCaptchaException exception) {
+            public void onFailure(final HCaptchaException exception) {
                 HCaptchaLog.d("HCaptcha.onFailure");
                 setException(exception);
             }

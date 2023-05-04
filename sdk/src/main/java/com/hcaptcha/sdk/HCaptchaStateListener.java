@@ -2,11 +2,11 @@ package com.hcaptcha.sdk;
 
 import java.io.Serializable;
 
-abstract class HCaptchaStateListener implements Serializable {
+interface HCaptchaStateListener extends Serializable {
 
-    abstract void onSuccess(String token);
+    void onSuccess(String token);
 
-    abstract void onFailure(HCaptchaException exception);
+    void onFailure(HCaptchaException exception);
 
-    abstract void onOpen();
+    void onOpen();
 }

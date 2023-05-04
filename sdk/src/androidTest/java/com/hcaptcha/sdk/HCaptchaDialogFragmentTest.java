@@ -123,7 +123,7 @@ public class HCaptchaDialogFragmentTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 assertEquals(TEST_TOKEN, token);
                 latch.countDown();
             }
@@ -138,7 +138,7 @@ public class HCaptchaDialogFragmentTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 assertEquals(HCaptchaError.CHALLENGE_ERROR, exception.getHCaptchaError());
                 latch.countDown();
             }
@@ -154,7 +154,7 @@ public class HCaptchaDialogFragmentTest {
         final CountDownLatch latch = new CountDownLatch(1);
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
             @Override
-            void onOpen() {
+            public void onOpen() {
                 latch.countDown();
             }
         };
@@ -172,7 +172,7 @@ public class HCaptchaDialogFragmentTest {
         bundle.putSerializable(KEY_INTERNAL_CONFIG, "invalid config class");
         bundle.putSerializable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
                 latch.countDown();
             }
@@ -196,7 +196,7 @@ public class HCaptchaDialogFragmentTest {
         bundle.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
         bundle.putSerializable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
                 latch.countDown();
             }
@@ -219,12 +219,12 @@ public class HCaptchaDialogFragmentTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 successLatch.countDown();
             }
 
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 failAsNonReachable();
             }
         };
@@ -250,12 +250,12 @@ public class HCaptchaDialogFragmentTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 failAsNonReachable();
             }
 
             @Override
-            void onFailure(HCaptchaException exception) {
+            public void onFailure(HCaptchaException exception) {
                 failureLatch.countDown();
             }
         };
@@ -280,7 +280,7 @@ public class HCaptchaDialogFragmentTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 successLatch.countDown();
             }
         };
@@ -299,7 +299,7 @@ public class HCaptchaDialogFragmentTest {
         final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
 
             @Override
-            void onSuccess(String token) {
+            public void onSuccess(String token) {
                 successLatch.countDown();
             }
         };

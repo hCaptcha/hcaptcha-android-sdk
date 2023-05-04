@@ -1,18 +1,18 @@
 package com.hcaptcha.sdk;
 
-public class HCaptchaStateTestAdapter extends HCaptchaStateListener {
+public class HCaptchaStateTestAdapter implements HCaptchaStateListener {
     @Override
-    void onOpen() {
+    public void onOpen() {
         // empty default implementation to reduce amount of boilerplate code in tests
     }
 
     @Override
-    void onSuccess(String response) {
+    public void onSuccess(String response) {
         // empty default implementation to reduce amount of boilerplate code in tests
     }
 
     @Override
-    void onFailure(HCaptchaException exception) {
+    public void onFailure(HCaptchaException exception) {
         // empty default implementation to reduce amount of boilerplate code in tests
     }
 }
