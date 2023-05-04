@@ -269,7 +269,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         rootView.setFocusableInTouchMode(true);
         rootView.requestFocus();
         rootView.setOnKeyListener((view, keyCode, event) -> {
-            boolean backDown = event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK;
+            final boolean backDown = event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK;
             if ((loaded || Boolean.TRUE.equals(config.getLoading())) && backDown) {
                 return webViewHelper != null && webViewHelper.shouldRetry(
                         new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
