@@ -81,7 +81,7 @@ public class HCaptchaDialogFragmentTest {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, captchaConfig);
         args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
-        args.putParcelable(KEY_LISTENER, listener);
+        args.putSerializable(KEY_LISTENER, listener);
         return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class,
                 args, R.style.HCaptchaDialogTheme, initialState);
     }
@@ -170,7 +170,7 @@ public class HCaptchaDialogFragmentTest {
         final Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_CONFIG, config);
         bundle.putSerializable(KEY_INTERNAL_CONFIG, "invalid config class");
-        bundle.putParcelable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
+        bundle.putSerializable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException exception) {
                 assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
@@ -194,7 +194,7 @@ public class HCaptchaDialogFragmentTest {
         final Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_CONFIG, config);
         bundle.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
-        bundle.putParcelable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
+        bundle.putSerializable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException exception) {
                 assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
