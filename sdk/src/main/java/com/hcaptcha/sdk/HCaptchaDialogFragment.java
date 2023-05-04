@@ -107,7 +107,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             assert internalConfig != null;
 
             if (inflater == null) {
-                throw new InflateException("inflater == null");
+                throw new InflateException("inflater is null");
             }
             final View rootView = prepareRootView(inflater, container, config);
             HCaptchaLog.d("DialogFragment.onCreateView inflated");
@@ -269,10 +269,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         rootView.setFocusableInTouchMode(true);
         rootView.requestFocus();
         rootView.setOnKeyListener((view, keyCode, event) -> {
-            if (!loaded && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK) {
-                if (Boolean.TRUE.equals(config.getLoading())) {
-                    return false;
-                }
+            if (loaded && event.getAction() == KeyEvent.ACTION_DOWN && keyCode == KeyEvent.KEYCODE_BACK && Boolean.FALSE.equals(config.getLoading())) {
                 return webViewHelper != null && webViewHelper.shouldRetry(
                         new HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
             }
