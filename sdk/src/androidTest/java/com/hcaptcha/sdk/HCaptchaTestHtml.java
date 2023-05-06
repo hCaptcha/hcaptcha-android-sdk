@@ -4,6 +4,16 @@ import androidx.annotation.NonNull;
 
 class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
 
+    private final boolean callBridgeOnLoaded;
+
+    HCaptchaTestHtml() {
+        this(true);
+    }
+
+    HCaptchaTestHtml(boolean callBridgeOnLoaded) {
+        this.callBridgeOnLoaded = callBridgeOnLoaded;
+    }
+
     @Override
     @NonNull
     public String getHtml() {
@@ -41,7 +51,7 @@ class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
                 + "            const errorCode = arg || parseInt(document.getElementById(\"input-text\").value);\n"
                 + "            BridgeObject.onError(errorCode);\n"
                 + "        }\n"
-                + "        onHcaptchaLoaded();\n"
+                + (callBridgeOnLoaded ? "onHcaptchaLoaded();\n" : "")
                 + "    </script>\n"
                 + "</body>\n"
                 + "</html>\n";
