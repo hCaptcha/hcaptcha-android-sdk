@@ -6,7 +6,9 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.AndroidRuntimeException;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
+import androidx.fragment.app.FragmentManager;
 
 import com.hcaptcha.sdk.tasks.Task;
 import lombok.NonNull;
@@ -101,7 +103,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                         .build();
                 captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
             } else {
-                captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
+                captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig);
+                activity.getSupportFragmentManager().registerFragmentLifecycleCallbacks(
+                        new FragmentStateListenerSetter(listener), false);
                 this.config = inputConfig;
             }
         } catch (AndroidRuntimeException e) {
@@ -159,5 +163,27 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             captchaVerifier.startVerification(activity);
         }
         return this;
+    }
+
+    /**
+     * This FragmentLifecycleCallbacks responsible to set, reset {@link HCaptchaStateListener} on fragment recreation
+     */
+    private final class FragmentStateListenerSetter extends FragmentManager.FragmentLifecycleCallbacks {
+        private final HCaptchaStateListener listener;
+
+        FragmentStateListenerSetter(final HCaptchaStateListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public void onFragmentCreated(@androidx.annotation.NonNull FragmentManager fragmentManager,
+                @androidx.annotation.NonNull Fragment fragment,
+                @Nullable Bundle savedInstanceState) {
+            super.onFragmentCreated(fragmentManager, fragment, savedInstanceState);
+            if (fragment == captchaVerifier) {
+                final HCaptchaDialogFragment captchaFragment = (HCaptchaDialogFragment) fragment;
+                captchaFragment.postCreateSetup(listener, this);
+            }
+        }
     }
 }

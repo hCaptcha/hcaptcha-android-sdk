@@ -20,4 +20,15 @@ abstract class HCaptchaStateListener implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         // nothing to persist
     }
+
+    public static final Parcelable.Creator<HCaptchaStateListener> CREATOR
+            = new Parcelable.Creator<HCaptchaStateListener>() {
+                public HCaptchaStateListener createFromParcel(Parcel in) {
+                    return null;
+                }
+
+                public HCaptchaStateListener[] newArray(int size) {
+                    return new HCaptchaStateListener[size];
+                }
+            };
 }

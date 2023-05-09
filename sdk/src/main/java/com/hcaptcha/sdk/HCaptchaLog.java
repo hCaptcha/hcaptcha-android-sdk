@@ -19,6 +19,10 @@ public final class HCaptchaLog {
         Log.w(TAG, message);
     }
 
+    public static void w(String message, Throwable throwable) {
+        Log.w(TAG, message, throwable);
+    }
+
     public static void d(String message) {
         if (sDiagnosticsLogEnabled) {
             Log.d(TAG, message);

@@ -47,11 +47,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      */
     static final String KEY_INTERNAL_CONFIG = "hCaptchaInternalConfig";
 
-    /**
-     * Key for passing listener to the dialog fragment
-     */
-    static final String KEY_LISTENER = "hCaptchaDialogListener";
-
     @Nullable
     private HCaptchaWebViewHelper webViewHelper;
 
@@ -59,23 +54,26 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     private float defaultDimAmount = 0.6f;
 
+    @Nullable
+    private HCaptchaStateListener stateListener;
+
+    @Nullable
+    private FragmentManager.FragmentLifecycleCallbacks lifecycleCallbacks;
+
     /**
      * Creates a new instance
      *
      * @param config   the config
-     * @param listener the listener
      * @return a new instance
      */
     public static HCaptchaDialogFragment newInstance(
             @lombok.NonNull final HCaptchaConfig config,
-            @lombok.NonNull final HCaptchaInternalConfig internalConfig,
-            @lombok.NonNull final HCaptchaStateListener listener
+            @lombok.NonNull final HCaptchaInternalConfig internalConfig
     ) {
         HCaptchaLog.d("DialogFragment.newInstance");
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
         args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
-        args.putParcelable(KEY_LISTENER, listener);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
         return hCaptchaDialogFragment;
@@ -87,16 +85,25 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         setStyle(STYLE_NO_FRAME, R.style.HCaptchaDialogTheme);
     }
 
+    /**
+     * @param listener the state listener {@link HCaptchaStateListener}
+     * @param callbacks the fragment lifecycle callbacks
+     *                  {@link androidx.fragment.app.FragmentManager.FragmentLifecycleCallbacks}
+     */
+    public void postCreateSetup(HCaptchaStateListener listener, FragmentManager.FragmentLifecycleCallbacks callbacks) {
+        stateListener = listener;
+        lifecycleCallbacks = callbacks;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HCaptchaLog.d("DialogFragment.onCreateView");
-        HCaptchaStateListener listener = null;
         View rootView = null;
         try {
+            assert stateListener != null;
+            final HCaptchaStateListener listener = stateListener;
             final Bundle args = getArguments();
             assert args != null;
-            listener = HCaptchaCompat.getParcelable(args, KEY_LISTENER, HCaptchaStateListener.class);
-            assert listener != null;
             final HCaptchaConfig config = HCaptchaCompat.getSerializable(args, KEY_CONFIG, HCaptchaConfig.class);
             assert config != null;
             final HCaptchaInternalConfig internalConfig = HCaptchaCompat.getSerializable(args,
@@ -125,20 +132,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back
             dismiss();
-            if (listener != null) {
-                listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
+            if (stateListener != null) {
+                stateListener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
+            } else {
+                HCaptchaLog.w("hCaptcha SDK failed to report error: ");
             }
         }
         return rootView;
-    }
-
-    @Override
-    public void onDestroy() {
-        HCaptchaLog.d("DialogFragment.onDestroy");
-        super.onDestroy();
-        if (webViewHelper != null) {
-            webViewHelper.destroy();
-        }
     }
 
     @Override
@@ -185,6 +185,29 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         }
     }
 
+    private void triggerFailureListener(@NonNull HCaptchaException exception) {
+        if (webViewHelper != null) {
+            webViewHelper.getListener().onFailure(exception);
+        }
+        unregisterFragmentLifecycleCallbacks();
+    }
+
+    private void unregisterFragmentLifecycleCallbacks() {
+        if (lifecycleCallbacks != null) {
+            final FragmentManager.FragmentLifecycleCallbacks callbacks = lifecycleCallbacks;
+            getParentFragmentManager().unregisterFragmentLifecycleCallbacks(callbacks);
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        HCaptchaLog.d("DialogFragment.onDestroy");
+        super.onDestroy();
+        if (webViewHelper != null) {
+            webViewHelper.destroy();
+        }
+    }
+
     @Override
     public void onLoaded() {
         assert webViewHelper != null;
@@ -215,7 +238,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             if (silentRetry) {
                 webViewHelper.resetAndExecute();
             } else {
-                webViewHelper.getListener().onFailure(exception);
+                triggerFailureListener(exception);
             }
         }
     }
@@ -227,6 +250,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             dismissAllowingStateLoss();
         }
         webViewHelper.getListener().onSuccess(token);
+        unregisterFragmentLifecycleCallbacks();
     }
 
     @Override
@@ -244,9 +268,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             HCaptchaLog.w("DialogFragment.startVerification " + e.getMessage());
             // https://stackoverflow.com/q/14262312/902217
             // Happens if Fragment is stopped i.e. activity is about to destroy on show call
-            if (webViewHelper != null) {
-                webViewHelper.getListener().onFailure(new HCaptchaException(HCaptchaError.ERROR));
-            }
+            triggerFailureListener(new HCaptchaException(HCaptchaError.ERROR));
         }
     }
 
