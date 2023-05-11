@@ -93,7 +93,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
         };
         try {
-            if (inputConfig.getHideDialog()) {
+            if (Boolean.TRUE.equals(inputConfig.getHideDialog())) {
                 // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
                 this.config = inputConfig.toBuilder()
                         .size(HCaptchaSize.INVISIBLE)

@@ -47,17 +47,15 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      */
     static final String KEY_INTERNAL_CONFIG = "hCaptchaInternalConfig";
 
-    /**
-     * Key for passing listener to the dialog fragment
-     */
-    static final String KEY_LISTENER = "hCaptchaDialogListener";
-
     @Nullable
     private HCaptchaWebViewHelper webViewHelper;
 
     private LinearLayout loadingContainer;
 
     private float defaultDimAmount = 0.6f;
+
+    @Nullable
+    private HCaptchaStateListener stateListener;
 
     /**
      * Creates a new instance
@@ -67,18 +65,22 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      * @return a new instance
      */
     public static HCaptchaDialogFragment newInstance(
-            @lombok.NonNull final HCaptchaConfig config,
-            @lombok.NonNull final HCaptchaInternalConfig internalConfig,
-            @lombok.NonNull final HCaptchaStateListener listener
+            @NonNull final HCaptchaConfig config,
+            @NonNull final HCaptchaInternalConfig internalConfig,
+            @NonNull final HCaptchaStateListener listener
     ) {
         HCaptchaLog.d("DialogFragment.newInstance");
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, config);
         args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
-        args.putParcelable(KEY_LISTENER, listener);
         final HCaptchaDialogFragment hCaptchaDialogFragment = new HCaptchaDialogFragment();
         hCaptchaDialogFragment.setArguments(args);
+        hCaptchaDialogFragment.stateListener = listener;
         return hCaptchaDialogFragment;
+    }
+
+    public void setStateListener(@Nullable HCaptchaStateListener stateListener) {
+        this.stateListener = stateListener;
     }
 
     @Override
@@ -90,13 +92,16 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         HCaptchaLog.d("DialogFragment.onCreateView");
-        HCaptchaStateListener listener = null;
+        if (stateListener == null) {
+            dismissAllowingStateLoss();
+            return null;
+        }
+        final @NonNull HCaptchaStateListener listener = stateListener;
+
         View rootView = null;
         try {
             final Bundle args = getArguments();
             assert args != null;
-            listener = HCaptchaCompat.getParcelable(args, KEY_LISTENER, HCaptchaStateListener.class);
-            assert listener != null;
             final HCaptchaConfig config = HCaptchaCompat.getSerializable(args, KEY_CONFIG, HCaptchaConfig.class);
             assert config != null;
             final HCaptchaInternalConfig internalConfig = HCaptchaCompat.getSerializable(args,
@@ -122,12 +127,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                     requireContext(), config, internalConfig, this, listener, webView);
         } catch (InflateException | ClassCastException e) {
             HCaptchaLog.w("Cannot create view. Dismissing dialog...");
-            // Happens when fragment tries to reconstruct because the activity was killed
-            // And thus there is no way of communicating back
-            dismiss();
-            if (listener != null) {
-                listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
-            }
+            dismissAllowingStateLoss();
+            listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
         }
         return rootView;
     }

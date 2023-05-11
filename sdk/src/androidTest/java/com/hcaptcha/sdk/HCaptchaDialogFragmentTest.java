@@ -15,7 +15,6 @@ import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
 import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_INTERNAL_CONFIG;
-import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -81,9 +80,11 @@ public class HCaptchaDialogFragmentTest {
         final Bundle args = new Bundle();
         args.putSerializable(KEY_CONFIG, captchaConfig);
         args.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
-        args.putParcelable(KEY_LISTENER, listener);
-        return FragmentScenario.launchInContainer(HCaptchaDialogFragment.class,
-                args, R.style.HCaptchaDialogTheme, initialState);
+        final FragmentScenario<HCaptchaDialogFragment> result = FragmentScenario.launchInContainer(
+                HCaptchaDialogFragment.class, args, R.style.HCaptchaDialogTheme, Lifecycle.State.CREATED);
+        result.onFragment(fragment -> fragment.setStateListener(listener));
+        result.moveToState(initialState);
+        return result;
     }
 
     private void waitForWebViewToEmitToken(final CountDownLatch latch)
@@ -170,15 +171,18 @@ public class HCaptchaDialogFragmentTest {
         final Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_CONFIG, config);
         bundle.putSerializable(KEY_INTERNAL_CONFIG, "invalid config class");
-        bundle.putParcelable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
+        final HCaptchaStateTestAdapter listener = new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException exception) {
                 assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
                 latch.countDown();
             }
-        });
+        };
 
-        FragmentScenario.launchInContainer(HCaptchaDialogFragment.class, bundle);
+        final FragmentScenario<HCaptchaDialogFragment> scenario = FragmentScenario.launchInContainer(
+                HCaptchaDialogFragment.class, bundle, R.style.HCaptchaDialogTheme, Lifecycle.State.CREATED);
+        scenario.onFragment(fragment -> fragment.setStateListener(listener));
+        scenario.moveToState(Lifecycle.State.RESUMED);
 
         assertTrue(latch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
@@ -194,17 +198,20 @@ public class HCaptchaDialogFragmentTest {
         final Bundle bundle = new Bundle();
         bundle.putSerializable(KEY_CONFIG, config);
         bundle.putSerializable(KEY_INTERNAL_CONFIG, internalConfig);
-        bundle.putParcelable(KEY_LISTENER, new HCaptchaStateTestAdapter() {
+
+        final HCaptchaStateTestAdapter listener = new HCaptchaStateTestAdapter() {
             @Override
             void onFailure(HCaptchaException exception) {
                 assertEquals(HCaptchaError.ERROR, exception.getHCaptchaError());
                 latch.countDown();
             }
-        });
+        };
 
         try (FragmentScenario<HCaptchaDialogFragment> scenario = FragmentScenario
-                .launchInContainer(HCaptchaDialogFragment.class, bundle)) {
+                .launchInContainer(HCaptchaDialogFragment.class, bundle,
+                        R.style.HCaptchaDialogTheme, Lifecycle.State.CREATED)) {
             scenario.onFragment(fragment -> {
+                fragment.setStateListener(listener);
                 fragment.onCreateView(inflater, null, bundle);
             });
         }
@@ -294,22 +301,11 @@ public class HCaptchaDialogFragmentTest {
     }
 
     @Test
-    public void testActivityRecreate() throws Exception {
-        final CountDownLatch successLatch = new CountDownLatch(1);
-        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
-
-            @Override
-            void onSuccess(String token) {
-                successLatch.countDown();
-            }
-        };
+    public void testActivityRecreate() {
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter();
 
         final FragmentScenario<HCaptchaDialogFragment> scenario = launchCaptchaFragment(config, listener);
         scenario.recreate();
-
-        waitHCaptchaWebViewToken(successLatch, AWAIT_CALLBACK_MS);
-
-        assertTrue(successLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test
