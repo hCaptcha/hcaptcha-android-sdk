@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.8.2
+
+- Bugfix: handle BadParcelableException when hCaptcha fragment needs to be recreated due to app resume
+
 # 3.8.1
 
 - Bugfix: report error when missing WebView provider
