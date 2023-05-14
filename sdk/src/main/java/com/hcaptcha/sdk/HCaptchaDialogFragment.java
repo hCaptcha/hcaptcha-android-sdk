@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.os.BadParcelableException;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -120,7 +121,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
                     requireContext(), config, internalConfig, this, listener, webView);
             return rootView;
-        } catch (InflateException | ClassCastException e) {
+        } catch (BadParcelableException | InflateException | ClassCastException e) {
             HCaptchaLog.w("Cannot create view. Dismissing dialog...");
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back
