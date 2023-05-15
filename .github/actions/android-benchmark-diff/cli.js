@@ -28,6 +28,11 @@ const readBenchmarksFromFile = (filePath) => {
   return new Map(content.benchmarks.map(benchmarkMapper))
 }
 
+const diffNumber = (n) => {
+  const sign = Math.sign(n) === 1 ? '+' : ''
+  return sign + (Number.isInteger(n) ? n : Number(n).toFixed(2))
+}
+
 const report = (referencePath, updatedPath, isMarkdownOutput) => {
   validateInput({ referencePath, updatedPath })
 
@@ -40,8 +45,8 @@ const report = (referencePath, updatedPath, isMarkdownOutput) => {
 
     return [
       k,
-      upd.metrics.timeNs.median - ref.metrics.timeNs.median,
-      upd.metrics.allocationCount.median - ref.metrics.allocationCount.median
+      diffNumber((upd.metrics.timeNs.median - ref.metrics.timeNs.median) / (10 ** 6)),
+      diffNumber(upd.metrics.allocationCount.median - ref.metrics.allocationCount.median)
     ]
   })
 
@@ -50,7 +55,7 @@ const report = (referencePath, updatedPath, isMarkdownOutput) => {
   }
 
   const header = [
-    ["Test name", "Time ns. (median)", "Allocations (median)"],
+    ["Test name", "Time ms. (median)", "Allocations (median)"],
     ["---------", "-----------------", "--------------------"]
   ]
   const markdown = header.concat(diff).map(e => e.join(' | ')).map(e => `| ${e} |`).join('\n');
