@@ -158,6 +158,13 @@ public class HCaptchaConfig implements Serializable {
     private Boolean diagnosticLog = false;
 
     /**
+     * Disable hardware acceleration for WebView
+     */
+    @Builder.Default
+    @NonNull
+    private Boolean disableHardwareAcceleration = true;
+
+    /**
      * @deprecated use {@link #getJsSrc()} getter instead
      */
     @Deprecated
