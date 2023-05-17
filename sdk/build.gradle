@@ -26,7 +26,7 @@ android {
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "3.8.3"
+        versionName "3.9.0"
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 
