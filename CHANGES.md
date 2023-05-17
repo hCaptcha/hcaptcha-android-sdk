@@ -1,8 +1,9 @@
 # Changelog
 
-# 3.8.3
+# 3.9.0
 
-- Feature: add config to control WebView hardware acceleration
+- Feature: add config to control WebView hardware acceleration `HCaptchaConfig.disableHardwareAcceleration`
+- Fix: removed unsafe cast with improved public api
 
 # 3.8.2
 
