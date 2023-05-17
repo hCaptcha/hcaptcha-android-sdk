@@ -1,5 +1,10 @@
 # Changelog
 
+# 3.9.0
+
+- Feature: add config to control WebView hardware acceleration `HCaptchaConfig.disableHardwareAcceleration`
+- Fix: removed unsafe cast with improved public api
+
 # 3.8.2
 
 - Bugfix: handle BadParcelableException when hCaptcha fragment needs to be recreated due to app resume

@@ -24,6 +24,7 @@ public class MainActivity extends AppCompatActivity {
     private Spinner sizeSpinner;
     private CheckBox hideDialog;
     private CheckBox loading;
+    private CheckBox disableHardwareAccel;
     private TextView tokenTextView;
     private TextView errorTextView;
     private HCaptcha hCaptcha;
@@ -39,6 +40,7 @@ public class MainActivity extends AppCompatActivity {
         errorTextView = findViewById(R.id.errorTextView);
         hideDialog = findViewById(R.id.hide_dialog);
         loading = findViewById(R.id.loading);
+        disableHardwareAccel = findViewById(R.id.hwAccel);
         final ArrayAdapter<HCaptchaSize> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
                 Arrays.asList(HCaptchaSize.NORMAL, HCaptchaSize.INVISIBLE, HCaptchaSize.COMPACT));
@@ -63,6 +65,7 @@ public class MainActivity extends AppCompatActivity {
                 .size(size)
                 .loading(loading.isChecked())
                 .hideDialog(hideDialog.isChecked())
+                .disableHardwareAcceleration(disableHardwareAccel.isChecked())
                 .tokenExpiration(10)
                 .diagnosticLog(true)
                 .retryPredicate((config, exception) -> exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT)

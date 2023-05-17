@@ -32,6 +32,7 @@ public class HCaptchaConfigTest {
         assertEquals(Locale.getDefault().getLanguage(), config.getLocale());
         assertEquals("https://js.hcaptcha.com/1/api.js", config.getJsSrc());
         assertEquals(null, config.getCustomTheme());
+        assertEquals(true, config.getDisableHardwareAcceleration());
         assertNull(config.getRqdata());
     }
 
@@ -44,6 +45,7 @@ public class HCaptchaConfigTest {
         final String customEndpoint = "https://local/api.js";
         final String customLocale = "ro";
         final Boolean sentry = false;
+        final Boolean disableHWAccel = false;
         final String customTheme = "{ \"palette\": {"
                 + "\"mode\": \"light\", \"primary\": { \"main\": \"#F16622\" },"
                 + "\"warn\": {  \"main\": \"#F16622\" },"
@@ -59,6 +61,7 @@ public class HCaptchaConfigTest {
                 .size(hCaptchaSize)
                 .orientation(hCaptchaOrientation)
                 .customTheme(customTheme)
+                .disableHardwareAcceleration(disableHWAccel)
                 .build();
         assertEquals(MOCK_SITE_KEY, config.getSiteKey());
         assertEquals(sentry, config.getSentry());
@@ -69,6 +72,7 @@ public class HCaptchaConfigTest {
         assertEquals(customRqdata, config.getRqdata());
         assertEquals(customEndpoint, config.getJsSrc());
         assertEquals(customTheme, config.getCustomTheme());
+        assertEquals(disableHWAccel, config.getDisableHardwareAcceleration());
     }
 
     @Test

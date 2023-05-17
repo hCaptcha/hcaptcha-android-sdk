@@ -85,11 +85,13 @@ final class HCaptchaWebViewHelper {
             webView.setWebChromeClient(new HCaptchaWebChromeClient());
         }
         webView.setBackgroundColor(Color.TRANSPARENT);
-        webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        if (config.getDisableHardwareAcceleration()) {
+            webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+        }
         webView.addJavascriptInterface(jsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
         webView.addJavascriptInterface(debugInfo, HCaptchaDebugInfo.JS_INTERFACE_TAG);
         webView.loadDataWithBaseURL(config.getHost(), htmlProvider.getHtml(), "text/html", "UTF-8", null);
-        HCaptchaLog.d("WebViewHelper.loadData");
+        HCaptchaLog.d("WebViewHelper.loadData. Hardware acceleration enabled: %b", webView.isHardwareAccelerated());
     }
 
     public void destroy() {
