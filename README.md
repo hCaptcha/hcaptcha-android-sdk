@@ -137,8 +137,6 @@ hCaptcha.removeOnSuccessListener(firstListener)
     .verifyWithHCaptcha();
 ```
 
-To release all resources you may call `HCaptcha.reset()`.
-
 ### For Jetpack Compose
 
 ```kotlin
@@ -193,6 +191,14 @@ val intent = Intent(context, HCaptchaActivity::class.java)
                     launcher.launch(intent)
                 }
 ```
+
+### Memory usage (fragment lifecycle)
+
+We cache the fragment instance inside the SDK to speed up the next HCaptcha.verifyWithHCaptcha calls.
+
+Once you are done with verification, you can call `HCaptcha.reset()` to release all allocated resources including the strong reference to `com.hcaptcha.sdk.HCaptchaDialogFragment`.
+
+Note: If you do not call `.reset()` you will likely see a warning from tools like LeakCanary.
 
 ### Good to know
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
