@@ -139,6 +139,61 @@ hCaptcha.removeOnSuccessListener(firstListener)
 
 To release all resources you may call `HCaptcha.reset()`.
 
+### For Jetpack Compose
+
+```kotlin
+import com.hcaptcha.sdk.HCaptcha
+import com.hcaptcha.sdk.HCaptchaException
+import com.hcaptcha.sdk.HCaptchaTokenResponse
+
+class HCaptchaActivity : AppCompatActivity() {
+
+    private val hCaptcha = HCaptcha.getClient(this)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        hCaptcha.setup(BuildConfig.SITE_KEY).verifyWithHCaptcha()
+        hCaptcha.addOnSuccessListener { response: HCaptchaTokenResponse ->
+            val userResponseToken = response.tokenResult
+            val intent = Intent()
+            intent.putExtra("captcha", userResponseToken)
+            setResult(RESULT_OK, intent)
+            finish()
+        }.addOnFailureListener { e: HCaptchaException ->
+            // Error handling here: trigger another verification, display a toast, etc.
+            Log.d("hCaptcha", "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")")
+            setResult(RESULT_CANCELED)
+            finish()
+        }.addOnOpenListener { 
+            // Usefull for analytics purposes
+            Log.d("hCaptcha", "hCaptcha is now visible.")
+        }
+    }
+}
+```
+To fetch token data from activity in @Composable Class: 
+
+```kotlin
+val intent = Intent(context, HCaptchaActivity::class.java)
+                val launcher =
+                    rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+                        val data: Intent? = result.data
+                        when (result.resultCode) {
+                            Activity.RESULT_OK -> {
+                                data?.let {
+                                    captcha.value = data.extras?.getString("captcha")?: ""
+                                }                        
+                            }
+                            Activity.RESULT_CANCELED -> {
+                                Log.d("hCaptcha", "hCaptcha failed")
+                            }
+                        }
+                    }
+                SideEffect {
+                    launcher.launch(intent)
+                }
+```
+
 ### Good to know
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
    1. the same client is used to invoke multiple verifications
