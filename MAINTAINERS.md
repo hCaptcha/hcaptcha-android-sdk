@@ -10,6 +10,19 @@ You can manually test before pushing by running both unit tests and instrumented
 * ```gradlew test```
 * ```gradlew connectedDebugAndroidTest```
 
+## Manual testing (full)
+
++ {normal,invisible,compact} -> verify -> success -> mark used
++ {normal,invisible,compact} -> verify -> success -> token timeout
+
++ {normal,invisible,compact} -> verify -> touch outside -> challenge closed
++ {normal,invisible,compact} -> verify -> back button -> challenge closed
+
++ {normal,invisible,compact} -> verify -> rotate device (recreate activity) -> hcaptcha gone, no callbacks fired
++ {normal,invisible,compact} -> verify -> send app to background -> open app from history again -> hcaptcha is displayed
+
++ {hide dialog} -> verify -> token obtained -> mark used
+
 # Publishing
 
 To publish a new version follow the next steps:

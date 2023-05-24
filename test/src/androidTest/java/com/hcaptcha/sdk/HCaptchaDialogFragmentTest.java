@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 import android.os.Bundle;
 import android.view.InflateException;
 import android.view.LayoutInflater;
+
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
@@ -34,8 +35,11 @@ import androidx.test.espresso.web.webdriver.DriverAtoms;
 import androidx.test.espresso.web.webdriver.Locator;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import com.hcaptcha.sdk.test.TestActivity;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -186,7 +190,7 @@ public class HCaptchaDialogFragmentTest {
     @Test
     public void webViewNotInstalled() throws InterruptedException {
         final LayoutInflater inflater = mock(LayoutInflater.class);
-        when(inflater.inflate(eq(R.layout.hcaptcha_fragment), any(), eq(false)))
+        when(inflater.inflate(ArgumentMatchers.eq(R.layout.hcaptcha_fragment), any(), eq(false)))
                 .thenThrow(InflateException.class);
 
         final CountDownLatch latch = new CountDownLatch(1);

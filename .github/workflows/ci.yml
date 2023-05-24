@@ -120,7 +120,7 @@ jobs:
           profile: Nexus 6
           script: |
             brew install parallel
-            parallel --retries 3 ::: "./gradlew sdk:connectedCheck"
+            parallel --retries 3 ::: "./gradlew test:connectedCheck -PtestingMinimizedBuild=true"
       - if: failure()
         uses: actions/upload-artifact@v3
         with:

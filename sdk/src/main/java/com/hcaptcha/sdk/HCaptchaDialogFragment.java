@@ -121,7 +121,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             loadingContainer.setVisibility(config.getLoading() ? View.VISIBLE : View.GONE);
             webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
                     requireContext(), config, internalConfig, this, listener, webView);
-        } catch (BadParcelableException | InflateException | ClassCastException e) {
+        } catch (AssertionError | BadParcelableException | InflateException | ClassCastException e) {
             HCaptchaLog.w("Cannot create view. Dismissing dialog...");
             // Happens when fragment tries to reconstruct because the activity was killed
             // And thus there is no way of communicating back

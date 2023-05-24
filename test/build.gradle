@@ -1,0 +1,70 @@
+apply plugin: 'com.android.application'
+
+//if (project.hasProperty("testingMinimizedBuild")) {
+//    apply plugin: 'com.slack.keeper'
+//
+//    keeper {
+//        r8JvmArgs = []
+//    }
+//}
+
+android {
+    compileSdkVersion 33
+    buildToolsVersion "30.0.3"
+    namespace 'com.hcaptcha.sdk.test'
+
+    defaultConfig {
+        applicationId "com.hcaptcha.sdk.test"
+        minSdkVersion 16
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {}
+        release {
+            signingConfig signingConfigs.debug
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    if (project.hasProperty("testingMinimizedBuild")) {
+        testBuildType "release"
+
+//        androidComponents {
+//            beforeVariants(selector().all()) { builder ->
+//                builder.registerExtension(com.slack.keeper.KeeperVariantMarker.class, com.slack.keeper.KeeperVariantMarker.INSTANCE)
+//            }
+//        }
+    }
+}
+
+dependencies {
+    implementation project(path: ':sdk')
+
+    implementation 'androidx.appcompat:appcompat:1.3.1'
+    //noinspection FragmentGradleConfiguration
+    implementation ('androidx.fragment:fragment-testing:1.5.7') { // noinspection FragmentGradleConfiguration
+        exclude group: 'androidx.test', module: 'core'
+    }
+
+    testImplementation 'junit:junit:4.13.2'
+
+    androidTestImplementation 'androidx.test:core:1.5.0'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test:rules:1.5.0'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
+    androidTestImplementation 'org.mockito:mockito-core:4.8.1'
+}
