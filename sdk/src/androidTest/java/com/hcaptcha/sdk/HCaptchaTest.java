@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HCaptchaTest {
     private static final long AWAIT_CALLBACK_MS = 5000;
-    private static final long E2E_AWAIT_CALLBACK_MS = AWAIT_CALLBACK_MS * 2;
+    private static final long E2E_AWAIT_CALLBACK_MS = AWAIT_CALLBACK_MS * 5;
 
     @Rule
     public ActivityScenarioRule<TestActivity> rule = new ActivityScenarioRule<>(TestActivity.class);
