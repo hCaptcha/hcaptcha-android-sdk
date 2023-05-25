@@ -4,3 +4,6 @@
 
 # Prevent obfuscating the names when serializing to JSON
 -keep class com.hcaptcha.sdk.HCaptchaConfig { *; }
+-keepclasseswithmembernames public enum com.hcaptcha.sdk.** {
+    @com.fasterxml.jackson.annotation.JsonValue *;
+}
