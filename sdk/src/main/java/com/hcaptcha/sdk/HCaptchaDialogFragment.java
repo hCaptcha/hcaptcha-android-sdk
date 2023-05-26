@@ -60,7 +60,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     private float defaultDimAmount = 0.6f;
 
-    private boolean loaded = false;
+    private boolean visualChanllengePresented = false;
 
     /**
      * Creates a new instance
@@ -192,9 +192,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
             hideLoadingContainer();
+            visualChanllengePresented = true;
         }
-
-        loaded = true;
     }
 
     @Override
@@ -204,6 +203,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (webViewHelper.getConfig().getSize() == HCaptchaSize.INVISIBLE) {
             hideLoadingContainer();
         }
+
+        visualChanllengePresented = true;
 
         webViewHelper.getListener().onOpen();
     }
@@ -275,7 +276,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 return false;
             }
 
-            final boolean withoutLoadingUI = !loaded && Boolean.FALSE.equals(config.getLoading());
+            final boolean withoutLoadingUI = !visualChanllengePresented && Boolean.FALSE.equals(config.getLoading());
             if (withoutLoadingUI) {
                 return true;
             }
@@ -291,7 +292,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         final HCaptchaWebView webView = rootView.findViewById(R.id.webView);
         if (Boolean.FALSE.equals(config.getLoading())) {
             webView.setOnTouchListener((view, event) -> {
-                if (!loaded && isAdded()) {
+                if (!visualChanllengePresented && isAdded()) {
                     final Activity activity = getActivity();
                     if (activity != null) {
                         activity.dispatchTouchEvent(event);
