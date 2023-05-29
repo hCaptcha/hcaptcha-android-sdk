@@ -43,6 +43,20 @@ const report = (referencePath, updatedPath, isMarkdownOutput) => {
     let ref = reference.get(k)
     let upd = v
 
+    if (ref === undefined) {
+      ref = {
+        metrics: {
+          timeNs: {
+            median: 0
+          },
+          allocationCount: {
+            median: 0
+          }
+        }
+      }
+      k += " (New)"
+    }
+
     return [
       k,
       diffNumber((upd.metrics.timeNs.median - ref.metrics.timeNs.median) / (10 ** 6)),
