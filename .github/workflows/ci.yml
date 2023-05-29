@@ -176,6 +176,28 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           script: ./gradlew bench:connectedReleaseAndroidTest
+      - name: Diff benchmark result
+        id: diff-benchmark
+        uses: ./.github/actions/android-benchmark-diff
+        with:
+          reference: benchmark/data/ci-benchmarkData.json
+          compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com.hcaptcha.sdk.bench.test-benchmarkData.json
+      - uses: peter-evans/find-comment@v2
+        id: find_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: Benchmark report
+      - uses: peter-evans/create-or-update-comment@v2
+        if: ${{ steps.diff-benchmark.outputs.markdown-table != null || steps.find_comment.outputs.comment-id != null }}
+        with:
+          body: |
+            Benchmark report:
+
+            ${{ steps.diff-benchmark.outputs.markdown-table }}
+          edit-mode: replace
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/upload-artifact@v3
         with:
           name: benchmark-json-output
