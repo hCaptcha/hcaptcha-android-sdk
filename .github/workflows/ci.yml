@@ -177,18 +177,20 @@ jobs:
           profile: Nexus 6
           script: ./gradlew bench:connectedReleaseAndroidTest
       - name: Diff benchmark result
+        if: github.ref != 'refs/heads/main'
         id: diff-benchmark
         uses: ./.github/actions/android-benchmark-diff
         with:
           reference: benchmark/data/ci-benchmarkData.json
           compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com.hcaptcha.sdk.bench.test-benchmarkData.json
       - uses: peter-evans/find-comment@v2
+        if: github.ref != 'refs/heads/main'
         id: find_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: Benchmark report
       - uses: peter-evans/create-or-update-comment@v2
-        if: ${{ steps.diff-benchmark.outputs.markdown-table != null || steps.find_comment.outputs.comment-id != null }}
+        if: ${{ github.ref != 'refs/heads/main' && (steps.diff-benchmark.outputs.markdown-table != null || steps.find_comment.outputs.comment-id != null) }}
         with:
           body: |
             Benchmark report:
