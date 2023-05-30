@@ -176,7 +176,6 @@ jobs:
           profile: Nexus 6
           script: ./gradlew bench:connectedReleaseAndroidTest
       - name: Diff benchmark result
-        if: github.ref != 'refs/heads/main'
         id: diff-benchmark
         uses: ./.github/actions/android-benchmark-diff
         with:
