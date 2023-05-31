@@ -6,7 +6,7 @@ package com.hcaptcha.sdk.tasks;
 public interface OnOpenListener {
 
     /**
-     * Called when the hCaptcha challenge is displayed on the html page
+     * Called when the hCaptcha visual challenge is displayed on the html page
      */
     void onOpen();
 }

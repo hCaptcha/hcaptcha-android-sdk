@@ -60,7 +60,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     private float defaultDimAmount = 0.6f;
 
-    private boolean loaded = false;
+    private boolean readyForInteraction = false;
 
     /**
      * Creates a new instance
@@ -120,6 +120,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
             webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
                     requireContext(), config, internalConfig, this, listener, webView);
+            readyForInteraction = false;
             return rootView;
         } catch (BadParcelableException | InflateException | ClassCastException e) {
             HCaptchaLog.w("Cannot create view. Dismissing dialog...");
@@ -191,10 +192,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         assert webViewHelper != null;
 
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
+            // checkbox will be shown
+            readyForInteraction = true;
             hideLoadingContainer();
         }
-
-        loaded = true;
     }
 
     @Override
@@ -204,6 +205,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (webViewHelper.getConfig().getSize() == HCaptchaSize.INVISIBLE) {
             hideLoadingContainer();
         }
+
+        readyForInteraction = true;
 
         webViewHelper.getListener().onOpen();
     }
@@ -275,7 +278,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 return false;
             }
 
-            final boolean withoutLoadingUI = !loaded && Boolean.FALSE.equals(config.getLoading());
+            final boolean withoutLoadingUI = !readyForInteraction && Boolean.FALSE.equals(config.getLoading());
             if (withoutLoadingUI) {
                 return true;
             }
@@ -291,7 +294,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         final HCaptchaWebView webView = rootView.findViewById(R.id.webView);
         if (Boolean.FALSE.equals(config.getLoading())) {
             webView.setOnTouchListener((view, event) -> {
-                if (!loaded && isAdded()) {
+                if (!readyForInteraction && isAdded()) {
                     final Activity activity = getActivity();
                     if (activity != null) {
                         activity.dispatchTouchEvent(event);
