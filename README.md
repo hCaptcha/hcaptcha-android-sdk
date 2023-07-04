@@ -4,7 +4,7 @@
 [![Release](https://jitpack.io/v/hcaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hcaptcha/hcaptcha-android-sdk)
 [![Minimal Android OS](https://img.shields.io/badge/Android%20OS%20-%3E=4.1-blue.svg)](https://developer.android.com/about/dashboards)
 
-###### [Installation](#installation) | [Requirements](#requirements) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing)
+###### [Installation](#installation) | [Requirements](#requirements) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing) | [FAQ](#faq)
 
 This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com). It is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
 
@@ -306,6 +306,14 @@ Useful error messages are often rendered on the hCaptcha checkbox. For example, 
 After retrieving a `token`, you should pass it to your backend in order to verify the validity of the token by doing a [server side check](https://docs.hcaptcha.com/#server) using the hCaptcha secret linked to your sitekey.
 
 ---
+
+## FAQ
+
+> Can I get a token in a non-UI thread?
+
+No: the SDK depends on WebView, which is a UI component and cannot be instantiated in a non-UI thread.
+
+However, the SDK provides a completely silent (invisible to the end-user) mechanism with `hideDialog=true` config + "passive" site key (this is an Enterprise feature). But note that the token request still has to be called from the UI thread.
 
 ## For maintainers
 
