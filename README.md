@@ -309,13 +309,11 @@ After retrieving a `token`, you should pass it to your backend in order to verif
 
 ## FAQ
 
-> How can I obtain captcha token in a non-UI thread?
+> Can I get a token in a non-UI thread?
 
-There is no possibility to obtain tokens from the non-UI thread.
+No: the SDK depends on WebView, which is a UI component and cannot be instantiated in a non-UI thread.
 
-The reason is the SDK depends on WebView which is a UI component and it cannot be instantiated in the non-UI thread. So SDK has to request an `Activity` instance for this anyway.
-
-Possible workaround: the SDK provides a completely “silent” (invisible to the end-user) token obtain mechanism with `hideDialog=true` config + “passive” site key. But it still has to be called from UI Thread
+However, the SDK provides a completely silent (invisible to the end-user) mechanism with `hideDialog=true` config + "passive" site key (this is an Enterprise feature). But note that the token request still has to be called from the UI thread.
 
 ## For maintainers
 
