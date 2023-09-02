@@ -1,5 +1,7 @@
 package com.hcaptcha.sdk;
 
+import static com.hcaptcha.sdk.AssertUtil.failAsNonReachable;
+
 public class HCaptchaStateTestAdapter extends HCaptchaStateListener {
     @Override
     void onOpen() {
@@ -8,11 +10,11 @@ public class HCaptchaStateTestAdapter extends HCaptchaStateListener {
 
     @Override
     void onSuccess(String response) {
-        // empty default implementation to reduce amount of boilerplate code in tests
+        failAsNonReachable();
     }
 
     @Override
     void onFailure(HCaptchaException exception) {
-        // empty default implementation to reduce amount of boilerplate code in tests
+        failAsNonReachable();
     }
 }

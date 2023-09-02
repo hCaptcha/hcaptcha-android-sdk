@@ -1,0 +1,33 @@
+name: android-benchmark-diff
+description: Do diff against previous/reference benchmarkData.json and prepare Markdown table with results
+inputs:
+  reference:
+    description: Path to the reference benchmarkData.json
+    required: true
+  compare-with:
+    description: Path to a benchmarkData.json that will be compared with the reference
+    required: true
+  reference-cache-key:
+    description: Key name to cache the reference benchmarkData.json
+    required: true
+    default: reference-json-key
+outputs:
+  markdown-table:
+    description: Human readable table of results
+    value: ${{ steps.diff.outputs.markdown-table }}
+runs:
+  using: "composite"
+  steps:
+  - uses: actions/cache@v3
+    with:
+      path: ${{ inputs.reference }}
+      key: ${{ inputs.reference-cache-key }}
+      restore-keys: ${{ inputs.reference-cache-key }}
+  - id: diff
+    uses: actions/github-script@v6
+    with:
+      script: |
+        const cli = require('${{ github.workspace }}/.github/actions/android-benchmark-diff/cli.js')
+        const { report } = cli
+        const table = report('${{ inputs.reference }}', '${{ inputs.compare-with }}', true)
+        core.setOutput('markdown-table', table);

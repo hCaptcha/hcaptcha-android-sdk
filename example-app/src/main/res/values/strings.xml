@@ -8,4 +8,5 @@
     <string name="web_view_debug">Web Debug</string>
     <string name="hw_accel">Disable HW Accel</string>
     <string name="hide_dialog">Hide Dialog</string>
+    <string name="hit_test">Hit test</string>
 </resources>

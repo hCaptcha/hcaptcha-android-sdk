@@ -41,4 +41,9 @@ public class HCaptchaWebView extends WebView {
             return false;
         }
     }
+
+    @Override
+    public boolean performClick() {
+        return false;
+    }
 }

@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.9.1
+
+- Fix: add missing ProGuard rules for enums
+
 # 3.9.0
 
 - Feature: add config to control WebView hardware acceleration `HCaptchaConfig.disableHardwareAcceleration`
