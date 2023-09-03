@@ -276,7 +276,7 @@ sonarqube {
 
         property "sonar.sources", "src/main"
         property "sonar.java.binaries", "${project.buildDir}/intermediates/javac/debug/classes"
-        property "sonar.tests", ["src/test/", "src/androidTest/"]
+        property "sonar.tests", ["src/test/", "../test/src/androidTest/"]
 
         property "sonar.android.lint.report", "${project.buildDir}/outputs/lint-results.xml"
         property "sonar.java.spotbugs.reportPaths", ["${project.buildDir}/reports/spotbugs/debug.xml", "${project.buildDir}/reports/spotbugs/release.xml"]
