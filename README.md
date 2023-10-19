@@ -315,6 +315,19 @@ No: the SDK depends on WebView, which is a UI component and cannot be instantiat
 
 However, the SDK provides a completely silent (invisible to the end-user) mechanism with `hideDialog=true` config + "passive" site key (this is an Enterprise feature). But note that the token request still has to be called from the UI thread.
 
+> How can I prevent the hCaptcha verification from being canceled when the back button is pressed?
+
+It is possible by specifying `HCaptchaConfig.retryPredicate` as shown in the following code snippet:
+
+```java
+final HCaptchaConfig config = HCaptchaConfig.builder()
+        .siteKey("YOUR_API_SITE_KEY")
+        .retryPredicate((config, hCaptchaException) -> {
+            return hCaptchaException.getHCaptchaError() == HCaptchaError.CHALLENGE_CLOSED;
+        })
+        .build();
+```
+
 ## For maintainers
 
 If you plan to contribute to the repo, please see [MAINTAINERS.md](./MAINTAINERS.md) for detailed build, test, and release instructions.
