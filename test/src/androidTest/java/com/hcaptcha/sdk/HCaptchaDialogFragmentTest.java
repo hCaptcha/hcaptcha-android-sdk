@@ -17,6 +17,7 @@ import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_INTERNAL_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -32,6 +33,7 @@ import android.view.InflateException;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.View;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
@@ -397,8 +399,10 @@ public class HCaptchaDialogFragmentTest {
             scenario.onFragment(fragment -> {
                 final Dialog dialog = fragment.getDialog();
                 assertNotNull(dialog);
+                final View rootView = dialog.getWindow().getDecorView().getRootView().findFocus();
+                assertNotNull(rootView);
                 final KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK);
-                assertTrue(dialog.dispatchKeyEvent(keyEvent));
+                assertTrue(rootView.dispatchKeyEvent(keyEvent));
             });
         }
     }
@@ -426,6 +430,47 @@ public class HCaptchaDialogFragmentTest {
                         dm.heightPixels / 2f,
                         0 /* NO_META */);
                 assertTrue(dialog.dispatchTouchEvent(keyEvent));
+            });
+        }
+    }
+
+    @Test
+    public void testBackShouldNotCloseCaptchaWithCustomRetry() {
+        try (FragmentScenario<HCaptchaDialogFragment> scenario = launch(
+                config.toBuilder()
+                        .loading(true)
+                        .retryPredicate((c, e) -> e.getHCaptchaError() == HCaptchaError.CHALLENGE_CLOSED)
+                        .build(),
+                internalConfig.toBuilder()
+                        .htmlProvider(new HCaptchaTestHtml(false))
+                        .build(),
+                new HCaptchaStateTestAdapter())) {
+
+            scenario.onFragment(fragment -> {
+                final Dialog dialog = fragment.getDialog();
+                assertNotNull(dialog);
+                final View rootView = dialog.getWindow().getDecorView().getRootView().findFocus();
+                assertNotNull(rootView);
+                final KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK);
+                assertTrue(rootView.dispatchKeyEvent(keyEvent));
+            });
+        }
+    }
+
+    @Test
+    public void testNonBackShouldNotCloseCaptcha() throws InterruptedException {
+        try (FragmentScenario<HCaptchaDialogFragment> scenario = launch(
+                config,
+                internalConfig.toBuilder()
+                        .htmlProvider(new HCaptchaTestHtml(false))
+                        .build(),
+                new HCaptchaStateTestAdapter())) {
+
+            scenario.onFragment(fragment -> {
+                final Dialog dialog = fragment.getDialog();
+                assertNotNull(dialog);
+                final KeyEvent keyEvent = new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_ENTER);
+                assertFalse(dialog.dispatchKeyEvent(keyEvent));
             });
         }
     }
