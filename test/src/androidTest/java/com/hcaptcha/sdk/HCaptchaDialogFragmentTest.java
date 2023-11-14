@@ -43,6 +43,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.hcaptcha.sdk.test.TestActivity;
 
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
@@ -220,6 +221,8 @@ public class HCaptchaDialogFragmentTest {
 
     @Test
     public void webViewNotInstalled() throws InterruptedException {
+        Assume.assumeTrue("Skip test for release, because impossible to mock LayoutInflater", BuildConfig.DEBUG);
+
         final LayoutInflater inflater = mock(LayoutInflater.class);
         when(inflater.inflate(ArgumentMatchers.eq(R.layout.hcaptcha_fragment), any(), eq(false)))
                 .thenThrow(InflateException.class);
@@ -353,13 +356,14 @@ public class HCaptchaDialogFragmentTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void testReset() {
-        final FragmentScenario<HCaptchaDialogFragment> scenario = launchInContainer(
-                config, new HCaptchaStateTestAdapter());
+        try (final FragmentScenario<HCaptchaDialogFragment> scenario = launchInContainer(
+                config, new HCaptchaStateTestAdapter())) {
 
-        scenario.onFragment(HCaptchaDialogFragment::reset);
+            scenario.onFragment(HCaptchaDialogFragment::reset);
 
-        // The fragment has been removed from the FragmentManager already.
-        scenario.onFragment(fragment -> assertTrue(fragment.isDetached()));
+            // The fragment has been removed from the FragmentManager already.
+            scenario.onFragment(fragment -> assertTrue(fragment.isDetached()));
+        }
     }
 
     @Test

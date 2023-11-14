@@ -101,7 +101,7 @@ public class HCaptchaTest {
                     response.markUsed();
                     latch.countDown();
                 })
-                .addOnFailureListener(exception -> fail("No errors expected")));
+                .addOnFailureListener(exception -> fail("No errors expected but received: " + exception.getHCaptchaError())));
 
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }

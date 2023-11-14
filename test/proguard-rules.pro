@@ -1,15 +1,19 @@
--keep public class androidx.tracing.Trace {
-   *;
-}
-#
-#-keep public class com.hcaptcha.sdk.test.** {
-#   *;
-#}
-#
-## -dontobfuscate
-#
-#-keepclassmembers @org.junit.runner.RunWith public class ** {
-#    @org.junit.runner.Test public *;
-#}
+# Proguard rules that are applied to your test apk/code.
+-ignorewarnings
 
--keep class com.hcaptcha.sdk.**
+# -keepattributes *Annotation*
+-keepattributes Signature
+
+#-keep class androidx.fragment.app.testing.** { *; }
+
+-assumenosideeffects class com.hcaptcha.sdk.HCaptchaDialogFragmentTest {
+    *** webViewNotInstalled(...);
+}
+
+# rules to keep compiller happy with android.enableR8.fullMode=true
+
+-keepnames class android.test.** { *; }
+-keep class androidx.lifecycle.Lifecycle$Event$Companion { *; }
+-keep class androidx.lifecycle.** { *; }
+-keep class com.google.errorprone.annotations.MustBeClosed { *; }
+-dontwarn com.sun.jna.**
