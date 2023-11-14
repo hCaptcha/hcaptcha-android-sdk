@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 34
+    compileSdk 34
     namespace 'com.hcaptcha.sdk.bench'
 
     compileOptions {
@@ -47,3 +47,18 @@ dependencies {
 
 // Workaround for: java.lang.ClassNotFoundException: com.android.tools.lint.client.api.Vendor
 lint.enabled = false
+
+tasks.register('pullBenchmarkData', Exec) {
+    def packageName = android.namespace + ".test"
+
+    commandLine java.nio.file.Paths.get(android.sdkDirectory.absolutePath, "platform-tools", "adb"),
+            "pull",
+            "/storage/emulated/0/Android/media/" \
+                + "${packageName}/additional_test_output/" \
+                + "${packageName.replace('.', '_')}-benchmarkData.json",
+            "${projectDir}/build/outputs/"
+
+    doFirst {
+        println "pullBenchmarkData: ${commandLine.join(' ')}"
+    }
+}
