@@ -133,8 +133,8 @@ android.libraryVariants.all { variant ->
         dependsOn variant.packageLibraryProvider
 
         doFirst {
-            String aarPath = variant.packageLibraryProvider.get().archivePath
-            long aarSizeKb = file(aarPath).length() / 1024
+            var aarPath = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
+            long aarSizeKb = aarPath.length() / 1024
             println("File ${aarPath} is ${aarSizeKb}Kbyte")
         }
     }
@@ -145,8 +145,8 @@ android.libraryVariants.all { variant ->
         dependsOn variant.packageLibraryProvider
 
         doFirst {
-            String aarPath = variant.packageLibraryProvider.get().archivePath
-            long aarSizeKb = file(aarPath).length() / 1024
+            var aarFile = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
+            long aarSizeKb = aarFile.length() / 1024
             if (aarSizeKb > MAX_AAR_SIZE_KB) {
                 throw new GradleException("${aarPath} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
             }
