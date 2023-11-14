@@ -46,7 +46,6 @@ import com.hcaptcha.sdk.test.TestActivity;
 import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentMatchers;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -224,7 +223,7 @@ public class HCaptchaDialogFragmentTest {
         Assume.assumeTrue("Skip test for release, because impossible to mock LayoutInflater", BuildConfig.DEBUG);
 
         final LayoutInflater inflater = mock(LayoutInflater.class);
-        when(inflater.inflate(ArgumentMatchers.eq(R.layout.hcaptcha_fragment), any(), eq(false)))
+        when(inflater.inflate(eq(R.layout.hcaptcha_fragment), any(), eq(false)))
                 .thenThrow(InflateException.class);
 
         final CountDownLatch latch = new CountDownLatch(1);
