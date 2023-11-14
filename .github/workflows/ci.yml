@@ -235,13 +235,13 @@ jobs:
           disable-animations: true
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew bench:connectedReleaseAndroidTest
+          script: ./gradlew benchmark:connectedReleaseAndroidTest
       - name: Diff benchmark result
         id: diff-benchmark
         uses: ./.github/actions/android-benchmark-diff
         with:
           reference: benchmark/data/ci-benchmarkData.json
-          compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com.hcaptcha.sdk.bench.test-benchmarkData.json
+          compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com_hcaptcha_sdk_bench_test-benchmarkData.json
       - name: Log diff benchmark reuslts
         run: echo "${{ steps.diff-benchmark.outputs.markdown-table }}"
       - uses: peter-evans/find-comment@v2
