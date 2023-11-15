@@ -49,7 +49,7 @@ jobs:
         include:
           - compile: 34
             target: 34
-            appcompat: 1.6.2
+            appcompat: 1.6.1
           - compile: 33
             target: 33
             appcompat: 1.5.1
