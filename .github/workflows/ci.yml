@@ -47,6 +47,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - compile: 34
+            target: 34
+            appcompat: 1.6.2
           - compile: 33
             target: 33
             appcompat: 1.5.1

@@ -1,17 +1,16 @@
 apply plugin: 'com.android.application'
 if (project.hasProperty("testingMinimizedBuild")) {
-    project.setProperty("android.enableR8.fullMode", false)
     apply plugin: 'com.slack.keeper'
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     namespace 'com.hcaptcha.sdk.test'
 
     defaultConfig {
         applicationId "com.hcaptcha.sdk.test"
         minSdkVersion 19
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode 1
         versionName "1.0"
 
@@ -23,7 +22,7 @@ android {
             signingConfig signingConfigs.debug
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', '../sdk/consumer-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), '../sdk/consumer-rules.pro'
         }
     }
 

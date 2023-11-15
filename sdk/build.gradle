@@ -10,7 +10,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     namespace 'com.hcaptcha.sdk'
 
     buildFeatures {
@@ -19,7 +19,7 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
