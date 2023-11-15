@@ -8,7 +8,7 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
 
-        if (BuildConfig.DEBUG) {
+        if (com.hcaptcha.sdk.BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(
                     new StrictMode.ThreadPolicy.Builder()
                             .detectAll()

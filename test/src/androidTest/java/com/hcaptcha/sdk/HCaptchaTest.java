@@ -9,6 +9,8 @@ import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
+import com.hcaptcha.sdk.test.TestActivity;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -99,7 +101,7 @@ public class HCaptchaTest {
                     response.markUsed();
                     latch.countDown();
                 })
-                .addOnFailureListener(exception -> fail("No errors expected")));
+                .addOnFailureListener(exception -> fail("No errors expected but received: " + exception.getHCaptchaError())));
 
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }

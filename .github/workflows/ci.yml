@@ -13,6 +13,9 @@ on:
     paths-ignore:
       - '**.md'
 
+env:
+  JAVA_VERSION: '17'
+
 jobs:
   test:
     name: 'Test Unit'
@@ -21,7 +24,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/gradle-build-action@v2
         with:
@@ -44,6 +47,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - compile: 34
+            target: 34
+            appcompat: 1.6.1
           - compile: 33
             target: 33
             appcompat: 1.5.1
@@ -60,7 +66,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/gradle-build-action@v2
         with:
@@ -82,7 +88,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/gradle-build-action@v2
         with:
@@ -119,14 +125,72 @@ jobs:
           profile: Nexus 6
           script: |
             brew install parallel
-            parallel --retries 3 ::: "./gradlew sdk:connectedCheck"
+            parallel --retries 3 ::: "./gradlew test:connectedCheck"
       - if: failure()
         uses: actions/upload-artifact@v3
         with:
           name: androidTest-results
           path: |
-            sdk/build/outputs/androidTest-results
-            sdk/build/reports/androidTests
+            test/build/outputs/androidTest-results
+            test/build/reports/androidTests
+
+  test-minified:
+    name: 'Test UI Minified'
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [29]
+        target: [default]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: adopt
+      - uses: gradle/gradle-build-action@v2
+        with:
+          cache-read-only: false
+      - name: 'Cache AVD'
+        uses: actions/cache@v3
+        id: avd-cache
+        with:
+          path: |
+            ~/.android/avd/*
+            ~/.android/adb*
+          key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
+      - name: 'Create AVD'
+        if: steps.avd-cache.outputs.cache-hit != 'true'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: false
+          disable-animations: false
+          arch: x86_64
+          profile: Nexus 6
+          script: echo "Generated AVD snapshot for caching."
+      - name: 'Tests'
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          force-avd-creation: false
+          disable-animations: true
+          arch: x86_64
+          profile: Nexus 6
+          script: |
+            brew install parallel
+            parallel --retries 3 ::: "./gradlew test:connectedCheck -P testingMinimizedBuild=true -P android.enableR8.fullMode=false"
+      - if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: androidTest-minified-results
+          path: |
+            test/build/outputs/androidTest-results
+            test/build/reports/androidTests
 
   test-benchmark:
     name: 'Test Benchmark'
@@ -140,7 +204,7 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/gradle-build-action@v2
         with:
@@ -174,13 +238,13 @@ jobs:
           disable-animations: true
           arch: x86_64
           profile: Nexus 6
-          script: ./gradlew bench:connectedReleaseAndroidTest
+          script: ./gradlew benchmark:connectedReleaseAndroidTest
       - name: Diff benchmark result
         id: diff-benchmark
         uses: ./.github/actions/android-benchmark-diff
         with:
           reference: benchmark/data/ci-benchmarkData.json
-          compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com.hcaptcha.sdk.bench.test-benchmarkData.json
+          compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com_hcaptcha_sdk_bench_test-benchmarkData.json
       - name: Log diff benchmark reuslts
         run: echo "${{ steps.diff-benchmark.outputs.markdown-table }}"
       - uses: peter-evans/find-comment@v2
@@ -215,7 +279,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/gradle-build-action@v2
         with:
@@ -241,7 +305,7 @@ jobs:
         fetch-depth: 0
     - uses: actions/setup-java@v3
       with:
-        java-version: '11'
+        java-version: ${{ env.JAVA_VERSION }}
         distribution: adopt
     - uses: gradle/gradle-build-action@v2
       with:

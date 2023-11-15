@@ -1,23 +1,25 @@
 plugins {
+    id "com.android.library"
     id "pmd"
     id "jacoco"
     id "checkstyle"
-    id "com.github.spotbugs" version "4.8.0"
+    id "maven-publish"
+    id "com.github.spotbugs" version "5.2.3"
     id "org.owasp.dependencycheck" version "7.1.1"
     id "org.sonarqube" version "3.4.0.2513"
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'maven-publish'
-
 android {
-    compileSdkVersion 33
-    buildToolsVersion "30.0.3"
+    compileSdk 34
     namespace 'com.hcaptcha.sdk'
+
+    buildFeatures {
+        buildConfig true
+    }
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
@@ -30,10 +32,8 @@ android {
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
         proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        multiDexEnabled true
     }
 
     compileOptions {
@@ -65,27 +65,15 @@ android {
 }
 
 dependencies {
-    implementation fileTree(dir: "libs", include: ["*.jar"])
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.3.1'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    compileOnly 'org.projectlombok:lombok:1.18.16'
-    annotationProcessor 'org.projectlombok:lombok:1.18.16'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
     testImplementation 'junit:junit:4.13.2'
-    testImplementation 'org.mockito:mockito-inline:3.6.28'
-    testImplementation 'org.skyscreamer:jsonassert:1.5.0'
-
-    androidTestImplementation 'androidx.test:core:1.5.0'
-    androidTestImplementation 'androidx.test:runner:1.5.2'
-    androidTestImplementation 'androidx.test:rules:1.5.0'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-    androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
-    androidTestImplementation 'androidx.fragment:fragment-testing:1.4.1' // cannot upgrade because https://issuetracker.google.com/issues/266687550
-
-    androidTestImplementation "androidx.multidex:multidex:2.0.1"
-    androidTestImplementation "org.mockito:mockito-android:3.6.28"
+    testImplementation 'org.mockito:mockito-inline:4.8.1'
+    testImplementation 'org.skyscreamer:jsonassert:1.5.1'
 
     compileOnly 'com.google.code.findbugs:annotations:3.0.1'
 }
@@ -143,8 +131,8 @@ android.libraryVariants.all { variant ->
         dependsOn variant.packageLibraryProvider
 
         doFirst {
-            String aarPath = variant.packageLibraryProvider.get().archivePath
-            long aarSizeKb = file(aarPath).length() / 1024
+            var aarPath = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
+            long aarSizeKb = aarPath.length() / 1024
             println("File ${aarPath} is ${aarSizeKb}Kbyte")
         }
     }
@@ -155,8 +143,8 @@ android.libraryVariants.all { variant ->
         dependsOn variant.packageLibraryProvider
 
         doFirst {
-            String aarPath = variant.packageLibraryProvider.get().archivePath
-            long aarSizeKb = file(aarPath).length() / 1024
+            var aarFile = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
+            long aarSizeKb = aarFile.length() / 1024
             if (aarSizeKb > MAX_AAR_SIZE_KB) {
                 throw new GradleException("${aarPath} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
             }
@@ -244,8 +232,8 @@ spotbugs {
 gradle.taskGraph.beforeTask { task ->
     if (task.name.toLowerCase().contains('spotbugs')) {
         task.reports {
-            html.enabled = true
-            xml.enabled = true
+            html.enabled true
+            xml.enabled true
         }
     }
 }
@@ -271,8 +259,8 @@ task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) 
     executionData.from = "${project.buildDir}/jacoco/testDebugUnitTest.exec"
 
     reports {
-        xml.enabled = true
-        html.enabled = true
+        xml.required = true
+        html.required = true
     }
 }
 
@@ -289,7 +277,7 @@ sonarqube {
 
         property "sonar.sources", "src/main"
         property "sonar.java.binaries", "${project.buildDir}/intermediates/javac/debug/classes"
-        property "sonar.tests", ["src/test/", "src/androidTest/"]
+        property "sonar.tests", ["src/test/", "../test/src/androidTest/"]
 
         property "sonar.android.lint.report", "${project.buildDir}/outputs/lint-results.xml"
         property "sonar.java.spotbugs.reportPaths", ["${project.buildDir}/reports/spotbugs/debug.xml", "${project.buildDir}/reports/spotbugs/release.xml"]
@@ -300,3 +288,4 @@ sonarqube {
 }
 
 project.tasks["sonarqube"].dependsOn "check"
+

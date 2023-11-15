@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
+    compileSdk 34
     namespace 'com.hcaptcha.sdk.bench'
 
     compileOptions {
@@ -14,7 +14,7 @@ android {
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 33
+        targetSdkVersion 34
 
         testInstrumentationRunner 'androidx.benchmark.junit4.AndroidBenchmarkRunner'
         testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "DEBUGGABLE,EMULATOR,LOW-BATTERY,UNLOCKED"
@@ -36,14 +36,29 @@ android {
 }
 
 dependencies {
-    androidTestImplementation 'androidx.test:runner:1.5.1'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.4'
+    androidTestImplementation 'androidx.test:runner:1.5.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.benchmark:benchmark-junit4:1.1.1'
+    androidTestImplementation 'androidx.benchmark:benchmark-junit4:1.2.0'
 
     implementation project(path: ':sdk')
-    implementation 'androidx.appcompat:appcompat:1.5.1'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
 }
 
 // Workaround for: java.lang.ClassNotFoundException: com.android.tools.lint.client.api.Vendor
 lint.enabled = false
+
+tasks.register('pullBenchmarkData', Exec) {
+    def packageName = android.namespace + ".test"
+
+    commandLine java.nio.file.Paths.get(android.sdkDirectory.absolutePath, "platform-tools", "adb"),
+            "pull",
+            "/storage/emulated/0/Android/media/" \
+                + "${packageName}/additional_test_output/" \
+                + "${packageName.replace('.', '_')}-benchmarkData.json",
+            "${projectDir}/build/outputs/"
+
+    doFirst {
+        println "pullBenchmarkData: ${commandLine.join(' ')}"
+    }
+}
