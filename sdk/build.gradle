@@ -33,7 +33,7 @@ android {
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 
         consumerProguardFiles "consumer-rules.pro"
-        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt')
+        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
     }
 
     compileOptions {

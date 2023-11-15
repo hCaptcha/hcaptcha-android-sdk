@@ -4,3 +4,6 @@
 #
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
+
+# Keep all sdk classes
+-keep class com.hcaptcha.sdk.** { *; }
