@@ -128,8 +128,8 @@ jobs:
         with:
           name: androidTest-results
           path: |
-            sdk/build/outputs/androidTest-results
-            sdk/build/reports/androidTests
+            test/build/outputs/androidTest-results
+            test/build/reports/androidTests
 
   test-minified:
     name: 'Test UI Minified'
@@ -186,8 +186,8 @@ jobs:
         with:
           name: androidTest-minified-results
           path: |
-            sdk/build/outputs/androidTest-results
-            sdk/build/reports/androidTests
+            test/build/outputs/androidTest-results
+            test/build/reports/androidTests
 
   test-benchmark:
     name: 'Test Benchmark'
