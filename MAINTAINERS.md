@@ -7,10 +7,11 @@
 There is automated testing for every `push` command through github actions (see `.github/workflows/ci.yml`).
 
 You can manually test before pushing by running both unit tests and instrumented tests:
-* ```gradlew test```
-* ```gradlew connectedDebugAndroidTest```
+* `./gradlew sdk:test`
+* `./gradlew test:connectedAndroidTest`
+* `./gradlew test:connectedAndroidTest -P testingMinimizedBuild=true -P android.enableR8.fullMode=false`
 
-## Manual testing (full)
+## Manual testing
 
 + {normal,invisible,compact} -> verify -> success -> mark used
 + {normal,invisible,compact} -> verify -> success -> token timeout
