@@ -63,6 +63,11 @@ public enum HCaptchaError implements Serializable {
     INVALID_CUSTOM_THEME(32, "Invalid custom theme"),
 
     /**
+     * Insecure HTTP request intercepted
+     */
+    INSECURE_HTTP_REQUEST_ERROR(33, "Insecure resource requested"),
+
+    /**
      * Generic error for unknown situations - should never happen.
      */
     ERROR(29, "Unknown error");

@@ -79,7 +79,7 @@ final class HCaptchaWebViewHelper {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            webView.setWebViewClient(new HCaptchaWebClient());
+            webView.setWebViewClient(new HCaptchaWebClient(handler, listener));
         }
         if (HCaptchaLog.sDiagnosticsLogEnabled) {
             webView.setWebChromeClient(new HCaptchaWebChromeClient());
@@ -123,6 +123,17 @@ final class HCaptchaWebViewHelper {
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class HCaptchaWebClient extends WebViewClient {
 
+        @NonNull
+        private final Handler handler;
+
+        @NonNull
+        private final HCaptchaStateListener listener;
+
+        HCaptchaWebClient(@NonNull Handler handler, @NonNull HCaptchaStateListener listener) {
+            this.handler = handler;
+            this.listener = listener;
+        }
+
         private String stripUrl(String url) {
             return url.split("[?#]")[0] + "...";
         }
@@ -130,9 +141,13 @@ final class HCaptchaWebViewHelper {
         @Override
         public WebResourceResponse shouldInterceptRequest (final WebView view, final WebResourceRequest request) {
             final Uri requestUri = request.getUrl();
-            if (requestUri != null && requestUri.getScheme().equals("http")) {
-                webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
-                webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);
+            if (requestUri != null && requestUri.getScheme() != null && requestUri.getScheme().equals("http")) {
+                handler.post(() -> {
+                    webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
+                    webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);
+                    listener.onFailure(new HCaptchaException(HCaptchaError.INSECURE_HTTP_REQUEST_ERROR,
+                            "Insecure resource " + requestUri + " requested"));
+                });
             }
             return super.shouldInterceptRequest(view, request);
         }

@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 
 
 /**
@@ -18,20 +19,28 @@ public class HCaptchaException extends Exception {
     /**
      * The hCaptcha error object
      */
+    @NonNull
     private final HCaptchaError hCaptchaError;
+
+    @Nullable
+    private final String message;
+
+    public HCaptchaException(HCaptchaError error) {
+        this(error, null);
+    }
 
     /**
      * @return The {@link HCaptchaError} error
      */
     public HCaptchaError getHCaptchaError() {
-        return this.hCaptchaError;
+        return hCaptchaError;
     }
 
     /**
      * @return The error id
      */
     public int getStatusCode() {
-        return this.hCaptchaError.getErrorId();
+        return hCaptchaError.getErrorId();
     }
 
     /**
@@ -40,7 +49,6 @@ public class HCaptchaException extends Exception {
     @Nullable
     @Override
     public String getMessage() {
-        return this.hCaptchaError.getMessage();
+        return message == null ? hCaptchaError.getMessage() : message;
     }
-
 }
