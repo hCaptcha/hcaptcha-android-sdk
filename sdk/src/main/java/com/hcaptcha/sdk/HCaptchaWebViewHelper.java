@@ -22,6 +22,10 @@ import androidx.annotation.RequiresApi;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Objects;
+
 final class HCaptchaWebViewHelper {
     @NonNull
     private final Context context;
@@ -120,6 +124,9 @@ final class HCaptchaWebViewHelper {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class HCaptchaWebClient extends WebViewClient {
+        private final Uri loaderUri = Uri.parse(
+                "https://www.unpkg.com/@hcaptcha/loader@" + BuildConfig.LOADER_VERSION + "/dist/index.mjs"
+        );
 
         @NonNull
         private final Handler handler;
@@ -135,7 +142,21 @@ final class HCaptchaWebViewHelper {
         @Override
         public WebResourceResponse shouldInterceptRequest (final WebView view, final WebResourceRequest request) {
             final Uri requestUri = request.getUrl();
-            if (requestUri != null && requestUri.getScheme() != null && requestUri.getScheme().equals("http")) {
+            if (loaderUri.equals(requestUri)) {
+                try {
+                    return new WebResourceResponse(
+                            "application/javascript",
+                            "UTF-8",
+                            200,
+                            "OK",
+                            Collections.singletonMap("Access-Control-Allow-Origin",
+                                    Objects.toString(config.getHost(), "null")),
+                            view.getContext().getAssets().open("hcaptcha/loader.mjs")
+                    );
+                } catch (IOException e) {
+                    HCaptchaLog.w("WebViewHelper wasn't able to load loader.mjs from assets");
+                }
+            } else if (requestUri != null && requestUri.getScheme() != null && requestUri.getScheme().equals("http")) {
                 handler.post(() -> {
                     webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
                     webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);

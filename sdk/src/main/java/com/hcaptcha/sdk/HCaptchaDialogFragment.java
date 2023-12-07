@@ -194,6 +194,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onLoaded() {
+        HCaptchaLog.d("DialogFragment.onLoaded");
         assert webViewHelper != null;
 
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
