@@ -14,6 +14,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import com.hcaptcha.sdk.test.TestActivity;
 
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,6 +39,8 @@ public class HCaptchaWebViewHelperTest {
 
     @Test
     public void testInsecureHttpRequestErrorHandling() throws Exception {
+        Assume.assumeTrue("Skip test for release, because impossible to mock IHCaptchaVerifier", BuildConfig.DEBUG);
+
         final Handler handler = new Handler(Looper.getMainLooper());
         final CountDownLatch failureLatch = new CountDownLatch(1);
         final HCaptchaConfig config = baseConfig.toBuilder().host("http://localhost").build();
@@ -67,5 +70,4 @@ public class HCaptchaWebViewHelperTest {
 
         assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
-
 }
