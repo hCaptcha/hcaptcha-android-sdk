@@ -1,5 +1,9 @@
 # Changelog
 
+# 3.10.0
+
+- Fix: crash on insecure HTTP request handling
+
 # 3.9.1
 
 - Fix: add missing ProGuard rules for enums
