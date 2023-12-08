@@ -1,6 +1,6 @@
 # Android SDK for hCaptcha
 
-![CI](https://github.com/hCaptcha/hcaptcha-android-sdk/workflows/Android%20SDK%20CI/badge.svg)
+![CI](https://github.com/hCaptcha/hcaptcha-android-sdk/workflows/ci/badge.svg)
 [![Release](https://jitpack.io/v/hcaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hcaptcha/hcaptcha-android-sdk)
 [![Minimal Android OS](https://img.shields.io/badge/Android%20OS%20-%3E=4.1-blue.svg)](https://developer.android.com/about/dashboards)
 
