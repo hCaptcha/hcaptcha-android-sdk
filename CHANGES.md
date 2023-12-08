@@ -3,7 +3,7 @@
 # 3.10.0
 
 - Fix: crash on insecure HTTP request handling
-
+- Feat: new error code `INSECURE_HTTP_REQUEST_ERROR`
 # 3.9.1
 
 - Fix: add missing ProGuard rules for enums
