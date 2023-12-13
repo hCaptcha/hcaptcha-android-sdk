@@ -39,7 +39,7 @@ final class HCaptchaWebViewHelper {
 
     @Getter
     @NonNull
-    private final WebView webView;
+    private final HCaptchaWebView webView;
 
     @NonNull
     private final IHCaptchaHtmlProvider htmlProvider;
@@ -50,7 +50,7 @@ final class HCaptchaWebViewHelper {
                           @NonNull final HCaptchaInternalConfig internalConfig,
                           @NonNull final IHCaptchaVerifier captchaVerifier,
                           @NonNull final HCaptchaStateListener listener,
-                          @NonNull final WebView webView) {
+                          @NonNull final HCaptchaWebView webView) {
         this.context = context;
         this.config = config;
         this.captchaVerifier = captchaVerifier;
@@ -113,7 +113,11 @@ final class HCaptchaWebViewHelper {
     }
 
     void reset() {
-        webView.loadUrl("javascript:reset();");
+        if (webView.isDestroyed()) {
+            HCaptchaLog.w("WebView is destroyed already");
+        } else {
+            webView.loadUrl("javascript:reset();");
+        }
     }
 
     public boolean shouldRetry(HCaptchaException exception) {
