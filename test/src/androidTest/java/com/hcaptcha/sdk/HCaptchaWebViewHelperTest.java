@@ -7,7 +7,6 @@ import static org.mockito.Mockito.mock;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.webkit.WebView;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
@@ -63,7 +62,7 @@ public class HCaptchaWebViewHelperTest {
 
         final ActivityScenario<TestActivity> scenario = rule.getScenario();
         scenario.onActivity(activity -> {
-            WebView webView = new WebView(activity);
+            HCaptchaWebView webView = new HCaptchaWebView(activity);
             final HCaptchaWebViewHelper helper = new HCaptchaWebViewHelper(
                     handler, activity, config, internalConfig, verifier, listener, webView);
         });

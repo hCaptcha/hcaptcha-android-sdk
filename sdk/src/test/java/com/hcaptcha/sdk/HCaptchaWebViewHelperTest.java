@@ -15,7 +15,6 @@ import android.util.Log;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import org.junit.After;
 import org.junit.Before;
@@ -46,7 +45,7 @@ public class HCaptchaWebViewHelperTest {
     HCaptchaStateListener stateListener;
 
     @Mock
-    WebView webView;
+    HCaptchaWebView webView;
 
     @Mock
     WebSettings webSettings;
@@ -64,7 +63,7 @@ public class HCaptchaWebViewHelperTest {
         MockitoAnnotations.openMocks(this);
         androidLogMock = mockStatic(Log.class);
         stateListener = mock(HCaptchaStateListener.class);
-        webView = mock(WebView.class);
+        webView = mock(HCaptchaWebView.class);
         webSettings = mock(WebSettings.class);
         htmlProvider = mock(IHCaptchaHtmlProvider.class);
         when(htmlProvider.getHtml()).thenReturn(MOCK_HTML);

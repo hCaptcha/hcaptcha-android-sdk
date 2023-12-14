@@ -46,4 +46,8 @@ public class HCaptchaWebView extends WebView {
     public boolean performClick() {
         return false;
     }
+
+    public boolean isDestroyed() {
+        return getParent() == null;
+    }
 }

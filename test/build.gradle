@@ -32,6 +32,9 @@ android {
     }
 
     testBuildType = project.hasProperty("testingMinimizedBuild") ? "release" : "debug"
+    testOptions {
+        animationsDisabled = true
+    }
 }
 
 androidComponents {

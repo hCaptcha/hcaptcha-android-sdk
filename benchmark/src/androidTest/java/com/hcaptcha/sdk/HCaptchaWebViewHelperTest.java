@@ -4,7 +4,6 @@ import static org.junit.Assert.fail;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.webkit.WebView;
 
 import androidx.benchmark.BenchmarkState;
 import androidx.benchmark.junit4.BenchmarkRule;
@@ -44,7 +43,7 @@ public class HCaptchaWebViewHelperTest {
             final CountDownLatch latch = new CountDownLatch(1);
             try {
                 rule.getScenario().onActivity(activity -> {
-                    WebView webView = new WebView(activity);
+                    HCaptchaWebView webView = new HCaptchaWebView(activity);
                     state.resumeTiming();
                     new HCaptchaWebViewHelper(
                             handler,
