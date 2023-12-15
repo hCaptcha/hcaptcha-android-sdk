@@ -57,8 +57,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             throw new IllegalStateException(e);
         }
         if (siteKey == null) {
-            throw new IllegalStateException("Add missing " + META_SITE_KEY + " meta-data to AndroidManifest.xml"
-                    + " or call getClient(context, siteKey) method");
+            throw new IllegalStateException("The site-key is missing. You can pass it by adding "
+                    + META_SITE_KEY + " as meta-data to AndroidManifest.xml "
+                    + "or as an argument for setup/verifyWithHCaptcha methods.");
         }
         return setup(siteKey);
     }
