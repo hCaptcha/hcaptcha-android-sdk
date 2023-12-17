@@ -98,14 +98,17 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         HCaptchaStateListener listener = null;
         try {
             final Bundle args = getArguments();
-            assert args != null;
             listener = HCaptchaCompat.getParcelable(args, KEY_LISTENER, HCaptchaStateListener.class);
-            assert listener != null;
             final HCaptchaConfig config = HCaptchaCompat.getSerializable(args, KEY_CONFIG, HCaptchaConfig.class);
-            assert config != null;
             final HCaptchaInternalConfig internalConfig = HCaptchaCompat.getSerializable(args,
                     KEY_INTERNAL_CONFIG, HCaptchaInternalConfig.class);
-            assert internalConfig != null;
+
+            if (listener == null || config == null || internalConfig == null) {
+                // According to Firebase Analytics, there are cases where Bundle args are empty.
+                // > 90% of these cases occur on Android 6, and the count of crashes <<< the count of sessions.
+                // This is a quick fix to prevent crashes in production
+                throw new AssertionError();
+            }
 
             if (inflater == null) {
                 throw new InflateException("inflater is null");
