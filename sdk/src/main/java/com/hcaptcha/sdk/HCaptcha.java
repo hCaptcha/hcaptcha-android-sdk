@@ -12,7 +12,6 @@ import lombok.NonNull;
 
 public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
-    public static final String TAG = "hCaptcha";
 
     @NonNull
     private final FragmentActivity activity;
@@ -57,8 +56,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             throw new IllegalStateException(e);
         }
         if (siteKey == null) {
-            throw new IllegalStateException("Add missing " + META_SITE_KEY + " meta-data to AndroidManifest.xml"
-                    + " or call getClient(context, siteKey) method");
+            throw new IllegalStateException("The site-key is missing. You can pass it by adding "
+                    + META_SITE_KEY + " as meta-data to AndroidManifest.xml "
+                    + "or as an argument for setup/verifyWithHCaptcha methods.");
         }
         return setup(siteKey);
     }
@@ -93,7 +93,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
         };
         try {
-            if (inputConfig.getHideDialog()) {
+            if (Boolean.TRUE.equals(inputConfig.getHideDialog())) {
                 // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
                 this.config = inputConfig.toBuilder()
                         .size(HCaptchaSize.INVISIBLE)

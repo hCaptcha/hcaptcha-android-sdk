@@ -104,6 +104,18 @@ public class HCaptchaTest {
                 any(HCaptchaStateListener.class)));
     }
 
+    @Test(expected = IllegalStateException.class)
+    public void test_exception_on_missing_site_key() throws Exception {
+        final ApplicationInfo applicationInfo = mock(ApplicationInfo.class);
+        applicationInfo.metaData = mock(Bundle.class);
+
+        when(fragmentActivity.getPackageName()).thenReturn(TEST_PACKAGE_NAME);
+        when(fragmentActivity.getPackageManager()).thenReturn(packageManager);
+        when(packageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
+                .thenReturn(applicationInfo);
+        HCaptcha.getClient(fragmentActivity).setup();
+    }
+
     @Test
     public void test_site_key_from_metadata() throws Exception {
         final ApplicationInfo applicationInfo = mock(ApplicationInfo.class);
