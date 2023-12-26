@@ -1,9 +1,18 @@
 # Changelog
 
+# 3.11.0
+
+- Fix: handle null `internalConfig` in args for HCaptchaDialogFragment (#140)
+- Feature: drop diagnostic logs from production code (#139)
+- Fix: wrong language used in `values-be/strings.xml` (#138)
+- Fix: misleading exception on missing `siteKey` (#137)
+- Fix: calling `webView.loadUrl` on destroyed `WebView` (#136)
+
 # 3.10.0
 
 - Fix: crash on insecure HTTP request handling
 - Feat: new error code `INSECURE_HTTP_REQUEST_ERROR`
+
 # 3.9.1
 
 - Fix: add missing ProGuard rules for enums
