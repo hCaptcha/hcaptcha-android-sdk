@@ -34,9 +34,9 @@ You can manually test before pushing by running both unit tests and instrumented
 
 ### How to do this
 
-To install SDK for a specific Pull Request (PR) or Git Branch in the same way as end-developers do (as a Gradle dependency), follow the steps below:
+To install the SDK for a specific pull request (PR) or git branch in the same way as end-developers do, i.e. as a Gradle dependency, follow the steps below:
 
-1. Update Your Dependency in `example-app/build.gradle`, replace:
+1. Update your dependency in `example-app/build.gradle` by replacing:
    ```groovy
    dependencies {
       // ...
@@ -44,7 +44,9 @@ To install SDK for a specific Pull Request (PR) or Git Branch in the same way as
       // ...
    }
    ```
-   with
+
+with:
+
    ```groovy
    dependencies {
       // ...
@@ -56,9 +58,9 @@ To install SDK for a specific Pull Request (PR) or Git Branch in the same way as
 1. Build `example-app` for `release` variant
 1. Test `example-app`
 
-> NOTE: JitPack builds dependencies on-demand, i.e. once Gradle request the dependency
+> NOTE: JitPack builds dependencies on-demand, i.e. once Gradle requests the dependency.
 > If the dependency for the specified PR branch has not been built yet, Gradle may fail with a timeout error.
-> Please be patient as it can take 5-10 minutes for JitPack to build and make the dependency available to Gradle.
+> It can take 5-10 minutes for JitPack to build and make the dependency available to Gradle, so please be patient.
 
 # Publishing
 
