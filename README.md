@@ -4,7 +4,7 @@
 [![Release](https://jitpack.io/v/hcaptcha/hcaptcha-android-sdk.svg)](https://jitpack.io/#hcaptcha/hcaptcha-android-sdk)
 [![Minimal Android OS](https://img.shields.io/badge/Android%20OS%20-%3E=4.1-blue.svg)](https://developer.android.com/about/dashboards)
 
-###### [Installation](#installation) | [Requirements](#requirements) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [Testing](#testing) | [Publishing](#publishing) | [FAQ](#faq)
+###### [Installation](#installation) | [Requirements](#requirements) | [Example App](#example-app) | [Usage](#usage) | [Customization](#config-params) | [Error Handling](#error-handling) | [Debugging](#debugging-tips) | [FAQ](#faq)
 
 This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com). It is a drop-in replacement for the SafetyNet reCAPTCHA API. You will need to configure a `site key` and a `secret key` from your hCaptcha account in order to use it.
 
@@ -212,30 +212,30 @@ Note: If you do not call `.reset()` you will likely see a warning from tools lik
 
 The following list contains configuration properties to allows customization of the hCaptcha verification flow.
 
-| Name                          | Values/Type             | Required | Default                          | Description                                                                                                                                                          |
-|-------------------------------|-------------------------|----------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `siteKey`                     | String                  | **Yes**  | -                                | This is your sitekey, this allows you to load challenges. If you need a sitekey, please visit [hCaptcha](https://www.hcaptcha.com), and sign up to get your sitekey. |
-| `size`                        | Enum                    | No       | INVISIBLE                        | This specifies the "size" of the checkbox component. By default, the checkbox is invisible and the challenge is shown automatically.                                 |
-| `orientation`                 | Enum                    | No       | PORTRAIT                         | This specifies the "orientation" of the challenge.                                                                                                                   |
-| `theme`                       | Enum                    | No       | LIGHT                            | hCaptcha supports light, dark, and contrast themes.                                                                                                                  |
-| `locale`                      | String (ISO 639-1 code) | No       | AUTO                             | You can enforce a specific language or let hCaptcha auto-detect the local language based on user's device.                                                           |
-| `resetOnTimeout`              | Boolean                 | No       | False                            | (DEPRECATED, use `retryPredicate`) Automatically reload to fetch new challenge if user does not submit challenge. (Matches iOS SDK behavior.)                        |
-| `retryPredicate`              | Lambda                  | No       | -                                | Automatically trigger a new verification when some error occurs.                                                                                                     |
-| `jsSrc`                       | String (URL)            | No       | https://js.hcaptcha.com/1/api.js | See Enterprise docs.                                                                                                                                                 |
-| `sentry`                      | Boolean                 | No       | True                             | See Enterprise docs.                                                                                                                                                 |
-| `rqdata`                      | String                  | No       | -                                | See Enterprise docs.                                                                                                                                                 |
-| `apiEndpoint`                 | String (URL)            | No       | -                                | (DEPRECATED, use `jsSrc`) See Enterprise docs.                                                                                                                       |
-| `endpoint`                    | String (URL)            | No       | -                                | See Enterprise docs.                                                                                                                                                 |
-| `reportapi`                   | String (URL)            | No       | -                                | See Enterprise docs.                                                                                                                                                 |
-| `assethost`                   | String (URL)            | No       | -                                | See Enterprise docs.                                                                                                                                                 |
-| `imghost`                     | String (URL)            | No       | -                                | See Enterprise docs.                                                                                                                                                 |
-| `customTheme`                 | Stringified JSON        | No       | -                                | See Enterprise docs.                                                                                                                                                 |
-| `host`                        | String (URL)            | No       | -                                | See Enterprise docs.                                                                                                                                                 |
-| `loading`                     | Boolean                 | No       | True                             | Show or hide the loading dialog.                                                                                                                                     |
-| `hideDialog`                  | Boolean                 | No       | False                            | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
-| `tokenExpiration`             | long                    | No       | 120                              | hCaptcha token expiration timeout (seconds).                                                                                                                         |
-| `diagnosticLog`               | Boolean                 | No       | False                            | Emit detailed console logs for debugging                                                                                                                             |
-| `disableHardwareAcceleration` | Boolean                 | No       | True                             | Disable WebView hardware acceleration                                                                                                                                |
+| Name                          | Values/Type                                          | Required | Default                          | Description                                                                                                                                                          |
+|-------------------------------|------------------------------------------------------|----------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `siteKey`                     | String                                               | **Yes**  | -                                | This is your sitekey, this allows you to load challenges. If you need a sitekey, please visit [hCaptcha](https://www.hcaptcha.com), and sign up to get your sitekey. |
+| `size`                        | Enum                                                 | No       | INVISIBLE                        | This specifies the "size" of the checkbox component. By default, the checkbox is invisible and the challenge is shown automatically.                                 |
+| `orientation`                 | Enum                                                 | No       | PORTRAIT                         | This specifies the "orientation" of the challenge.                                                                                                                   |
+| `theme`                       | Enum                                                 | No       | LIGHT                            | hCaptcha supports light, dark, and contrast themes.                                                                                                                  |
+| `locale`                      | String (ISO 639-1 code)                              | No       | AUTO                             | You can enforce a specific language or let hCaptcha auto-detect the local language based on user's device.                                                           |
+| `resetOnTimeout`              | Boolean                                              | No       | False                            | (DEPRECATED, use `retryPredicate`) Automatically reload to fetch new challenge if user does not submit challenge. (Matches iOS SDK behavior.)                        |
+| `retryPredicate`              | Lambda<sup>[*](#retry-predicate-serialization)</sup> | No       | -                                | Automatically trigger a new verification when some error occurs.                                                                                                     |
+| `jsSrc`                       | String (URL)                                         | No       | https://js.hcaptcha.com/1/api.js | See Enterprise docs.                                                                                                                                                 |
+| `sentry`                      | Boolean                                              | No       | True                             | See Enterprise docs.                                                                                                                                                 |
+| `rqdata`                      | String                                               | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `apiEndpoint`                 | String (URL)                                         | No       | -                                | (DEPRECATED, use `jsSrc`) See Enterprise docs.                                                                                                                       |
+| `endpoint`                    | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `reportapi`                   | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `assethost`                   | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `imghost`                     | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `customTheme`                 | Stringified JSON                                     | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `host`                        | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `loading`                     | Boolean                                              | No       | True                             | Show or hide the loading dialog.                                                                                                                                     |
+| `hideDialog`                  | Boolean                                              | No       | False                            | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
+| `tokenExpiration`             | long                                                 | No       | 120                              | hCaptcha token expiration timeout (seconds).                                                                                                                         |
+| `diagnosticLog`               | Boolean                                              | No       | False                            | Emit detailed console logs for debugging                                                                                                                             |
+| `disableHardwareAcceleration` | Boolean                                              | No       | True                             | Disable WebView hardware acceleration                                                                                                                                |
 
 ### Config Examples
 
@@ -295,6 +295,16 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
         .build();
 ...
 ```
+
+### Retry predicate serialization
+
+Lambda may implicitly capture variables from its surrounding context.
+For a lambda to be serializable, all the captured variables must be serializable as well.
+Failing to meet this requirement can result in runtime errors when attempting to deserialize the lambda.
+
+The `retryPredicate` is part of `HCaptchaConfig` that may get persist during application lifecycle.
+So pay attention to this aspect and make sure that `retryPredicate` is serializable to avoid
+`android.os.BadParcelableException` in run-time.
 
 ## Debugging Tips
 
