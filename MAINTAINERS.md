@@ -24,6 +24,44 @@ You can manually test before pushing by running both unit tests and instrumented
 
 + {hide dialog} -> verify -> token obtained -> mark used
 
+## How to end-to-end test SDK integration before release
+
+### When this make sense
+
+* Proguard configuration update
+* API Changes
+* Breaking Changes
+
+### How to do this
+
+To install the SDK for a specific pull request (PR) or git branch in the same way as end-developers do, i.e. as a Gradle dependency, follow the steps below:
+
+1. Update your dependency in `example-app/build.gradle` by replacing:
+   ```groovy
+   dependencies {
+      // ...
+      implementation project(path: ':sdk')
+      // ...
+   }
+   ```
+
+with:
+
+   ```groovy
+   dependencies {
+      // ...
+      implementation "com.github.hCaptcha:hcaptcha-android-sdk:BRANCH_NAME-SNAPSHOT"
+      // or
+      implementation "com.github.hCaptcha:hcaptcha-android-sdk:pull/PR_NUMBER/head-SNAPSHOT"
+   }
+   ```
+1. Build `example-app` for `release` variant
+1. Test `example-app`
+
+> NOTE: JitPack builds dependencies on-demand, i.e. once Gradle requests the dependency.
+> If the dependency for the specified PR branch has not been built yet, Gradle may fail with a timeout error.
+> It can take 5-10 minutes for JitPack to build and make the dependency available to Gradle, so please be patient.
+
 # Publishing
 
 To publish a new version follow the next steps:
