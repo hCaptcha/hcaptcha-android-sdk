@@ -84,6 +84,25 @@
         hcaptcha.reset();
     }
 
+    function errorCallback(error) {
+        switch(error) {
+            case "rate-limited":
+                return BridgeObject.onError(31);
+            case "network-error":
+                return BridgeObject.onError(7);
+            case "invalid-data":
+                return BridgeObject.onError(8);
+            case "challenge-error":
+                return BridgeObject.onError(9);
+            case "internal-error":
+                return BridgeObject.onError(10);
+            default:
+                // Error not handled? Log it for debugging purposes
+                console.error(error);
+                return BridgeObject.onError(29);
+        }
+    }
+
     function getTheme(config) {
         var theme = config.theme;
         var customTheme = config.customTheme;
@@ -119,24 +138,7 @@
             'open-callback': function openCallback() {
                 return BridgeObject.onOpen();
             },
-            'error-callback': function errorCallback(error) {
-                switch(error) {
-                    case "rate-limited":
-                        return BridgeObject.onError(31);
-                    case "network-error":
-                        return BridgeObject.onError(7);
-                    case "invalid-data":
-                        return BridgeObject.onError(8);
-                    case "challenge-error":
-                        return BridgeObject.onError(9);
-                    case "internal-error":
-                        return BridgeObject.onError(10);
-                    default:
-                        // Error not handled? Log it for debugging purposes
-                        console.error(error);
-                        return BridgeObject.onError(29);
-                }
-            }
+            'error-callback': errorCallback
         };
     }
     function getScriptParams(config) {
@@ -178,22 +180,7 @@
             var { response } = await hcaptcha.execute(getScriptParams(bridgeConfig));
             BridgeObject.onPass(response);
         } catch (error) {
-            switch(error) {
-                case "rate-limited":
-                    return BridgeObject.onError(31);
-                case "network-error":
-                    return BridgeObject.onError(7);
-                case "invalid-data":
-                    return BridgeObject.onError(8);
-                case "challenge-error":
-                    return BridgeObject.onError(9);
-                case "internal-error":
-                    return BridgeObject.onError(10);
-                default:
-                    // Error not handled? Log it for debugging purposes
-                    console.error(error);
-                    return BridgeObject.onError(29);
-            }
+            errorCallback(error);
         }
     }
     async function loadApi(config) {
