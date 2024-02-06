@@ -118,6 +118,24 @@
             },
             'open-callback': function openCallback() {
                 return BridgeObject.onOpen();
+            },
+            'error-callback': function errorCallback(error) {
+                switch(error) {
+                    case "rate-limited":
+                        return BridgeObject.onError(31);
+                    case "network-error":
+                        return BridgeObject.onError(7);
+                    case "invalid-data":
+                        return BridgeObject.onError(8);
+                    case "challenge-error":
+                        return BridgeObject.onError(9);
+                    case "internal-error":
+                        return BridgeObject.onError(10);
+                    default:
+                        // Error not handled? Log it for debugging purposes
+                        console.error(error);
+                        return BridgeObject.onError(29);
+                }
             }
         };
     }
@@ -128,13 +146,13 @@
             loadAsync: true,
             async: true,
         };
-    };
+    }
     function getLoaderParams(config) {
         var result = getScriptParams(config);
 
         result.render = 'explicit';
         result.sentry = config.sentry;
-        result.custom = !!config.customTheme
+        result.custom = !!config.customTheme;
         result.assethost = config.assethost;
         result.imghost = config.imghost;
         result.reportapi = config.reportapi;
@@ -145,7 +163,7 @@
         result.cleanup = true;
 
         return result;
-    };
+    }
     var container = document.getElementById("hcaptcha-container");
     container.addEventListener("click", function () {
         if (hcaptcha) {
@@ -157,7 +175,7 @@
     });
     async function execute() {
         try {
-            const { response } = await hcaptcha.execute(getScriptParams(bridgeConfig)); // { async: true }
+            var { response } = await hcaptcha.execute(getScriptParams(bridgeConfig));
             BridgeObject.onPass(response);
         } catch (error) {
             switch(error) {

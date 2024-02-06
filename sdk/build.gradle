@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 16 // Android 4.1
         targetSdkVersion 34
 
         // See https://developer.android.com/studio/publish/versioning
