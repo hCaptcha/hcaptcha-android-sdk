@@ -56,6 +56,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @Nullable
     private HCaptchaWebViewHelper webViewHelper;
 
+    @NonNull
+    private HCaptchaStateListener listener;
+
     private LinearLayout loadingContainer;
 
     private float defaultDimAmount = 0.6f;
@@ -95,7 +98,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                              @Nullable final ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         HCaptchaLog.d("DialogFragment.onCreateView");
-        HCaptchaStateListener listener = null;
         try {
             final Bundle args = getArguments();
             listener = HCaptchaCompat.getParcelable(args, KEY_LISTENER, HCaptchaStateListener.class);
@@ -122,7 +124,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             loadingContainer.setVisibility(Boolean.TRUE.equals(config.getLoading()) ? View.VISIBLE : View.GONE);
 
             webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
-                    requireContext(), config, internalConfig, this, listener, webView);
+                    requireContext(), config, internalConfig, this, webView);
             readyForInteraction = false;
             return rootView;
         } catch (AssertionError | BadParcelableException | InflateException | ClassCastException e) {
@@ -211,7 +213,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
         readyForInteraction = true;
 
-        webViewHelper.getListener().onOpen();
+        listener.onOpen();
     }
 
     @Override
@@ -224,7 +226,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             if (silentRetry) {
                 webViewHelper.resetAndExecute();
             } else {
-                webViewHelper.getListener().onFailure(exception);
+                listener.onFailure(exception);
             }
         }
     }
@@ -235,7 +237,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (isAdded()) {
             dismissAllowingStateLoss();
         }
-        webViewHelper.getListener().onSuccess(token);
+        listener.onSuccess(token);
     }
 
     @Override
@@ -254,7 +256,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             // https://stackoverflow.com/q/14262312/902217
             // Happens if Fragment is stopped i.e. activity is about to destroy on show call
             if (webViewHelper != null) {
-                webViewHelper.getListener().onFailure(new HCaptchaException(HCaptchaError.ERROR));
+                listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
             }
         }
     }
