@@ -11,7 +11,7 @@ plugins {
 }
 
 ext {
-    hcaptchaLoaderVersion = "1.1.3"
+    hcaptchaLoaderVersion = "1.2.3"
 }
 
 android {
@@ -117,13 +117,19 @@ project.afterEvaluate {
     }
 }
 
-long MAX_AAR_SIZE_KB = 200
+long MAX_AAR_SIZE_KB = 250
 
-tasks.register('downloadHCaptchaLoaderJs', Download) {
-    src "https://www.unpkg.com/@hcaptcha/loader@${hcaptchaLoaderVersion}/dist/index.mjs"
-    dest layout.buildDirectory.file("generated/assets/hcaptcha/loader.mjs")
+tasks.register('downloadPolyfillsJs', Download) {
+    src "https://www.unpkg.com/@hcaptcha/loader@${hcaptchaLoaderVersion}/dist/polyfills.js"
+    dest layout.buildDirectory.file("generated/assets/hcaptcha/polyfills.js")
     onlyIfModified true
 }
+
+tasks.register('downloadHCaptchaLoaderJs', Download) {
+    src "https://www.unpkg.com/@hcaptcha/loader@${hcaptchaLoaderVersion}/dist/index.es5.js"
+    dest layout.buildDirectory.file("generated/assets/hcaptcha/loader.js")
+    onlyIfModified true
+}.get().dependsOn('downloadPolyfillsJs')
 
 android.sourceSets.main.assets.srcDirs += [layout.buildDirectory.file("generated/assets")]
 
@@ -150,7 +156,7 @@ android.libraryVariants.all { variant ->
             var aarFile = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
             long aarSizeKb = aarFile.length() / 1024
             if (aarSizeKb > MAX_AAR_SIZE_KB) {
-                throw new GradleException("${aarPath} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
+                throw new GradleException("${aarFile} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
             }
         }
     })

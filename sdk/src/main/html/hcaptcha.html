@@ -36,9 +36,9 @@
         window.sysDebug = JSON.parse(window.JSDI.getSysDebug());
     }
 </script>
-<script type="module">
-    import { hCaptchaLoader } from 'https://www.unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/index.mjs';
-
+<script type="text/javascript" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/polyfills.js"></script>
+<script type="text/javascript" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/index.es5.js"></script>
+<script>
     // Android will inject this bridge object as `JSInterface`
     // Browser is missing it, so we mock it
     var BridgeObject = window.JSInterface || {
@@ -75,9 +75,9 @@
     /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
-    async function resetAndExecute() {
+    function resetAndExecute() {
         hcaptcha.reset();
-        await execute();
+        execute();
     }
     window.resetAndExecute = resetAndExecute;
     function reset() {
@@ -175,17 +175,16 @@
             BridgeObject.onError(30);
         }
     });
-    async function execute() {
-        try {
-            var { response } = await hcaptcha.execute(getScriptParams(bridgeConfig));
+    function execute() {
+        hcaptcha.execute(getScriptParams(bridgeConfig)).then(function(result) {
+            var response = result.response;
             BridgeObject.onPass(response);
-        } catch (error) {
+        }).catch(function(error) {
             errorCallback(error);
-        }
+        });
     }
-    async function loadApi(config) {
-        try {
-            window.hcaptcha = await hCaptchaLoader(getLoaderParams(config));
+    function loadApi(config) {
+        hCaptchaLoader(getLoaderParams(config)).then(function(hcaptcha) {
             var renderConfig = getRenderConfig(config);
             hcaptcha.render("hcaptcha-container", renderConfig);
             BridgeObject.onLoaded();
@@ -197,12 +196,12 @@
                 // We want to auto execute in case of `invisible` checkbox.
                 // But not in case of `hideDialog` since verification process
                 // might be desired to happen at a later time.
-                await execute();
+                execute();
             }
-        } catch (e) {
-            console.error("loadApi error", e);
+        }).catch(function(error) {
+            console.error("loadApi error", error);
             BridgeObject.onError(29);
-        }
+        });
     }
     loadApi(bridgeConfig);
 </script>
