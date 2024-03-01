@@ -68,6 +68,11 @@ public enum HCaptchaError implements Serializable {
     INSECURE_HTTP_REQUEST_ERROR(33, "Insecure resource requested"),
 
     /**
+     *
+     */
+    BAD_ACTIVITY_ERROR(34, "Visual Challenge verification require FragmentActivity"),
+
+    /**
      * Generic error for unknown situations - should never happen.
      */
     ERROR(29, "Unknown error");

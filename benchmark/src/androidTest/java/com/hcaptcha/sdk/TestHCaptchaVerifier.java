@@ -1,11 +1,11 @@
 package com.hcaptcha.sdk;
 
-import androidx.fragment.app.FragmentActivity;
+import android.app.Activity;
 
 public class TestHCaptchaVerifier implements IHCaptchaVerifier {
 
     @Override
-    public void startVerification(FragmentActivity activity) {
+    public void startVerification(Activity activity) {
         // no implementation need for performance measurement
     }
 

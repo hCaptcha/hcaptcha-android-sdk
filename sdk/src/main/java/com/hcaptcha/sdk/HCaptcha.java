@@ -1,5 +1,6 @@
 package com.hcaptcha.sdk;
 
+import android.app.Activity;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -14,7 +15,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
 
     @NonNull
-    private final FragmentActivity activity;
+    private final Activity activity;
 
     @Nullable
     private IHCaptchaVerifier captchaVerifier;
@@ -25,7 +26,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @NonNull
     private final HCaptchaInternalConfig internalConfig;
 
-    private HCaptcha(@NonNull final FragmentActivity activity, @NonNull final HCaptchaInternalConfig internalConfig) {
+    private HCaptcha(@NonNull final Activity activity, @NonNull final HCaptchaInternalConfig internalConfig) {
         this.activity = activity;
         this.internalConfig = internalConfig;
     }
@@ -33,14 +34,15 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     /**
      * Constructs a new client which allows to display a challenge dialog
      *
-     * @param activity The current activity
+     * @param activity FragmentActivity instance for a visual challenge verification,
+     *                or any Activity in case of passive siteKey
      * @return new {@link HCaptcha} object
      */
-    public static HCaptcha getClient(@NonNull final FragmentActivity activity) {
+    public static HCaptcha getClient(@NonNull final Activity activity) {
         return new HCaptcha(activity, HCaptchaInternalConfig.builder().build());
     }
 
-    static HCaptcha getClient(@NonNull final FragmentActivity activity,
+    static HCaptcha getClient(@NonNull final Activity activity,
                               @NonNull HCaptchaInternalConfig internalConfig) {
         return new HCaptcha(activity, internalConfig);
     }
@@ -100,9 +102,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                         .loading(false)
                         .build();
                 captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
-            } else {
+            } else if (this.activity instanceof FragmentActivity) {
                 captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
                 this.config = inputConfig;
+            } else {
+                listener.onFailure(new HCaptchaException(HCaptchaError.BAD_ACTIVITY_ERROR));
             }
         } catch (AndroidRuntimeException e) {
             listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
@@ -154,7 +158,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         HCaptchaLog.d("HCaptcha.startVerification");
         handler.removeCallbacksAndMessages(null);
         if (captchaVerifier == null) {
-            setException(new HCaptchaException(HCaptchaError.ERROR));
+            setExceptionIfMissing(new HCaptchaException(HCaptchaError.ERROR));
         } else {
             captchaVerifier.startVerification(activity);
         }
