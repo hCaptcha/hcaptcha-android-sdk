@@ -79,6 +79,7 @@ jobs:
   test-ui:
     name: 'Test UI'
     runs-on: macos-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -137,6 +138,7 @@ jobs:
   test-minified:
     name: 'Test UI Minified'
     runs-on: macos-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -195,6 +197,7 @@ jobs:
   test-benchmark:
     name: 'Test Benchmark'
     runs-on: macos-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
