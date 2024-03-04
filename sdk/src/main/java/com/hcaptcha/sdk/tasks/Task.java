@@ -108,15 +108,6 @@ public abstract class Task<TResult> {
         tryCb();
     }
 
-    protected void setExceptionIfMissing(@NonNull HCaptchaException exception) {
-        if (this.hCaptchaException == null) {
-            this.hCaptchaException = exception;
-        }
-        this.successful = false;
-        this.complete = true;
-        tryCb();
-    }
-
     /**
      * Internal callback which called once 'open-callback' fired in js SDK
      */

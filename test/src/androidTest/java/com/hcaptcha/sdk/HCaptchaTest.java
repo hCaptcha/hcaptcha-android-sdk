@@ -126,24 +126,14 @@ public class HCaptchaTest {
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 
-    @Test
-    public void badActivity() throws Exception {
-        final CountDownLatch latch = new CountDownLatch(1);
-
+    @Test(expected = IllegalStateException.class)
+    public void badActivity() {
         Looper.prepare();
         final Activity activity = new TestNonFragmentActivity();
 
         HCaptcha.getClient(activity)
                 .verifyWithHCaptcha(config.toBuilder().hideDialog(false).diagnosticLog(true).build())
                 .addOnSuccessListener(response -> fail("No token expected"))
-                .addOnFailureListener(exception -> {
-                    if (exception.getHCaptchaError() == HCaptchaError.BAD_ACTIVITY_ERROR) {
-                        latch.countDown();
-                    } else {
-                        fail("Wrong failure reason: " + exception.getHCaptchaError());
-                    }
-                });
-
-        assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+                .addOnFailureListener(e -> fail("Wrong failure reason: " + e.getHCaptchaError()));
     }
 }

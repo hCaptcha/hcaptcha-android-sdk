@@ -266,20 +266,19 @@ You can add logic to gracefully handle the errors.
 
 The following is a list of possible error codes:
 
-| Name                           | Code | Description                                              |
-|--------------------------------|------|----------------------------------------------------------|
-| `NETWORK_ERROR`                | 7    | There is no internet connection.                         |
-| `INVALID_DATA`                 | 8    | Invalid data is not accepted by endpoints.               |
-| `CHALLENGE_ERROR`              | 9    | JS client encountered an error on challenge setup.       |
-| `INTERNAL_ERROR`               | 10   | JS client encountered an internal error.                 |
-| `SESSION_TIMEOUT`              | 15   | The challenge expired.                                   |
-| `TOKEN_TIMEOUT`                | 16   | The token expired.                                       |
-| `CHALLENGE_CLOSED`             | 30   | The challenge was closed by the user.                    |
-| `RATE_LIMITED`                 | 31   | Spam detected.                                           |
-| `INVALID_CUSTOM_THEME`         | 32   | Invalid custom theme.                                    |
-| `INSECURE_HTTP_REQUEST_ERROR`  | 33   | Insecure resource requested.                             |
-| `BAD_ACTIVITY_ERROR`           | 34   | Visual Challenge verification require `FragmentActivity` |
-| `ERROR`                        | 29   | General failure.                                         |
+| Name                           | Code | Description                                        |
+|--------------------------------|------|----------------------------------------------------|
+| `NETWORK_ERROR`                | 7    | There is no internet connection.                   |
+| `INVALID_DATA`                 | 8    | Invalid data is not accepted by endpoints.         |
+| `CHALLENGE_ERROR`              | 9    | JS client encountered an error on challenge setup. |
+| `INTERNAL_ERROR`               | 10   | JS client encountered an internal error.           |
+| `SESSION_TIMEOUT`              | 15   | The challenge expired.                             |
+| `TOKEN_TIMEOUT`                | 16   | The token expired.                                 |
+| `CHALLENGE_CLOSED`             | 30   | The challenge was closed by the user.              |
+| `RATE_LIMITED`                 | 31   | Spam detected.                                     |
+| `INVALID_CUSTOM_THEME`         | 32   | Invalid custom theme.                              |
+| `INSECURE_HTTP_REQUEST_ERROR`  | 33   | Insecure resource requested.                       |
+| `ERROR`                        | 29   | General failure.                                   |
 
 ### Retry Failed Verification
 
@@ -341,7 +340,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
         .build();
 ```
 
-> HCaptcha constantly failing with `BAD_ACTIVITY_ERROR` error, how to fix it?
+> HCaptcha constantly failing with IllegalStateException "Visual Challenge verification require FragmentActivity", how to fix it?
 
 SDK expect to be initialized with `FragmentActivity` instance in regular scenario.
 
