@@ -106,7 +106,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                 captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
                 this.config = inputConfig;
             } else {
-                throw new IllegalStateException("Visual Challenge verification require FragmentActivity");
+                throw new IllegalStateException("Visual hCaptcha challenge verification requires FragmentActivity.");
             }
         } catch (AndroidRuntimeException e) {
             listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));

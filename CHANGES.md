@@ -2,7 +2,7 @@
 
 # 4.0.0
 
-- Feature: accept `HCaptcha.getClient(Activity)` for passive `siteKey`s (#112)
+- Feat (breaking change): accept `HCaptcha.getClient(Activity)` for passive sitekeys. (#112)
 
 # 3.11.0
 
