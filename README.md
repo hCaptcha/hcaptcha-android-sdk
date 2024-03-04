@@ -115,7 +115,9 @@ To remove a specific listener you may use `HCaptcha.removeOn[Success|Failure|Ope
 
 To remove all listeners you may use `HCaptcha.removeAllListener()`.
 
-Note ⚠️: For the regular use-case (visual challenge validation), `HCaptcha.getClient(Activity)` must be called with `FragmentActivity` instance. `Activity` is allowed only when `hideDialog=true`.
+Note ⚠️: For any sitekey that can show visual challenges, `HCaptcha.getClient(Activity)` must be called with `FragmentActivity` instance.
+
+`Activity` is allowed only when `hideDialog=true` and sitekey setting is Passive (Enterprise feature).
 
 
 ```java
