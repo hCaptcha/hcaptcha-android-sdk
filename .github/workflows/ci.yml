@@ -79,6 +79,7 @@ jobs:
   test-ui:
     name: 'Test UI'
     runs-on: macos-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -103,7 +104,7 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -114,7 +115,7 @@ jobs:
           profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
       - name: 'Tests'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -137,6 +138,7 @@ jobs:
   test-minified:
     name: 'Test UI Minified'
     runs-on: macos-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -161,7 +163,7 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -172,7 +174,7 @@ jobs:
           profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
       - name: 'Tests'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -195,6 +197,7 @@ jobs:
   test-benchmark:
     name: 'Test Benchmark'
     runs-on: macos-latest
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -219,7 +222,7 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -229,7 +232,7 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
-      - uses: reactivecircus/android-emulator-runner@v2
+      - uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
