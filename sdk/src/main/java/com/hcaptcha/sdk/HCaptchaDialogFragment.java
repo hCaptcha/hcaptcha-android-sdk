@@ -239,8 +239,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public void startVerification(@NonNull FragmentActivity fragmentActivity) {
-        final FragmentManager fragmentManager = fragmentActivity.getSupportFragmentManager();
+    public void startVerification(@NonNull Activity fragmentActivity) {
+        final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
         if (oldFragment != null && oldFragment.isAdded()) {
             HCaptchaLog.w("DialogFragment was already added.");

@@ -5,11 +5,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import android.app.Activity;
+import android.os.Looper;
+
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import com.hcaptcha.sdk.tasks.OnSuccessListener;
 import com.hcaptcha.sdk.test.TestActivity;
+import com.hcaptcha.sdk.test.TestNonFragmentActivity;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -120,5 +124,16 @@ public class HCaptchaTest {
                 .addOnFailureListener(exception -> fail("No errors expected")));
 
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void badActivity() {
+        Looper.prepare();
+        final Activity activity = new TestNonFragmentActivity();
+
+        HCaptcha.getClient(activity)
+                .verifyWithHCaptcha(config.toBuilder().hideDialog(false).diagnosticLog(true).build())
+                .addOnSuccessListener(response -> fail("No token expected"))
+                .addOnFailureListener(e -> fail("Wrong failure reason: " + e.getHCaptchaError()));
     }
 }

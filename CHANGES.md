@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.0.0
+
+- Feat (breaking change): accept `HCaptcha.getClient(Activity)` for passive sitekeys. (#112)
+
 # 3.11.0
 
 - Fix: handle null `internalConfig` in args for HCaptchaDialogFragment (#140)

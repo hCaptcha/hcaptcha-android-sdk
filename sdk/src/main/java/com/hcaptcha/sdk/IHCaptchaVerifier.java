@@ -1,6 +1,6 @@
 package com.hcaptcha.sdk;
 
-import androidx.fragment.app.FragmentActivity;
+import android.app.Activity;
 
 import com.hcaptcha.sdk.tasks.OnFailureListener;
 import com.hcaptcha.sdk.tasks.OnLoadedListener;
@@ -17,7 +17,7 @@ interface IHCaptchaVerifier extends
     /**
      * Starts the human verification process.
      */
-    void startVerification(@NonNull FragmentActivity activity);
+    void startVerification(@NonNull Activity activity);
 
     /**
      * Force stop verification and release resources.

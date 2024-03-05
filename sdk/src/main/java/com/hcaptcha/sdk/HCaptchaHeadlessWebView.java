@@ -1,11 +1,11 @@
 package com.hcaptcha.sdk;
 
+import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
-import androidx.fragment.app.FragmentActivity;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -25,7 +25,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     private boolean shouldExecuteOnLoad;
     private boolean shouldResetOnLoad;
 
-    HCaptchaHeadlessWebView(@NonNull final FragmentActivity activity,
+    HCaptchaHeadlessWebView(@NonNull final Activity activity,
                             @NonNull final HCaptchaConfig config,
                             @NonNull final HCaptchaInternalConfig internalConfig,
                             @NonNull final HCaptchaStateListener listener) {
@@ -44,7 +44,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     }
 
     @Override
-    public void startVerification(@NonNull FragmentActivity activity) {
+    public void startVerification(@NonNull Activity activity) {
         if (webViewLoaded) {
             // Safe to execute
             webViewHelper.resetAndExecute();
