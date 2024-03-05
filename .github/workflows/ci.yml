@@ -21,12 +21,12 @@ jobs:
     name: 'Test Unit'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: false
       - name: 'Build'
@@ -63,12 +63,12 @@ jobs:
             target: 30
             appcompat: 1.3.1
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: false
       - run: |
@@ -86,16 +86,16 @@ jobs:
         api-level: [29]
         target: [default]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: false
       - name: 'Cache AVD'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: avd-cache
         with:
           path: |
@@ -128,7 +128,7 @@ jobs:
             brew install parallel
             parallel --retries 3 ::: "./gradlew test:connectedCheck"
       - if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: androidTest-results
           path: |
@@ -145,16 +145,16 @@ jobs:
         api-level: [29]
         target: [default]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: false
       - name: 'Cache AVD'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: avd-cache
         with:
           path: |
@@ -187,7 +187,7 @@ jobs:
             brew install parallel
             parallel --retries 3 ::: "./gradlew test:connectedCheck -P testingMinimizedBuild=true -P android.enableR8.fullMode=false"
       - if: failure()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: androidTest-minified-results
           path: |
@@ -204,16 +204,16 @@ jobs:
         api-level: [29]
         target: [default]
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: false
       - name: 'Cache AVD'
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: avd-cache
         with:
           path: |
@@ -250,13 +250,13 @@ jobs:
           compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com_hcaptcha_sdk_bench_test-benchmarkData.json
       - name: Log diff benchmark reuslts
         run: echo "${{ steps.diff-benchmark.outputs.markdown-table }}"
-      - uses: peter-evans/find-comment@v2
+      - uses: peter-evans/find-comment@v3
         if: github.ref != 'refs/heads/main'
         id: find_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: Benchmark report
-      - uses: peter-evans/create-or-update-comment@v2
+      - uses: peter-evans/create-or-update-comment@v4
         if: ${{ github.ref != 'refs/heads/main' && (steps.diff-benchmark.outputs.markdown-table != null || steps.find_comment.outputs.comment-id != null) }}
         with:
           body: |
@@ -267,7 +267,7 @@ jobs:
           comment-id: ${{ steps.find_comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: benchmark-json-output
           path: benchmark/build/outputs/connected_android_test_additional_output
@@ -277,17 +277,17 @@ jobs:
     needs: [ test ]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         with:
           cache-read-only: false
-      - uses: actions/cache@v3
+      - uses: actions/cache@v4
         with:
           path: ~/.sonar/cache
           key: ${{ runner.os }}-sonar
@@ -303,14 +303,14 @@ jobs:
     if: github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
-    - uses: actions/setup-java@v3
+    - uses: actions/setup-java@v4
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: adopt
-    - uses: gradle/gradle-build-action@v2
+    - uses: gradle/gradle-build-action@v3
       with:
         cache-read-only: false
     - name: 'Build'
@@ -327,12 +327,12 @@ jobs:
       with:
         old-file-path: sdk-main.aar
         new-file-path: sdk-pr.aar
-    - uses: peter-evans/find-comment@v2
+    - uses: peter-evans/find-comment@v3
       id: find_comment
       with:
         issue-number: ${{ github.event.pull_request.number }}
         body-includes: Diffuse report
-    - uses: peter-evans/create-or-update-comment@v2
+    - uses: peter-evans/create-or-update-comment@v4
       if: ${{ steps.diffuse.outputs.diff-raw != null || steps.find_comment.outputs.comment-id != null }}
       with:
         body: |
