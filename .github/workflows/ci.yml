@@ -104,7 +104,7 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -115,7 +115,7 @@ jobs:
           profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
       - name: 'Tests'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -163,7 +163,7 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -174,7 +174,7 @@ jobs:
           profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
       - name: 'Tests'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -222,7 +222,7 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
@@ -232,7 +232,7 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           script: echo "Generated AVD snapshot for caching."
-      - uses: reactivecircus/android-emulator-runner@v2
+      - uses: reactivecircus/android-emulator-runner@v2.29.0
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
