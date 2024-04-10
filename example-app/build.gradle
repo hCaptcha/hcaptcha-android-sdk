@@ -16,7 +16,7 @@ android {
     namespace 'com.hcaptcha.example'
 
     defaultConfig {
-        minSdkVersion 21
+        minSdkVersion 23
         targetSdkVersion intProp("exampleTargetSdkVersion", 34)
         versionCode 1
         versionName "0.0.1"
@@ -61,12 +61,12 @@ dependencies {
     implementation "com.google.android.flexbox:flexbox:3.0.0"
     implementation project(path: ':sdk')
 
-    implementation 'androidx.compose.ui:ui:1.6.1'
-    implementation 'androidx.compose.material3:material3:1.2.0'
+    implementation "androidx.compose.ui:ui:$compose_version"
+    implementation 'androidx.compose.material3:material3:1.2.1'
     implementation 'androidx.activity:activity-ktx:1.8.2'
     implementation 'androidx.activity:activity-compose:1.8.2'
     implementation project(path: ':compose')
-    implementation 'androidx.compose.foundation:foundation-layout-android:1.6.0'
+    implementation "androidx.compose.foundation:foundation-layout-android:$compose_version"
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'

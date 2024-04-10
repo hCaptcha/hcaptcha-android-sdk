@@ -56,6 +56,7 @@ class ComposeActivity : ComponentActivity() {
                 if (hCaptchaVisible) {
                     HCaptchaCompose(HCaptchaConfig
                         .builder()
+                        .siteKey("10000000-ffff-ffff-ffff-000000000001")
                         .build()) { result ->
                         when (result) {
                             is HCaptchaResponse.Success -> {

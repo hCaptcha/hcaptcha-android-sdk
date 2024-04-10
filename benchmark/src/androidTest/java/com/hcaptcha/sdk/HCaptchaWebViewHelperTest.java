@@ -56,7 +56,6 @@ public class HCaptchaWebViewHelperTest {
                                     latch.countDown();
                                 }
                             },
-                            new TestHCaptchaStateListener(),
                             webView
                     );
                 });

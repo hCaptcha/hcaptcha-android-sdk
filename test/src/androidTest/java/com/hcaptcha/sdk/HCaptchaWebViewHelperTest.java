@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -43,17 +44,35 @@ public class HCaptchaWebViewHelperTest {
         final Handler handler = new Handler(Looper.getMainLooper());
         final CountDownLatch failureLatch = new CountDownLatch(1);
         final HCaptchaConfig config = baseConfig.toBuilder().host("http://localhost").build();
-        final IHCaptchaVerifier verifier = mock(IHCaptchaVerifier.class);
 
-        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+        final IHCaptchaVerifier verifier = new IHCaptchaVerifier() {
 
             @Override
-            void onSuccess(String token) {
+            public void onOpen() {
                 failAsNonReachable();
             }
 
             @Override
-            void onFailure(HCaptchaException e) {
+            public void onLoaded() {
+            }
+
+            @Override
+            public void startVerification(Activity activity) {
+                failAsNonReachable();
+            }
+
+            @Override
+            public void reset() {
+                failAsNonReachable();
+            }
+
+            @Override
+            public void onSuccess(String token) {
+                failAsNonReachable();
+            }
+
+            @Override
+            public void onFailure(HCaptchaException e) {
                 assertEquals(HCaptchaError.INSECURE_HTTP_REQUEST_ERROR, e.getHCaptchaError());
                 assertEquals("Insecure resource http://localhost/favicon.ico requested", e.getMessage());
                 failureLatch.countDown();
@@ -64,7 +83,7 @@ public class HCaptchaWebViewHelperTest {
         scenario.onActivity(activity -> {
             HCaptchaWebView webView = new HCaptchaWebView(activity);
             final HCaptchaWebViewHelper helper = new HCaptchaWebViewHelper(
-                    handler, activity, config, internalConfig, verifier, listener, webView);
+                    handler, activity, config, internalConfig, verifier, webView);
         });
 
         assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));

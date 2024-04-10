@@ -2,14 +2,20 @@ plugins {
     id 'maven-publish'
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
+    id "pmd"
+    id "jacoco"
+    id "checkstyle"
+    id "com.github.spotbugs" version "5.2.3"
+    id "org.owasp.dependencycheck" version "7.1.1"
+    id "org.sonarqube" version "3.4.0.2513"
 }
 
 android {
     namespace 'com.hcaptcha.compose'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
-        minSdk 16
+        minSdk 23
 
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
@@ -57,11 +63,17 @@ android {
 
 dependencies {
     implementation project(':sdk')
-    implementation 'androidx.activity:activity-compose:1.8.2'
-    implementation 'androidx.compose.ui:ui-tooling:1.6.1'
+    implementation "androidx.activity:activity-compose:$compose_version"
+    implementation "androidx.compose.ui:ui-tooling:$compose_version"
+    implementation 'androidx.compose.material3:material3:1.2.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4-android:$compose_version"
+    androidTestImplementation "androidx.compose.ui:ui:$compose_version"
+    androidTestImplementation "androidx.activity:activity-ktx:$compose_version"
+    androidTestImplementation "androidx.compose.foundation:foundation-layout-android:$compose_version"
 }
 
 project.afterEvaluate {
@@ -80,11 +92,11 @@ project.afterEvaluate {
                 pom {
                     name = 'Android Jetpack Compose SDK hCaptcha'
                     description = 'This SDK provides a wrapper for hCaptcha and ready to use Jetpack Compose Component'
-                    url = 'https://github.com/hCaptcha/hcaptcha-android-sdk'
+                    url = 'https://github.com/hCaptcha/hcaptcha-jetpack-compose'
                     licenses {
                         license {
                             name = 'MIT License'
-                            url = 'https://github.com/hCaptcha/hcaptcha-android-sdk/blob/main/LICENSE'
+                            url = 'https://github.com/hCaptcha/hcaptcha-jetpack-compose-sdk/blob/main/LICENSE'
                         }
                     }
                     developers {
@@ -106,3 +118,5 @@ project.afterEvaluate {
         }
     }
 }
+
+apply from: "$rootProject.projectDir/gradle/shared/code-quality.gradle"
