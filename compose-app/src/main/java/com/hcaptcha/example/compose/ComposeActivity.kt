@@ -1,4 +1,4 @@
-package com.hcaptcha.example
+package com.hcaptcha.example.compose
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -72,8 +72,6 @@ class ComposeActivity : ComponentActivity() {
                             is HCaptchaResponse.Event -> {
                                 println("Event: ${result.event}")
                             }
-
-                            else -> {}
                         }
                     }
                 }
