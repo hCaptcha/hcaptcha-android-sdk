@@ -15,6 +15,9 @@ on:
 
 env:
   JAVA_VERSION: '17'
+  AVD_ARCH: arm64-v8a
+  AVD_OPTIONS: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+  AVD_PROFILE: Nexus 6
 
 jobs:
   test:
@@ -83,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [29]
+        api-level: [30]
         target: [default]
     steps:
       - uses: actions/checkout@v3
@@ -104,26 +107,26 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2.29.0
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: ${{ env.AVD_OPTIONS }}
           force-avd-creation: false
           disable-animations: false
-          arch: x86_64
-          profile: Nexus 6
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
           script: echo "Generated AVD snapshot for caching."
       - name: 'Tests'
-        uses: reactivecircus/android-emulator-runner@v2.29.0
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: ${{ env.AVD_OPTIONS }}
           force-avd-creation: false
           disable-animations: true
-          arch: x86_64
-          profile: Nexus 6
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
           script: |
             brew install parallel
             parallel --retries 3 ::: "./gradlew test:connectedCheck"
@@ -143,7 +146,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [29]
+        api-level: [30]
         target: [default]
     steps:
       - uses: actions/checkout@v3
@@ -164,26 +167,26 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2.29.0
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: ${{ env.AVD_OPTIONS }}
           force-avd-creation: false
           disable-animations: false
-          arch: x86_64
-          profile: Nexus 6
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
           script: echo "Generated AVD snapshot for caching."
       - name: 'Tests'
-        uses: reactivecircus/android-emulator-runner@v2.29.0
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: ${{ env.AVD_OPTIONS }}
           force-avd-creation: false
           disable-animations: true
-          arch: x86_64
-          profile: Nexus 6
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
           script: |
             brew install parallel
             parallel --retries 3 ::: "./gradlew test:connectedCheck -P testingMinimizedBuild=true -P android.enableR8.fullMode=false"
@@ -202,7 +205,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [29]
+        api-level: [30]
         target: [default]
     steps:
       - uses: actions/checkout@v3
@@ -223,25 +226,25 @@ jobs:
           key: avd-api-${{ matrix.api-level }}-target-${{ matrix.target }}
       - name: 'Create AVD'
         if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2.29.0
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: ${{ env.AVD_OPTIONS }}
           force-avd-creation: false
           disable-animations: false
-          arch: x86_64
-          profile: Nexus 6
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
           script: echo "Generated AVD snapshot for caching."
-      - uses: reactivecircus/android-emulator-runner@v2.29.0
+      - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           target: ${{ matrix.target }}
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          emulator-options: ${{ env.AVD_OPTIONS }}
           force-avd-creation: false
           disable-animations: true
-          arch: x86_64
-          profile: Nexus 6
+          arch: ${{ env.AVD_ARCH }}
+          profile: ${{ env.AVD_PROFILE }}
           script: ./gradlew benchmark:connectedReleaseAndroidTest
       - name: Diff benchmark result
         id: diff-benchmark
