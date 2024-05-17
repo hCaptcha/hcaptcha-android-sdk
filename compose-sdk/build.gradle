@@ -62,7 +62,7 @@ android {
 }
 
 dependencies {
-    implementation project(':sdk')
+    api project(':sdk')
     implementation "androidx.activity:activity-compose:$compose_version"
     implementation "androidx.compose.ui:ui-tooling:$compose_version"
     implementation 'androidx.compose.material3:material3:1.2.1'
@@ -86,7 +86,7 @@ project.afterEvaluate {
                 from components.release
 
                 groupId = 'com.hcaptcha'
-                artifactId = 'compose'
+                artifactId = 'compose-sdk'
                 version = android.defaultConfig.versionName
 
                 pom {

@@ -18,11 +18,27 @@ repositories {
 }
 // Add hCaptcha sdk dependency inside the app's build.gradle file
 dependencies {
-    <b>implementation 'com.github.hcaptcha:hcaptcha-android-sdk:x.y.z'</b>
+    // For Android View
+    <b>implementation 'com.github.hCaptcha.hcaptcha-android-sdk:sdk:x.y.z'</b>
+    // For Jetpack Compose
+    <b>implementation 'com.github.hCaptcha.hcaptcha-android-sdk:compose-sdk:x.y.z'</b>
 }
 </pre>
 
 *Note: replace `x.y.z` with one from [Release](https://github.com/hCaptcha/hcaptcha-android-sdk/releases) (e.g. `1.0.0`).*
+
+### Legacy (versions < 5.0)
+
+<pre>
+// Register JitPack Repository inside the root build.gradle file
+repositories {
+    <b>maven { url 'https://jitpack.io' }</b> 
+}
+// Add hCaptcha sdk dependency inside the app's build.gradle file
+dependencies {
+    <b>implementation 'com.github.hcaptcha:hcaptcha-android-sdk:x.y.z'</b>
+}
+</pre>
 
 ## Requirements
 
