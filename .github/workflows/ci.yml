@@ -133,7 +133,6 @@ jobs:
           arch: ${{ env.AVD_ARCH }}
           profile: ${{ env.AVD_PROFILE }}
           script: |
-            brew install parallel
             parallel --retries 3 ::: "./gradlew test:connectedCheck"
       - if: failure()
         uses: actions/upload-artifact@v4
@@ -198,7 +197,6 @@ jobs:
           arch: ${{ env.AVD_ARCH }}
           profile: ${{ env.AVD_PROFILE }}
           script: |
-            brew install parallel
             parallel --retries 3 ::: "./gradlew test:connectedCheck -P testingMinimizedBuild=true -P android.enableR8.fullMode=false"
       - if: failure()
         uses: actions/upload-artifact@v4
