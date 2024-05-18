@@ -86,7 +86,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [30]
+        api-level: [28]
         target: [default]
     steps:
       - uses: actions/checkout@v4
@@ -150,7 +150,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [30]
+        api-level: [28]
         target: [default]
     steps:
       - uses: actions/checkout@v4
@@ -213,7 +213,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        api-level: [30]
+        api-level: [28]
         target: [default]
     steps:
       - uses: actions/checkout@v4
