@@ -1,0 +1,67 @@
+name: android-emulator-run
+description: Do run script after emulator boot (use cached AVD or create a new one)
+
+inputs:
+  script:
+    description: Script to run after emulator booted
+    required: true
+  arch:
+    description: Emulator arch, supported values depends on runner
+    required: true
+    default: x86_64
+  target:
+    description: Emulator target. Supported `default` or `google_apis` values
+    required: true
+    default: default
+  profile:
+    description: Emulator profile
+    required: true
+    default: Nexus 6
+  api-level:
+    description: Emulator API level
+    required: true
+    default: '28'
+  boot-options:
+    description: Emulator boot options
+    required: true
+    default: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+
+runs:
+  using: "composite"
+  steps:
+  - name: Cache AVD
+    uses: actions/cache@v4
+    id: avd-cache
+    with:
+      path: |
+        ~/.android/avd/*
+        ~/.android/adb*
+      key: avd-api-${{ inputs.api-level }}-target-${{ inputs.target }}
+  - name: Enable KVM group perms
+    shell: bash
+    run: |
+      echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+      sudo udevadm control --reload-rules
+      sudo udevadm trigger --name-match=kvm
+  - name: 'Create AVD'
+    if: steps.avd-cache.outputs.cache-hit != 'true'
+    uses: reactivecircus/android-emulator-runner@v2
+    with:
+      arch: ${{ inputs.arch }}
+      target: ${{ inputs.target }}
+      profile: ${{ inputs.profile }}
+      api-level: ${{ inputs.api-level }}
+      emulator-options: ${{ inputs.boot-options }}
+      force-avd-creation: false
+      disable-animations: false
+      script: echo "Generated AVD snapshot for caching."
+  - uses: reactivecircus/android-emulator-runner@v2
+    with:
+      arch: ${{ inputs.arch }}
+      target: ${{ inputs.target }}
+      profile: ${{ inputs.profile }}
+      api-level: ${{ inputs.api-level }}
+      emulator-options: ${{ inputs.boot-options }}
+      force-avd-creation: false
+      disable-animations: true
+      script: ${{ inputs.script }}
