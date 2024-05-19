@@ -41,7 +41,7 @@ jobs:
 
   build-matrix:
     name: 'Build (target:${{ matrix.target }} compile:${{ matrix.compile }} appcompat: ${{ matrix.appcompat }})'
-    needs: [ test ]
+    needs: test
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -78,6 +78,7 @@ jobs:
 
   test-ui:
     name: 'Test UI'
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -129,6 +130,7 @@ jobs:
 
   test-benchmark:
     name: 'Test Benchmark'
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -143,6 +145,7 @@ jobs:
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
+          api-level: 33
           script: ./gradlew benchmark:connectedReleaseAndroidTest
       - name: Diff benchmark result
         id: diff-benchmark
