@@ -1,17 +1,18 @@
 package com.hcaptcha.sdk
 
 import android.app.Activity
-import android.app.Dialog
 import android.os.Handler
 import android.os.Looper
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 
 @Composable
 public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) -> Unit) {
     val handler = Handler(Looper.getMainLooper())
-    val context = LocalContext.current
     val verifier = object : IHCaptchaVerifier {
         override fun onLoaded() {
             onResult(HCaptchaResponse.Event(HCaptchaEvent.Loaded))
@@ -39,16 +40,21 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
     }
     val internalConfig = HCaptchaInternalConfig(com.hcaptcha.sdk.HCaptchaHtml())
 
-    DisposableEffect(context) {
-        val dialog = Dialog(context)
-        dialog.setContentView(
-            HCaptchaWebView(context).apply {
-                HCaptchaWebViewHelper(handler, context, config, internalConfig, verifier, this)
+    Dialog(onDismissRequest = {}, properties = DialogProperties(usePlatformDefaultWidth = false)) {
+        AndroidView(
+            modifier = Modifier.fillMaxSize(),
+            factory = { context ->
+                HCaptchaWebView(context).apply {
+                    HCaptchaWebViewHelper(
+                        handler,
+                        context,
+                        config,
+                        internalConfig,
+                        verifier,
+                        this
+                    )
+                }
             }
         )
-        dialog.show()
-        onDispose {
-            dialog.dismiss()
-        }
     }
 }
