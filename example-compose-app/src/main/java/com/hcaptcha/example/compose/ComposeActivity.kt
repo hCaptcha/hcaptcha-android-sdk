@@ -8,13 +8,17 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.hcaptcha.sdk.HCaptchaCompose
 import com.hcaptcha.sdk.HCaptchaConfig
+import com.hcaptcha.sdk.HCaptchaEvent
 import com.hcaptcha.sdk.HCaptchaResponse
 
 class ComposeActivity : ComponentActivity() {
@@ -22,7 +26,8 @@ class ComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var hCaptchaVisible by remember { mutableStateOf(false) }
+            var hCaptchaStarted by remember { mutableStateOf(false) }
+            var hCaptchaLoaded by remember { mutableStateOf(false) }
             var text by remember { mutableStateOf("") }
 
             Column(
@@ -39,11 +44,9 @@ class ComposeActivity : ComponentActivity() {
                         .background(Color.Gray)
                 )
 
-                // Button to toggle WebView visibility
                 Button(
                     onClick = {
-                        hCaptchaVisible = !hCaptchaVisible
-                        // Additional logic when the button is clicked
+                        hCaptchaStarted = !hCaptchaStarted
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -52,8 +55,21 @@ class ComposeActivity : ComponentActivity() {
                     Text(text = "Toggle WebView")
                 }
 
+                if (hCaptchaStarted && !hCaptchaLoaded) {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.width(64.dp),
+                            color = MaterialTheme.colorScheme.secondary,
+                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        )
+                    }
+                }
+
                 // WebView Dialog
-                if (hCaptchaVisible) {
+                if (hCaptchaStarted) {
                     HCaptchaCompose(HCaptchaConfig
                         .builder()
                         .siteKey("10000000-ffff-ffff-ffff-000000000001")
@@ -61,15 +77,20 @@ class ComposeActivity : ComponentActivity() {
                         when (result) {
                             is HCaptchaResponse.Success -> {
                                 text = "Success: ${result.token}"
-                                hCaptchaVisible = false
+                                hCaptchaStarted = false
+                                hCaptchaLoaded = false
                                 println(text)
                             }
                             is HCaptchaResponse.Failure -> {
-                                hCaptchaVisible = false
+                                hCaptchaStarted = false
+                                hCaptchaLoaded = false
                                 text = "Failure: ${result.error.message}"
                                 println(text)
                             }
                             is HCaptchaResponse.Event -> {
+                                if (result.event == HCaptchaEvent.Opened) {
+                                    hCaptchaLoaded = true;
+                                }
                                 println("Event: ${result.event}")
                             }
                         }
