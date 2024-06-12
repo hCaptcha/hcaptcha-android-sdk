@@ -145,7 +145,7 @@ jobs:
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
-          api-level: 33
+          api-level: 28
           script: ./gradlew benchmark:connectedReleaseAndroidTest
       - if: failure()
         uses: actions/upload-artifact@v4
