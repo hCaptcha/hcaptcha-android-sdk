@@ -131,7 +131,9 @@ jobs:
   test-benchmark:
     name: 'Test Benchmark'
     needs: test
-    runs-on: ubuntu-latest
+    # ubuntu-latest fails with JNI ERROR (app bug): weak global reference table overflow (max=51200)
+    # macos-latest i.e. macos-14 https://github.com/ReactiveCircus/android-emulator-runner/issues/324
+    runs-on: macos-13
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
@@ -145,7 +147,7 @@ jobs:
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
-          api-level: 28
+          api-level: 29
           script: ./gradlew benchmark:connectedReleaseAndroidTest
       - if: failure()
         uses: actions/upload-artifact@v4
