@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
 if (project.hasProperty("testingMinimizedBuild")) {
     apply plugin: 'com.slack.keeper'
 }
@@ -9,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.hcaptcha.sdk.test"
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
@@ -35,6 +37,18 @@ android {
     testOptions {
         animationsDisabled = true
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "$compose_version"
+    }
 }
 
 androidComponents {
@@ -51,6 +65,9 @@ dependencies {
     implementation project(path: ':sdk')
     implementation 'androidx.appcompat:appcompat:1.6.1'
 
+    implementation project(path: ':compose-sdk')
+    implementation 'androidx.compose.material3:material3:1.2.1'
+
     testImplementation 'junit:junit:4.13.2'
 
     androidTestImplementation 'androidx.fragment:fragment-testing:1.6.2'
@@ -61,4 +78,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
     androidTestImplementation 'org.mockito:mockito-android:5.3.1'
+
+    androidTestImplementation "androidx.compose.ui:ui:$compose_version"
+    androidTestImplementation "androidx.compose.ui:ui-test-junit4-android:$compose_version"
+    androidTestImplementation "androidx.compose.foundation:foundation-layout-android:$compose_version"
+
+
 }

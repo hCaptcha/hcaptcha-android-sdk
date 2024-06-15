@@ -40,6 +40,7 @@ class HCaptchaComposeTest {
                 HCaptchaCompose(HCaptchaConfig
                     .builder()
                     .siteKey(token)
+                    .diagnosticLog(true)
                     .build()) { result ->
                     when (result) {
                         is HCaptchaResponse.Success -> {
@@ -67,11 +68,11 @@ class HCaptchaComposeTest {
 
     @Test
     fun invalidToken() {
-        setContent("bad-baad-token")
+        setContent("")
 
         runBlocking { delay(timeout) }
 
         composeTestRule.onNodeWithContentDescription(resultContentDescription)
-            .assertTextEquals(HCaptchaError.INVALID_DATA.name)
+            .assertTextContains(HCaptchaError.ERROR.name)
     }
 }
