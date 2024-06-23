@@ -26,7 +26,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: false
       - name: 'Build'
@@ -68,7 +68,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: false
       - run: |
@@ -87,7 +87,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: false
       - name: Run tests
@@ -113,7 +113,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: false
       - name: Run tests
@@ -141,7 +141,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: false
       - name: Run tests
@@ -198,7 +198,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
           cache-read-only: false
       - uses: actions/cache@v4
@@ -224,7 +224,7 @@ jobs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: adopt
-    - uses: gradle/gradle-build-action@v3
+    - uses: gradle/actions/setup-gradle@v3
       with:
         cache-read-only: false
     - name: 'Build'
