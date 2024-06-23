@@ -36,7 +36,7 @@ runs:
       path: |
         ~/.android/avd/*
         ~/.android/adb*
-      key: avd-api-${{ inputs.api-level }}-target-${{ inputs.target }}
+      key: avd-api-${{ runner.os }}-${{ inputs.api-level }}-target-${{ inputs.target }}
   - if: runner.os == 'Linux'
     name: Enable KVM group perms
     shell: bash
