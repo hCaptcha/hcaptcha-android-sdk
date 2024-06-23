@@ -125,8 +125,7 @@ jobs:
         with:
           name: androidTest-minified-results
           path: |
-            test/build/outputs/androidTest-results
-            test/build/reports/androidTests
+            test/build
 
   test-benchmark:
     name: 'Test Benchmark'
