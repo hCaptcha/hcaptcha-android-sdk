@@ -56,7 +56,7 @@ if (project.hasProperty("testingMinimizedBuild")) {
         tasks.register("postInferReleaseAndroidTestKeepRulesForKeeper") {
             doLast {
                 def sourceFile = file("${projectDir}/test-proguard-rules.pro")
-                def destinationFile = file("${project.buildDir}/intermediates/keeper/releaseAndroidTest/inferredKeepRules.pro")
+                def destinationFile = fileTree(dir: "${project.buildDir}/intermediates/keeper", include: '**/inferredKeepRules.pro').find { true }
 
                 if (sourceFile.exists() && destinationFile.exists()) {
                     def sourceText = sourceFile.text
