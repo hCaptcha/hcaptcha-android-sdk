@@ -14,5 +14,5 @@
 
 # Remove debug logging from the production code
 -assumenosideeffects class com.hcaptcha.sdk.HCaptchaLog {
-    *;
+    public static void *(...);
 }
