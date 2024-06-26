@@ -89,15 +89,6 @@ project.afterEvaluate {
                             url = 'https://github.com/hCaptcha/hcaptcha-jetpack-compose-sdk/blob/main/LICENSE'
                         }
                     }
-                    developers {
-                        developer {
-                            id = 'sergiu'
-                            name = 'Sergiu Danalachi'
-                            email = 'sergiu@intuitionmachines.com'
-                            organization = 'hCaptcha'
-                            organizationUrl = 'https://www.hcaptcha.com'
-                        }
-                    }
                     scm {
                         connection = 'scm:git:git://github.com/hCaptcha/hcaptcha-android-sdk.git'
                         developerConnection = 'scm:git:ssh://github.com:hCaptcha/hcaptcha-android-sdk.git'
