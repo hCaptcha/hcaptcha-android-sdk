@@ -50,9 +50,9 @@ with:
    ```groovy
    dependencies {
       // ...
-      implementation "com.github.hCaptcha:hcaptcha-android-sdk:BRANCH_NAME-SNAPSHOT"
+      implementation "com.github.hCaptcha.hcaptcha-android-sdk:sdk:BRANCH_NAME-SNAPSHOT"
       // or
-      implementation "com.github.hCaptcha:hcaptcha-android-sdk:pull/PR_NUMBER/head-SNAPSHOT"
+      implementation "com.github.hCaptcha.hcaptcha-android-sdk:sdk:pull/PR_NUMBER/head-SNAPSHOT"
    }
    ```
 1. Build `example-app` for `release` variant

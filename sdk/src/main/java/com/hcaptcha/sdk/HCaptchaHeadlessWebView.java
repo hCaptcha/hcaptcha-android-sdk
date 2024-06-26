@@ -40,7 +40,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
             rootView.addView(webView);
         }
         webViewHelper = new HCaptchaWebViewHelper(
-                new Handler(Looper.getMainLooper()), activity, config, internalConfig, this, listener, webView);
+                new Handler(Looper.getMainLooper()), activity, config, internalConfig, this, webView);
     }
 
     @Override

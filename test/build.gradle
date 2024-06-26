@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
 if (project.hasProperty("testingMinimizedBuild")) {
     apply plugin: 'com.slack.keeper'
 }
@@ -9,7 +11,7 @@ android {
 
     defaultConfig {
         applicationId "com.hcaptcha.sdk.test"
-        minSdkVersion 19
+        minSdkVersion 23
         targetSdkVersion 34
         versionCode 1
         versionName "1.0"
@@ -31,9 +33,49 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    testBuildType = project.hasProperty("testingMinimizedBuild") ? "release" : "debug"
+    testBuildType project.hasProperty("testingMinimizedBuild") ? "release" : "debug"
     testOptions {
         animationsDisabled = true
+    }
+
+    buildFeatures {
+        compose = true
+    }
+
+    kotlinOptions {
+        jvmTarget = JavaVersion.VERSION_1_8
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = "$compose_version"
+    }
+}
+
+if (project.hasProperty("testingMinimizedBuild")) {
+    project.afterEvaluate {
+        tasks.register("postInferReleaseAndroidTestKeepRulesForKeeper") {
+            doLast {
+                def sourceFile = file("${projectDir}/test-proguard-rules.pro")
+                def destinationFile = fileTree(dir: "${project.buildDir}/intermediates/keeper", include: '**/inferredKeepRules.pro').find { true }
+
+                if (sourceFile.exists() && destinationFile.exists()) {
+                    def sourceText = sourceFile.text
+                    destinationFile << sourceText
+                    println("Rules from of ${sourceFile} appended too keeper")
+                } else {
+                    if (!sourceFile.exists()) {
+                        throw new GradleException("Proguard file does not exist: ${sourceFile}")
+                    }
+                    if (!destinationFile.exists()) {
+                        throw new GradleException("Keeper's proguard file does not exist: ${destinationFile}")
+                    }
+                }
+            }
+        }
+
+        tasks.named("inferReleaseAndroidTestKeepRulesForKeeper").configure {
+            finalizedBy(tasks.named("postInferReleaseAndroidTestKeepRulesForKeeper"))
+        }
     }
 }
 
@@ -48,11 +90,10 @@ androidComponents {
 }
 
 dependencies {
-    implementation project(path: ':sdk')
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-
     testImplementation 'junit:junit:4.13.2'
 
+    implementation project(path: ':sdk')
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     androidTestImplementation 'androidx.fragment:fragment-testing:1.6.2'
     androidTestImplementation 'androidx.test:core:1.5.0'
     androidTestImplementation 'androidx.test:rules:1.5.0'
@@ -61,4 +102,10 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
     androidTestImplementation 'org.mockito:mockito-android:5.3.1'
+
+    implementation project(path: ':compose-sdk')
+    implementation 'androidx.compose.material3:material3:1.2.1'
+    implementation "androidx.compose.ui:ui:$compose_version"
+    implementation "androidx.compose.foundation:foundation-layout-android:$compose_version"
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4-android:1.6.8'
 }

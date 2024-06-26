@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Example hCaptcha App</string>
+    <string name="app_name">hCaptcha Example</string>
     <string name="reset">Reset</string>
     <string name="setup">Setup</string>
     <string name="verify">Verify</string>
