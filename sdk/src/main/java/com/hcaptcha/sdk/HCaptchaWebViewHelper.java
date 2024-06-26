@@ -35,10 +35,6 @@ final class HCaptchaWebViewHelper {
 
     @Getter
     @NonNull
-    private final HCaptchaStateListener listener;
-
-    @Getter
-    @NonNull
     private final HCaptchaWebView webView;
 
     @NonNull
@@ -49,12 +45,10 @@ final class HCaptchaWebViewHelper {
                           @NonNull final HCaptchaConfig config,
                           @NonNull final HCaptchaInternalConfig internalConfig,
                           @NonNull final IHCaptchaVerifier captchaVerifier,
-                          @NonNull final HCaptchaStateListener listener,
                           @NonNull final HCaptchaWebView webView) {
         this.context = context;
         this.config = config;
         this.captchaVerifier = captchaVerifier;
-        this.listener = listener;
         this.webView = webView;
         this.htmlProvider = internalConfig.getHtmlProvider();
         setupWebView(handler);
@@ -79,7 +73,7 @@ final class HCaptchaWebViewHelper {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            webView.setWebViewClient(new HCaptchaWebClient(handler, listener));
+            webView.setWebViewClient(new HCaptchaWebClient(handler));
         }
         if (HCaptchaLog.sDiagnosticsLogEnabled) {
             webView.setWebChromeClient(new HCaptchaWebChromeClient());
@@ -130,12 +124,8 @@ final class HCaptchaWebViewHelper {
         @NonNull
         private final Handler handler;
 
-        @NonNull
-        private final HCaptchaStateListener listener;
-
-        HCaptchaWebClient(@NonNull Handler handler, @NonNull HCaptchaStateListener listener) {
+        HCaptchaWebClient(@NonNull Handler handler) {
             this.handler = handler;
-            this.listener = listener;
         }
 
         private String stripUrl(String url) {
@@ -149,7 +139,7 @@ final class HCaptchaWebViewHelper {
                 handler.post(() -> {
                     webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
                     webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);
-                    listener.onFailure(new HCaptchaException(HCaptchaError.INSECURE_HTTP_REQUEST_ERROR,
+                    captchaVerifier.onFailure(new HCaptchaException(HCaptchaError.INSECURE_HTTP_REQUEST_ERROR,
                             "Insecure resource " + requestUri + " requested"));
                 });
             }

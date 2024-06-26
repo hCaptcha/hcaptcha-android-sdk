@@ -1,0 +1,108 @@
+checkstyle {
+    toolVersion = '8.45.1'
+}
+
+task checkstyle(type: Checkstyle) {
+    description 'Check code standard'
+    group 'verification'
+    configFile file("${rootDir}/gradle/config/checkstyle.xml")
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    classpath = files()
+    ignoreFailures = false
+    maxWarnings = 0
+}
+
+pmd {
+    consoleOutput = true
+    toolVersion = "6.51.0"
+}
+
+task pmd(type: Pmd) {
+    ruleSetFiles = files("${project.rootDir}/gradle/config/pmd.xml")
+    ignoreFailures = false
+    ruleSets = []
+    source 'src'
+    include '**/*.java'
+    exclude '**/gen/**'
+    reports {
+        xml.required = false
+        xml.outputLocation = file("${project.buildDir}/reports/pmd/pmd.xml")
+        html.required = true
+        html.outputLocation = file("$project.buildDir/outputs/pmd/pmd.html")
+    }
+}
+
+spotbugs {
+    ignoreFailures = false
+    showStackTraces = true
+    showProgress = false
+    reportLevel = 'high'
+    excludeFilter = file("${project.rootDir}/gradle/config/findbugs-exclude.xml")
+    onlyAnalyze = ['com.hcaptcha.sdk.*']
+    projectName = name
+    release = version
+}
+
+// enable html report
+gradle.taskGraph.beforeTask { task ->
+    if (task.name.toLowerCase().contains('spotbugs')) {
+        task.reports {
+            html.enabled true
+            xml.enabled true
+        }
+    }
+}
+
+// https://www.rallyhealth.com/coding/code-coverage-for-android-testing
+task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+    def coverageSourceDirs = [
+            "src/main/java"
+    ]
+    def javaClasses = fileTree(
+            dir: "${project.buildDir}/intermediates/javac/debug/classes",
+            excludes: [
+                    '**/R.class',
+                    '**/R$*.class',
+                    '**/BuildConfig.*',
+                    '**/Manifest*.*'
+            ]
+    )
+
+    classDirectories.from files([javaClasses])
+    additionalSourceDirs.from files(coverageSourceDirs)
+    sourceDirectories.from files(coverageSourceDirs)
+    executionData.from = "${project.buildDir}/jacoco/testDebugUnitTest.exec"
+
+    reports {
+        xml.required = true
+        html.required = true
+    }
+}
+
+check.dependsOn('checkstyle', 'pmd', 'jacocoUnitTestReport')
+
+sonarqube {
+    properties {
+        property "sonar.projectKey", "hCaptcha_hcaptcha-android-sdk"
+        property "sonar.organization", "hcaptcha"
+        property "sonar.host.url", "https://sonarcloud.io"
+
+        property "sonar.language", "java"
+        property "sonar.sourceEncoding", "utf-8"
+
+        property "sonar.sources", "src/main"
+        property "sonar.java.binaries", "${project.buildDir}/intermediates/javac/debug/classes"
+        property "sonar.tests", ["src/test/", "../test/src/androidTest/"]
+
+        property "sonar.android.lint.report", "${project.buildDir}/outputs/lint-results.xml"
+        property "sonar.java.spotbugs.reportPaths", ["${project.buildDir}/reports/spotbugs/debug.xml", "${project.buildDir}/reports/spotbugs/release.xml"]
+        property "sonar.java.pmd.reportPaths", "${project.buildDir}/reports/pmd/pmd.xml"
+        property "sonar.java.checkstyle.reportPaths", "${project.buildDir}/reports/checkstyle/checkstyle.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/jacocoUnitTestReport.xml"
+    }
+}
+
+project.tasks["sonarqube"].dependsOn "check"
+

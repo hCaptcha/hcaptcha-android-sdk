@@ -42,9 +42,6 @@ public class HCaptchaWebViewHelperTest {
     IHCaptchaVerifier captchaVerifier;
 
     @Mock
-    HCaptchaStateListener stateListener;
-
-    @Mock
     HCaptchaWebView webView;
 
     @Mock
@@ -62,7 +59,6 @@ public class HCaptchaWebViewHelperTest {
     public void init() {
         MockitoAnnotations.openMocks(this);
         androidLogMock = mockStatic(Log.class);
-        stateListener = mock(HCaptchaStateListener.class);
         webView = mock(HCaptchaWebView.class);
         webSettings = mock(WebSettings.class);
         htmlProvider = mock(IHCaptchaHtmlProvider.class);
@@ -79,7 +75,7 @@ public class HCaptchaWebViewHelperTest {
     @Test
     public void test_constructor() {
         new HCaptchaWebViewHelper(handler, context, config, internalConfig, captchaVerifier,
-                stateListener, webView);
+                webView);
         verify(webView).loadDataWithBaseURL(null, MOCK_HTML, "text/html", "UTF-8", null);
         verify(webView, times(2)).addJavascriptInterface(any(), anyString());
     }
@@ -87,7 +83,7 @@ public class HCaptchaWebViewHelperTest {
     @Test
     public void test_destroy() {
         final HCaptchaWebViewHelper webViewHelper = new HCaptchaWebViewHelper(handler, context, config,
-                internalConfig, captchaVerifier, stateListener, webView);
+                internalConfig, captchaVerifier, webView);
         final ViewGroup viewParent = mock(ViewGroup.class, withSettings().extraInterfaces(ViewParent.class));
         when(webView.getParent()).thenReturn(viewParent);
         webViewHelper.destroy();
@@ -98,7 +94,7 @@ public class HCaptchaWebViewHelperTest {
     @Test
     public void test_destroy_webview_parent_null() {
         final HCaptchaWebViewHelper webViewHelper = new HCaptchaWebViewHelper(handler, context, config,
-                internalConfig, captchaVerifier, stateListener, webView);
+                internalConfig, captchaVerifier, webView);
         webViewHelper.destroy();
     }
 
@@ -106,8 +102,7 @@ public class HCaptchaWebViewHelperTest {
     public void test_config_host_pased() {
         final String host = "https://my.awesome.host";
         when(config.getHost()).thenReturn(host);
-        new HCaptchaWebViewHelper(handler, context, config, internalConfig, captchaVerifier,
-                stateListener, webView);
+        new HCaptchaWebViewHelper(handler, context, config, internalConfig, captchaVerifier, webView);
         verify(webView).loadDataWithBaseURL(host, MOCK_HTML, "text/html", "UTF-8", null);
     }
 }
