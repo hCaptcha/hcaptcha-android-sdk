@@ -11,7 +11,7 @@ plugins {
 }
 
 ext {
-    hcaptchaLoaderVersion = "1.2.3"
+    hcaptchaLoaderVersion = "1.2.4"
 }
 
 android {
