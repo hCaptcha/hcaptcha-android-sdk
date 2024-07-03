@@ -1,7 +1,5 @@
 package com.hcaptcha.sdk.compose
 
-import androidx.compose.ui.test.*
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Text
 import androidx.compose.runtime.getValue
@@ -11,6 +9,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.test.*
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hcaptcha.sdk.HCaptchaCompose
 import com.hcaptcha.sdk.HCaptchaConfig
@@ -66,13 +66,10 @@ class HCaptchaComposeTest {
                 .assertTextEquals("10000000-aaaa-bbbb-cccc-000000000001")
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException::class)
     fun invalidToken() {
-        setContent("")
+        setContent("bad-token")
 
         runBlocking { delay(timeout) }
-
-        composeTestRule.onNodeWithContentDescription(resultContentDescription)
-            .assertTextContains(HCaptchaError.ERROR.name)
     }
 }
