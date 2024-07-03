@@ -13,7 +13,7 @@ import java.util.Locale;
 
 public class HCaptchaConfigTest {
 
-    public static final String MOCK_SITE_KEY = "mocked-site-key";
+    public static final String MOCK_SITE_KEY = "00000000-0000-0000-0000-000000000000";
 
     @Test
     public void custom_locale() {
@@ -90,4 +90,8 @@ public class HCaptchaConfigTest {
                 deserializedObject.toBuilder().retryPredicate(null).build());
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void invalid_site_key() {
+        HCaptchaConfig.builder().siteKey("invalid-uuid-site-key").build();
+    }
 }

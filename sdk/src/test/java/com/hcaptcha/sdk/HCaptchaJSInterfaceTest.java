@@ -36,7 +36,7 @@ public class HCaptchaJSInterfaceTest {
     @Captor
     ArgumentCaptor<HCaptchaException> exceptionCaptor;
 
-    HCaptchaConfig testConfig = HCaptchaConfig.builder().siteKey("0000-1111-2222-3333").build();
+    HCaptchaConfig testConfig = HCaptchaConfig.builder().siteKey(HCaptchaConfigTest.MOCK_SITE_KEY).build();
 
     @Before
     public void init() {
@@ -48,7 +48,7 @@ public class HCaptchaJSInterfaceTest {
 
     @Test
     public void full_config_serialization() throws JSONException {
-        final String siteKey = "0000-1111-2222-3333";
+        final String siteKey = HCaptchaConfigTest.MOCK_SITE_KEY;
         final String locale = "ro";
         final HCaptchaOrientation orientation = HCaptchaOrientation.PORTRAIT;
         final HCaptchaSize size = HCaptchaSize.NORMAL;
@@ -108,7 +108,7 @@ public class HCaptchaJSInterfaceTest {
 
     @Test
     public void subset_config_serialization() throws JSONException {
-        final String siteKey = "0000-1111-2222-3333";
+        final String siteKey = HCaptchaConfigTest.MOCK_SITE_KEY;
         final String locale = "ro";
         final HCaptchaSize size = HCaptchaSize.NORMAL;
         final HCaptchaOrientation orientation = HCaptchaOrientation.LANDSCAPE;

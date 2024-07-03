@@ -181,5 +181,15 @@ public class HCaptchaConfig implements Serializable {
             this.jsSrc(url);
             return this;
         }
+
+        public HCaptchaConfigBuilder siteKey(@NonNull String siteKey) {
+            try {
+                java.util.UUID.fromString(siteKey);
+                this.siteKey = siteKey;
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("hCaptcha site-key must be a valid UUID", e);
+            }
+            return this;
+        }
     }
 }

@@ -37,6 +37,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.Locale;
+import java.util.UUID;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -201,7 +202,7 @@ public class HCaptchaTest {
     @Test
     public void test_verify_config_has_priority_over_setup_config() throws Exception {
         final HCaptchaConfig verifyConfig = HCaptchaConfig.builder()
-                .siteKey(HCaptchaConfigTest.MOCK_SITE_KEY + "-on-verify")
+                .siteKey(HCaptchaConfigTest.MOCK_SITE_KEY)
                 .size(HCaptchaSize.INVISIBLE)
                 .loading(false)
                 .build();
@@ -222,7 +223,7 @@ public class HCaptchaTest {
 
     @Test
     public void test_verify_site_key_has_priority_over_setup_config() throws Exception {
-        final String siteKey = HCaptchaConfigTest.MOCK_SITE_KEY + "-on-verify";
+        final String siteKey = UUID.randomUUID().toString();
         HCaptcha.getClient(fragmentActivity)
                 .setup(config)
                 .verifyWithHCaptcha(siteKey);
