@@ -25,11 +25,16 @@ inputs:
     description: Emulator boot options
     required: true
     default: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+  fresh-avd:
+    description: Force AVD creation and skip cache
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
   steps:
   - name: Cache AVD
+    if: inputs.fresh-avd != 'true'
     uses: actions/cache@v4
     id: avd-cache
     with:
@@ -45,7 +50,7 @@ runs:
       sudo udevadm control --reload-rules
       sudo udevadm trigger --name-match=kvm
   - name: 'Create AVD'
-    if: steps.avd-cache.outputs.cache-hit != 'true'
+    if: inputs.fresh-avd != 'true' && steps.avd-cache.outputs.cache-hit != 'true'
     uses: reactivecircus/android-emulator-runner@v2
     with:
       arch: ${{ inputs.arch }}
@@ -63,6 +68,6 @@ runs:
       profile: ${{ inputs.profile }}
       api-level: ${{ inputs.api-level }}
       emulator-options: ${{ inputs.boot-options }}
-      force-avd-creation: false
+      force-avd-creation: ${{ inputs.fresh-avd == 'true' }}
       disable-animations: true
       script: ${{ inputs.script }}
