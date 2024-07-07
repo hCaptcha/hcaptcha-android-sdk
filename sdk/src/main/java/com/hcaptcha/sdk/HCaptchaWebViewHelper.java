@@ -149,6 +149,7 @@ final class HCaptchaWebViewHelper {
             final String assetPath = assetsCache.get(requestUri);
             if (assetPath != null) {
                 try {
+                    HCaptchaLog.d("[webview] shouldInterceptRequest return local asset for " + requestUri);
                     return new WebResourceResponse(
                             "application/javascript",
                             "UTF-8",
@@ -159,7 +160,7 @@ final class HCaptchaWebViewHelper {
                             view.getContext().getAssets().open(assetPath)
                     );
                 } catch (IOException e) {
-                    HCaptchaLog.w("WebViewHelper wasn't able to load " + assetPath + " from assets");
+                    HCaptchaLog.w("[webview] shouldInterceptRequest wasn't able to load " + assetPath + " from assets");
                 }
             } else if (requestUri != null && requestUri.getScheme() != null && requestUri.getScheme().equals("http")) {
                 handler.post(() -> {

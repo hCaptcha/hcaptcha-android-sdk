@@ -36,8 +36,8 @@
         window.sysDebug = JSON.parse(window.JSDI.getSysDebug());
     }
 </script>
-<script type="text/javascript" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/polyfills.js"></script>
-<script type="text/javascript" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/index.es5.js"></script>
+<script type="text/javascript" integrity="@POLYFILLS_INTEGRITY@" crossorigin="anonymous" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/polyfills.js"></script>
+<script type="text/javascript" integrity="@LOADER_INTEGRITY@" crossorigin="anonymous" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/index.es5.js"></script>
 <script>
     // Android will inject this bridge object as `JSInterface`
     // Browser is missing it, so we mock it

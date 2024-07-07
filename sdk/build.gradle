@@ -119,6 +119,16 @@ project.afterEvaluate {
 
 long MAX_AAR_SIZE_KB = 250
 
+String sha256Integrity(String filename) {
+    def file = new File("${buildDir}/generated/assets/hcaptcha/${filename}")
+    def sha256Hash = file.withInputStream { stream ->
+        org.apache.commons.codec.digest.DigestUtils.sha256(stream)
+    }
+    def base64Hash = org.apache.commons.codec.binary.Base64.encodeBase64String(sha256Hash)
+
+    return "sha256-${base64Hash}"
+}
+
 tasks.register('downloadPolyfillsJs', Download) {
     src "https://www.unpkg.com/@hcaptcha/loader@${hcaptchaLoaderVersion}/dist/polyfills.js"
     dest layout.buildDirectory.file("generated/assets/hcaptcha/polyfills.js")
@@ -170,10 +180,14 @@ android.libraryVariants.all { variant ->
         doFirst {
             def outputJavaClass = file("$outputDir/HCaptchaHtml.java")
             def template = file("$projectDir/src/main/html/HCaptchaHtml.java.tml").text
+            def polyfillsIntegrity = sha256Integrity('polyfills.js')
+            def loaderIntegrity = sha256Integrity('loader.js')
             def html = file("$projectDir/src/main/html/hcaptcha.html")
                     .readLines()
                     .stream()
                     .map({l -> "${l.replaceAll('@LOADER_VERSION@', hcaptchaLoaderVersion)}"})
+                    .map({l -> "${l.replaceAll('@POLYFILLS_INTEGRITY@', polyfillsIntegrity)}"})
+                    .map({l -> "${l.replaceAll('@LOADER_INTEGRITY@', loaderIntegrity)}"})
                     .map({l -> "\"${l.replaceAll('"', '\\\\"')}\\n\""})
                     .collect(java.util.stream.Collectors.joining("\n${' ' * 16}+ "))
 
@@ -189,6 +203,8 @@ android.libraryVariants.all { variant ->
     }
 
     variant.registerJavaGeneratingTask(generateTask, outputDir)
+    generateTask.dependsOn(downloadHCaptchaLoaderJs)
+
     tasks.named("package${variant.name.capitalize()}Assets")
             .get()
             .dependsOn(downloadHCaptchaLoaderJs)
