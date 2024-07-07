@@ -36,7 +36,9 @@
         window.sysDebug = JSON.parse(window.JSDI.getSysDebug());
     }
 </script>
-<script type="text/javascript">
+<script type="text/javascript" integrity="@POLYFILLS_INTEGRITY@" crossorigin="anonymous" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/polyfills.js"></script>
+<script type="text/javascript" integrity="@LOADER_INTEGRITY@" crossorigin="anonymous" src="https://unpkg.com/@hcaptcha/loader@@LOADER_VERSION@/dist/index.es5.js"></script>
+<script>
     // Android will inject this bridge object as `JSInterface`
     // Browser is missing it, so we mock it
     var BridgeObject = window.JSInterface || {
@@ -70,20 +72,40 @@
         }
     };
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
-    var hCaptchaID = null;
     /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
     function resetAndExecute() {
         hcaptcha.reset();
-        hcaptcha.execute(hCaptchaID);
+        execute();
     }
+    window.resetAndExecute = resetAndExecute;
     function reset() {
         hcaptcha.reset();
     }
-    function getTheme(bridgeConfig) {
-        var theme = bridgeConfig.theme;
-        var customTheme = bridgeConfig.customTheme;
+
+    function errorCallback(error) {
+        switch(error) {
+            case "rate-limited":
+                return BridgeObject.onError(31);
+            case "network-error":
+                return BridgeObject.onError(7);
+            case "invalid-data":
+                return BridgeObject.onError(8);
+            case "challenge-error":
+                return BridgeObject.onError(9);
+            case "internal-error":
+                return BridgeObject.onError(10);
+            default:
+                // Error not handled? Log it for debugging purposes
+                console.error(error);
+                return BridgeObject.onError(29);
+        }
+    }
+
+    function getTheme(config) {
+        var theme = config.theme;
+        var customTheme = config.customTheme;
         if (customTheme) {
             try {
                 return JSON.parse(customTheme);
@@ -94,112 +116,94 @@
         }
         return theme;
     }
-    function getRenderConfig() {
+    function getRenderConfig(config) {
         return {
-            sitekey: bridgeConfig.siteKey,
-            size: bridgeConfig.size,
-            orientation: bridgeConfig.orientation,
-            theme: getTheme(bridgeConfig),
+            sitekey: config.siteKey,
+            size: config.size,
+            orientation: config.orientation,
+            theme: getTheme(config),
+            host: config.host || config.siteKey + '.android-sdk.hcaptcha.com',
             callback: function callback(token) {
+                console.log("callback");
                 return BridgeObject.onPass(token);
             },
             'chalexpired-callback': function chalexpiredCallback() {
+                console.log("chalexpired-callback");
                 return BridgeObject.onError(15);
             },
             'close-callback': function closeCallback() {
+                console.log("close-callback");
                 return BridgeObject.onError(30);
-            },
-            'error-callback': function errorCallback(error) {
-                switch(error) {
-                    case "rate-limited":
-                        return BridgeObject.onError(31);
-                    case "network-error":
-                        return BridgeObject.onError(7);
-                    case "invalid-data":
-                        return BridgeObject.onError(8);
-                    case "challenge-error":
-                        return BridgeObject.onError(9);
-                    case "internal-error":
-                        return BridgeObject.onError(10);
-                    default:
-                        // Error not handled? Log it for debugging purposes
-                        console.error(error);
-                        return BridgeObject.onError(29);
-                }
             },
             'open-callback': function openCallback() {
                 return BridgeObject.onOpen();
-            }
+            },
+            'error-callback': errorCallback
         };
     }
-    function onHcaptchaLoaded() {
-        try {
-            var renderConfig = getRenderConfig();
-            hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
-            BridgeObject.onLoaded();
-            var rqdata = bridgeConfig.rqdata;
-            if (rqdata) {
-                hcaptcha.setData(hCaptchaID, { rqdata: rqdata });
-            }
-            if (renderConfig.size === 'invisible' && !bridgeConfig.hideDialog) {
-                // We want to auto execute in case of `invisible` checkbox.
-                // But not in case of `hideDialog` since verification process
-                // might be desired to happen at a later time.
-                hcaptcha.execute(hCaptchaID);
-            }
-        } catch (e) {
-            console.error(e);
-            BridgeObject.onError(29);
-        }
-    }
-    function addQueryParamIfDefined(url, queryName, queryValue) {
-        if (queryValue !== undefined && queryValue !== null) {
-            var link = url.indexOf('?') !== -1 ? '&' : '?';
-            return url + link + queryName + '=' + encodeURIComponent(queryValue);
-        }
-        return url;
-    }
-    function loadApi() {
-        var siteKey = bridgeConfig.siteKey;
-        var locale = bridgeConfig.locale;
-        var sentry = bridgeConfig.sentry;
-        var jsSrc = bridgeConfig.jsSrc;
-        var endpoint = bridgeConfig.endpoint;
-        var assethost = bridgeConfig.assethost;
-        var imghost = bridgeConfig.imghost;
-        var reportapi = bridgeConfig.reportapi;
-        var host = bridgeConfig.host || siteKey + '.android-sdk.hcaptcha.com';
-        var scriptSrc = jsSrc + '?render=explicit&onload=' + onHcaptchaLoaded.name;
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'recaptchacompat', 'off');
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'hl', locale);
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'host', host);
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'sentry', sentry);
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'endpoint', endpoint);
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'assethost', assethost);
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'imghost', imghost);
-        scriptSrc = addQueryParamIfDefined(scriptSrc, 'reportapi', reportapi);
-        if (bridgeConfig.customTheme) {
-            scriptSrc = addQueryParamIfDefined(scriptSrc, 'custom', 'true');
-        }
-        var script = document.createElement('script');
-        script.async = true;
-        script.src = scriptSrc;
-        script.onerror = function () {
-            // network issue
-            BridgeObject.onError(7);
+    function getScriptParams(config) {
+        return {
+            scriptLocation: document.head,
+            apihost: config.jsSrc,
+            loadAsync: true,
+            async: true,
         };
-        document.head.appendChild(script);
+    }
+    function getLoaderParams(config) {
+        var result = getScriptParams(config);
+
+        result.render = 'explicit';
+        result.sentry = config.sentry;
+        result.custom = !!config.customTheme;
+        result.assethost = config.assethost;
+        result.imghost = config.imghost;
+        result.reportapi = config.reportapi;
+        result.endpoint = config.endpoint;
+        result.host = config.host || config.siteKey + '.android-sdk.hcaptcha.com';
+        result.recaptchacompat = 'off';
+        result.hl = config.locale;
+        result.cleanup = true;
+
+        return result;
     }
     var container = document.getElementById("hcaptcha-container");
     container.addEventListener("click", function () {
-        if (window.hcaptcha) {
+        if (hcaptcha) {
             // Allows dismissal of checkbox view
-            window.hcaptcha.close();
+            hcaptcha.close();
         } else {
             BridgeObject.onError(30);
         }
     });
-    loadApi();
+    function execute() {
+        hcaptcha.execute(getScriptParams(bridgeConfig)).then(function(result) {
+            var response = result.response;
+            BridgeObject.onPass(response);
+        }).catch(function(error) {
+            errorCallback(error);
+        });
+    }
+    function loadApi(config) {
+        hCaptchaLoader(getLoaderParams(config)).then(function(hcaptcha) {
+            var renderConfig = getRenderConfig(config);
+            hcaptcha.render("hcaptcha-container", renderConfig);
+            BridgeObject.onLoaded();
+            var rqdata = config.rqdata;
+            if (rqdata) {
+                hcaptcha.setData({ rqdata: rqdata });
+            }
+            if (renderConfig.size === 'invisible' && !config.hideDialog) {
+                // We want to auto execute in case of `invisible` checkbox.
+                // But not in case of `hideDialog` since verification process
+                // might be desired to happen at a later time.
+                execute();
+            }
+        }).catch(function(error) {
+            console.error("loadApi error", error);
+            BridgeObject.onError(29);
+        });
+    }
+    loadApi(bridgeConfig);
 </script>
 </body>
 </html>

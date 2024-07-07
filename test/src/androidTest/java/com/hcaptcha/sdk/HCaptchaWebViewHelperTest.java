@@ -2,15 +2,20 @@ package com.hcaptcha.sdk;
 
 import static com.hcaptcha.sdk.AssertUtil.failAsNonReachable;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
+import android.content.Context;
+import android.content.res.AssetManager;
 import android.app.Activity;
 import android.os.Handler;
 import android.os.Looper;
 
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
+import androidx.test.platform.app.InstrumentationRegistry;
 
 import com.hcaptcha.sdk.test.TestActivity;
 
@@ -18,6 +23,8 @@ import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -87,5 +94,23 @@ public class HCaptchaWebViewHelperTest {
         });
 
         assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void testLoaderJsAssetPresence() throws IOException {
+        AssetManager assets = InstrumentationRegistry
+                .getInstrumentation()
+                .getTargetContext()
+                .getAssets();
+        assertNotNull(assets.open("hcaptcha/loader.js"));
+    }
+
+    @Test
+    public void testPolyfillsJsAssetPresence() throws IOException {
+        AssetManager assets = InstrumentationRegistry
+                .getInstrumentation()
+                .getTargetContext()
+                .getAssets();
+        assertNotNull(assets.open("hcaptcha/polyfills.js"));
     }
 }

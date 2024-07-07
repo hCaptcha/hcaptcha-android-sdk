@@ -22,6 +22,12 @@ import androidx.annotation.RequiresApi;
 import lombok.Getter;
 import lombok.NonNull;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
+
 final class HCaptchaWebViewHelper {
     @NonNull
     private final Context context;
@@ -120,12 +126,17 @@ final class HCaptchaWebViewHelper {
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class HCaptchaWebClient extends WebViewClient {
+        private final Map<Uri, String> assetsCache = new HashMap<>();
 
         @NonNull
         private final Handler handler;
 
         HCaptchaWebClient(@NonNull Handler handler) {
             this.handler = handler;
+
+            final String baseUrl = "https://unpkg.com/@hcaptcha/loader@" + BuildConfig.LOADER_VERSION + "/dist";
+            assetsCache.put(Uri.parse(baseUrl + "/index.es5.js"), "hcaptcha/loader.js");
+            assetsCache.put(Uri.parse(baseUrl + "/polyfills.js"), "hcaptcha/polyfills.js");
         }
 
         private String stripUrl(String url) {
@@ -135,7 +146,23 @@ final class HCaptchaWebViewHelper {
         @Override
         public WebResourceResponse shouldInterceptRequest (final WebView view, final WebResourceRequest request) {
             final Uri requestUri = request.getUrl();
-            if (requestUri != null && requestUri.getScheme() != null && requestUri.getScheme().equals("http")) {
+            final String assetPath = assetsCache.get(requestUri);
+            if (assetPath != null) {
+                try {
+                    HCaptchaLog.d("[webview] shouldInterceptRequest return local asset for " + requestUri);
+                    return new WebResourceResponse(
+                            "application/javascript",
+                            "UTF-8",
+                            200,
+                            "OK",
+                            Collections.singletonMap("Access-Control-Allow-Origin",
+                                    Objects.toString(config.getHost(), "null")),
+                            view.getContext().getAssets().open(assetPath)
+                    );
+                } catch (IOException e) {
+                    HCaptchaLog.w("[webview] shouldInterceptRequest wasn't able to load " + assetPath + " from assets");
+                }
+            } else if (requestUri != null && requestUri.getScheme() != null && requestUri.getScheme().equals("http")) {
                 handler.post(() -> {
                     webView.removeJavascriptInterface(HCaptchaJSInterface.JS_INTERFACE_TAG);
                     webView.removeJavascriptInterface(HCaptchaDebugInfo.JS_INTERFACE_TAG);

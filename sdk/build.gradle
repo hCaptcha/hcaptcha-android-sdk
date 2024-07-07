@@ -7,6 +7,11 @@ plugins {
     id "com.github.spotbugs" version "5.2.3"
     id "org.owasp.dependencycheck" version "7.1.1"
     id "org.sonarqube" version "3.4.0.2513"
+    id "de.undercouch.download" version "5.5.0"
+}
+
+ext {
+    hcaptchaLoaderVersion = "1.2.4"
 }
 
 android {
@@ -18,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        minSdkVersion 16
+        minSdkVersion 16 // Android 4.1
         targetSdkVersion 34
 
         // See https://developer.android.com/studio/publish/versioning
@@ -31,6 +36,7 @@ android {
         versionName "4.0.0"
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
+        buildConfigField 'String', 'LOADER_VERSION', "\"${hcaptchaLoaderVersion}\""
 
         consumerProguardFiles "consumer-rules.pro"
         proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -111,7 +117,31 @@ project.afterEvaluate {
     }
 }
 
-long MAX_AAR_SIZE_KB = 200
+long MAX_AAR_SIZE_KB = 250
+
+String sha256Integrity(String filename) {
+    def file = new File("${buildDir}/generated/assets/hcaptcha/${filename}")
+    def sha256Hash = file.withInputStream { stream ->
+        org.apache.commons.codec.digest.DigestUtils.sha256(stream)
+    }
+    def base64Hash = org.apache.commons.codec.binary.Base64.encodeBase64String(sha256Hash)
+
+    return "sha256-${base64Hash}"
+}
+
+tasks.register('downloadPolyfillsJs', Download) {
+    src "https://www.unpkg.com/@hcaptcha/loader@${hcaptchaLoaderVersion}/dist/polyfills.js"
+    dest layout.buildDirectory.file("generated/assets/hcaptcha/polyfills.js")
+    onlyIfModified true
+}
+
+tasks.register('downloadHCaptchaLoaderJs', Download) {
+    src "https://www.unpkg.com/@hcaptcha/loader@${hcaptchaLoaderVersion}/dist/index.es5.js"
+    dest layout.buildDirectory.file("generated/assets/hcaptcha/loader.js")
+    onlyIfModified true
+}.get().dependsOn('downloadPolyfillsJs')
+
+android.sourceSets.main.assets.srcDirs += [layout.buildDirectory.file("generated/assets")]
 
 android.libraryVariants.all { variant ->
     def variantName = variant.name.capitalize()
@@ -136,7 +166,7 @@ android.libraryVariants.all { variant ->
             var aarFile = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
             long aarSizeKb = aarFile.length() / 1024
             if (aarSizeKb > MAX_AAR_SIZE_KB) {
-                throw new GradleException("${aarPath} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
+                throw new GradleException("${aarFile} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
             }
         }
     })
@@ -150,9 +180,14 @@ android.libraryVariants.all { variant ->
         doFirst {
             def outputJavaClass = file("$outputDir/HCaptchaHtml.java")
             def template = file("$projectDir/src/main/html/HCaptchaHtml.java.tml").text
+            def polyfillsIntegrity = sha256Integrity('polyfills.js')
+            def loaderIntegrity = sha256Integrity('loader.js')
             def html = file("$projectDir/src/main/html/hcaptcha.html")
                     .readLines()
                     .stream()
+                    .map({l -> "${l.replaceAll('@LOADER_VERSION@', hcaptchaLoaderVersion)}"})
+                    .map({l -> "${l.replaceAll('@POLYFILLS_INTEGRITY@', polyfillsIntegrity)}"})
+                    .map({l -> "${l.replaceAll('@LOADER_INTEGRITY@', loaderIntegrity)}"})
                     .map({l -> "\"${l.replaceAll('"', '\\\\"')}\\n\""})
                     .collect(java.util.stream.Collectors.joining("\n${' ' * 16}+ "))
 
@@ -167,8 +202,15 @@ android.libraryVariants.all { variant ->
         }
     }
 
-    // preBuild.dependsOn generateTask
     variant.registerJavaGeneratingTask(generateTask, outputDir)
+    generateTask.dependsOn(downloadHCaptchaLoaderJs)
+
+    tasks.named("package${variant.name.capitalize()}Assets")
+            .get()
+            .dependsOn(downloadHCaptchaLoaderJs)
+    tasks.named("merge${variant.name.capitalize()}Assets")
+            .get()
+            .dependsOn(downloadHCaptchaLoaderJs)
 }
 
 apply from: "$rootProject.projectDir/gradle/shared/code-quality.gradle"
