@@ -157,8 +157,8 @@ jobs:
         with:
           name: androidTest-benchmark-results
           path: |
-            benchmark/build/outputs/androidTest-results
-            benchmark/build/reports/androidTests
+            benchmark/build/outputs/
+            benchmark/build/reports/
       - name: Diff benchmark result
         id: diff-benchmark
         uses: ./.github/actions/android-benchmark-diff
