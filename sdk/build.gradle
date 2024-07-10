@@ -9,6 +9,10 @@ plugins {
     id "org.sonarqube" version "3.4.0.2513"
 }
 
+ext {
+    maxAarSizeKb = 200
+}
+
 android {
     compileSdk 34
     namespace 'com.hcaptcha.sdk'
@@ -111,64 +115,6 @@ project.afterEvaluate {
     }
 }
 
-long MAX_AAR_SIZE_KB = 200
-
-android.libraryVariants.all { variant ->
-    def variantName = variant.name.capitalize()
-    project.task("report${variantName}AarSize") {
-        group 'Help'
-        description "Report ${variant.name} AAR size"
-        dependsOn variant.packageLibraryProvider
-
-        doFirst {
-            var aarPath = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
-            long aarSizeKb = aarPath.length() / 1024
-            println("File ${aarPath} is ${aarSizeKb}Kbyte")
-        }
-    }
-
-    project.tasks.findByName("check").dependsOn(project.task("check${variantName}AarSize") {
-        group 'Verification'
-        description "Checks ${variant.name} AAR size doesn't exceed ${MAX_AAR_SIZE_KB}Kb"
-        dependsOn variant.packageLibraryProvider
-
-        doFirst {
-            var aarFile = variant.packageLibraryProvider.get().archiveFile.get().getAsFile()
-            long aarSizeKb = aarFile.length() / 1024
-            if (aarSizeKb > MAX_AAR_SIZE_KB) {
-                throw new GradleException("${aarPath} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
-            }
-        }
-    })
-
-    def packageName = "com.hcaptcha.sdk"
-    def outputDir = file("${project.buildDir}/generated/source/hcaptcha/${variant.name}/${packageName.replaceAll('\\.', '/')}")
-    def generateTask = project.task("generate${variantName}JavaClassFromStaticHtml") {
-        group 'Generate'
-        description "Generate HTML java class"
-
-        doFirst {
-            def outputJavaClass = file("$outputDir/HCaptchaHtml.java")
-            def template = file("$projectDir/src/main/html/HCaptchaHtml.java.tml").text
-            def html = file("$projectDir/src/main/html/hcaptcha.html")
-                    .readLines()
-                    .stream()
-                    .map({l -> "\"${l.replaceAll('"', '\\\\"')}\\n\""})
-                    .collect(java.util.stream.Collectors.joining("\n${' ' * 16}+ "))
-
-            def engine = new groovy.text.SimpleTemplateEngine()
-            def src = engine.createTemplate(template).make([
-                    "htmlContent": html,
-                    "packageName": packageName
-            ])
-
-            outputDir.mkdirs()
-            outputJavaClass.write(src.toString())
-        }
-    }
-
-    // preBuild.dependsOn generateTask
-    variant.registerJavaGeneratingTask(generateTask, outputDir)
-}
-
 apply from: "$rootProject.projectDir/gradle/shared/code-quality.gradle"
+apply from: "$rootProject.projectDir/gradle/shared/size-check.gradle"
+apply from: "$rootProject.projectDir/gradle/shared/html-java-gen.gradle"
