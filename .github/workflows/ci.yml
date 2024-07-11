@@ -152,7 +152,7 @@ jobs:
           script: |
             adb uninstall com.hcaptcha.sdk.bench.test || true
             ./gradlew benchmark:connectedReleaseAndroidTest
-      - if: failure()
+      - if: always()
         uses: actions/upload-artifact@v4
         with:
           name: androidTest-benchmark-results
