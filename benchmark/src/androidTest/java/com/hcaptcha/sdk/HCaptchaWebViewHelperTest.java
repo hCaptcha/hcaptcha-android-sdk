@@ -10,12 +10,14 @@ import androidx.benchmark.junit4.BenchmarkRule;
 import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.concurrent.CountDownLatch;
 
+@Ignore("https://github.com/hCaptcha/hcaptcha-android-sdk/issues/101")
 @RunWith(AndroidJUnit4.class)
 public class HCaptchaWebViewHelperTest {
     @Rule
