@@ -14,8 +14,10 @@ inputs:
 outputs:
   granted:
     description: 'true if the user has the required permission, false otherwise'
+    value: ${{ steps.check.outputs.granted }}
   permission:
     description: actual user permission (admin, write, read)
+    value: ${{ steps.check.outputs.permission }}
 
 runs:
   using: "composite"
