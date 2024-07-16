@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.0.1
+
+- Feat: release of `compose-sdk`
+
 # 4.0.0
 
 - Feat (breaking change): accept `HCaptcha.getClient(Activity)` for passive sitekeys. (#112)
