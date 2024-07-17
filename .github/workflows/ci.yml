@@ -223,12 +223,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - uses: peter-evans/find-comment@v3
+        if: github.event_name == 'pull_request'
         id: find_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: SonarQube Execution
       - uses: peter-evans/create-or-update-comment@v4
-        if: steps.find_comment.outputs.comment-id == null && steps.write_access.outputs.granted == 'false'
+        if: github.event_name == 'pull_request' && steps.find_comment.outputs.comment-id == null && steps.write_access.outputs.granted == 'false'
         with:
           body: |
             SonarQube Execution Skipped. `${{ github.triggering_actor }}` does not have permissions on this repo. Maintainers will rerun it manually
@@ -237,7 +238,7 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.GITHUB_TOKEN }}
       - uses: peter-evans/create-or-update-comment@v4
-        if: steps.find_comment.outputs.comment-id != null && steps.write_access.outputs.granted == 'true'
+        if: github.event_name == 'pull_request' && steps.find_comment.outputs.comment-id != null && steps.write_access.outputs.granted == 'true'
         with:
           body: |
             
