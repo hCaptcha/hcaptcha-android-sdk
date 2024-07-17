@@ -44,7 +44,6 @@ android {
 
 dependencies {
     implementation project(path: ':sdk')
-    // implementation "com.github.hCaptcha.hcaptcha-android-sdk:sdk:main-SNAPSHOT"
 
     //noinspection GradleDependency
     implementation "androidx.appcompat:appcompat:${prop('exampleAppcompatVersion', '1.3.1')}"
