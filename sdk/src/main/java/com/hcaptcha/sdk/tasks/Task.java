@@ -17,19 +17,19 @@ import java.util.concurrent.TimeUnit;
 /**
  * Generic task definition which allows registration of listeners for the result/error of the task.
  *
- * @param <TResult> The result type of the task.
+ * @param <R> The result type of the task.
  */
-public abstract class Task<TResult> {
+public abstract class Task<R> {
 
     private boolean complete;
 
     private boolean successful;
 
-    private TResult result;
+    private R result;
 
     private HCaptchaException hCaptchaException;
 
-    private final List<OnSuccessListener<TResult>> onSuccessListeners;
+    private final List<OnSuccessListener<R>> onSuccessListeners;
 
     private final List<OnFailureListener> onFailureListeners;
 
@@ -72,7 +72,7 @@ public abstract class Task<TResult> {
      * @return the result object
      */
     @Nullable
-    protected TResult getResult() {
+    protected R getResult() {
         return result;
     }
 
@@ -89,7 +89,7 @@ public abstract class Task<TResult> {
      *
      * @param result the result object
      */
-    protected void setResult(TResult result) {
+    protected void setResult(R result) {
         this.result = result;
         this.successful = true;
         this.complete = true;
@@ -138,7 +138,7 @@ public abstract class Task<TResult> {
      * @param onSuccessListener the success listener to be triggered
      * @return current object
      */
-    public Task<TResult> addOnSuccessListener(@NonNull final OnSuccessListener<TResult> onSuccessListener) {
+    public Task<R> addOnSuccessListener(@NonNull final OnSuccessListener<R> onSuccessListener) {
         this.onSuccessListeners.add(onSuccessListener);
         tryCb();
         return this;
@@ -149,7 +149,7 @@ public abstract class Task<TResult> {
      * @param onSuccessListener the success listener to be removed
      * @return current object
      */
-    public Task<TResult> removeOnSuccessListener(@NonNull final OnSuccessListener<TResult> onSuccessListener) {
+    public Task<R> removeOnSuccessListener(@NonNull final OnSuccessListener<R> onSuccessListener) {
         if (!onSuccessListeners.remove(onSuccessListener)) {
             HCaptchaLog.d("removeOnSuccessListener: %1 not found and cannot be removed", onSuccessListener);
         }
@@ -162,7 +162,7 @@ public abstract class Task<TResult> {
      * @param onFailureListener the failure listener to be triggered
      * @return current object
      */
-    public Task<TResult> addOnFailureListener(@NonNull final OnFailureListener onFailureListener) {
+    public Task<R> addOnFailureListener(@NonNull final OnFailureListener onFailureListener) {
         this.onFailureListeners.add(onFailureListener);
         tryCb();
         return this;
@@ -173,7 +173,7 @@ public abstract class Task<TResult> {
      * @param onFailureListener to be removed
      * @return current object
      */
-    public Task<TResult> removeOnFailureListener(@NonNull final OnFailureListener onFailureListener) {
+    public Task<R> removeOnFailureListener(@NonNull final OnFailureListener onFailureListener) {
         if (!onFailureListeners.remove(onFailureListener)) {
             HCaptchaLog.d("removeOnFailureListener: %1 not found and cannot be removed", onFailureListener);
         }
@@ -186,7 +186,7 @@ public abstract class Task<TResult> {
      * @param onOpenListener the open listener to be triggered
      * @return current object
      */
-    public Task<TResult> addOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
+    public Task<R> addOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
         this.onOpenListeners.add(onOpenListener);
         tryCb();
         return this;
@@ -197,7 +197,7 @@ public abstract class Task<TResult> {
      * @param onOpenListener to be removed
      * @return current object
      */
-    public Task<TResult> removeOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
+    public Task<R> removeOnOpenListener(@NonNull final OnOpenListener onOpenListener) {
         if (!onOpenListeners.remove(onOpenListener)) {
             HCaptchaLog.d("removeOnOpenListener: %1 not found and cannot be removed", onOpenListener);
         }
@@ -208,7 +208,7 @@ public abstract class Task<TResult> {
      * Remove all listeners: success, failure and open listeners
      * @return current object
      */
-    public Task<TResult> removeAllListeners() {
+    public Task<R> removeAllListeners() {
         onSuccessListeners.clear();
         onFailureListeners.clear();
         onOpenListeners.clear();
@@ -218,7 +218,7 @@ public abstract class Task<TResult> {
     private void tryCb() {
         boolean shouldReset = false;
         if (getResult() != null) {
-            for (OnSuccessListener<TResult> onSuccessListener : onSuccessListeners) {
+            for (OnSuccessListener<R> onSuccessListener : onSuccessListeners) {
                 onSuccessListener.onSuccess(getResult());
                 shouldReset = true;
             }
