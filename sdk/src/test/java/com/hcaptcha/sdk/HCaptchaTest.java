@@ -247,12 +247,14 @@ public class HCaptchaTest {
     }
 
     @Test
+    @SuppressWarnings("java:S2699") // expect no exception thrown for public API call
     public void test_reset() {
         HCaptcha.getClient(fragmentActivity).setup(config).reset();
         verify(fragment).reset();
     }
 
     @Test
+    @SuppressWarnings("java:S2699") // expect no exception thrown for public API call
     public void test_remove_listener() {
         HCaptcha.getClient(fragmentActivity)
                 .addOnSuccessListener(onSuccessListener)
@@ -260,6 +262,7 @@ public class HCaptchaTest {
     }
 
     @Test
+    @SuppressWarnings("java:S2699") // expect no exception thrown for public API call
     public void test_remove_non_existing_listener() {
         HCaptcha.getClient(fragmentActivity)
                 .removeOnSuccessListener(onSuccessListener);
