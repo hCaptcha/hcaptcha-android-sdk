@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.runtime.*
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,15 +29,16 @@ class ComposeActivity : ComponentActivity() {
         setContent {
             var hCaptchaStarted by remember { mutableStateOf(false) }
             var hCaptchaLoaded by remember { mutableStateOf(false) }
+            var hideDialog by remember { mutableStateOf(false) }
             var text by remember { mutableStateOf("") }
 
             Column(
                 modifier = Modifier.fillMaxSize().padding(16.dp),
                 verticalArrangement = Arrangement.Bottom
             ) {
-                // Multiline Text
                 TextField(
                     value = text,
+                    placeholder = { Text("Verification result will be here...") },
                     onValueChange = { newText -> text = newText },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -44,15 +46,32 @@ class ComposeActivity : ComponentActivity() {
                         .background(Color.Gray)
                 )
 
+                Spacer(modifier = Modifier.weight(1f))
+
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(
+                        checked = hideDialog,
+                        onCheckedChange = { isChecked ->
+                            hideDialog = isChecked
+                        }
+                    )
+
+                    Text(
+                        text = "Hide Dialog (Passive Site Key)",
+                    )
+                }
+
                 Button(
                     onClick = {
                         hCaptchaStarted = !hCaptchaStarted
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp)
+                        .padding(vertical = 16.dp)
                 ) {
-                    Text(text = "Toggle WebView")
+                    Text(text = "Verify with HCaptcha")
                 }
 
                 if (hCaptchaStarted && !hCaptchaLoaded) {
@@ -68,11 +87,12 @@ class ComposeActivity : ComponentActivity() {
                     }
                 }
 
-                // WebView Dialog
                 if (hCaptchaStarted) {
                     HCaptchaCompose(HCaptchaConfig
                         .builder()
                         .siteKey("10000000-ffff-ffff-ffff-000000000001")
+                        .hideDialog(hideDialog)
+                        .diagnosticLog(true)
                         .build()) { result ->
                         when (result) {
                             is HCaptchaResponse.Success -> {
@@ -89,7 +109,7 @@ class ComposeActivity : ComponentActivity() {
                             }
                             is HCaptchaResponse.Event -> {
                                 if (result.event == HCaptchaEvent.Opened) {
-                                    hCaptchaLoaded = true;
+                                    hCaptchaLoaded = true
                                 }
                                 println("Event: ${result.event}")
                             }

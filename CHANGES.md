@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.0.2
+
+- Fix: passive site keys (hideDialog=true) broken for `compose-sdk`
+
 # 4.0.1
 
 - Feat: release of `compose-sdk`
