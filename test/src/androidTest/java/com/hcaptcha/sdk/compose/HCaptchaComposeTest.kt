@@ -16,6 +16,7 @@ import com.hcaptcha.sdk.HCaptchaCompose
 import com.hcaptcha.sdk.HCaptchaConfig
 import com.hcaptcha.sdk.HCaptchaError
 import com.hcaptcha.sdk.HCaptchaResponse
+import com.hcaptcha.sdk.HCaptchaSize
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -25,13 +26,18 @@ import java.util.concurrent.TimeUnit
 
 @RunWith(AndroidJUnit4::class)
 class HCaptchaComposeTest {
+    companion object {
+        const val SITE_KEY = "10000000-ffff-ffff-ffff-000000000001"
+        const val TEST_TOKEN = "10000000-aaaa-bbbb-cccc-000000000001"
+    }
+
     private val resultContentDescription = "HCaptchaResultString"
     private val timeout = TimeUnit.SECONDS.toMillis(4)
 
     @get:Rule
     val composeTestRule = createComposeRule()
 
-    fun setContent(token: String = "10000000-ffff-ffff-ffff-000000000001") {
+    fun setContent(siteKey: String = SITE_KEY, passiveSiteKey: Boolean = false) {
         composeTestRule.setContent {
             var text by remember { mutableStateOf("<init>") }
             Column {
@@ -39,8 +45,10 @@ class HCaptchaComposeTest {
 
                 HCaptchaCompose(HCaptchaConfig
                     .builder()
-                    .siteKey(token)
+                    .siteKey(siteKey)
                     .diagnosticLog(true)
+                    .size(HCaptchaSize.INVISIBLE)
+                    .hideDialog(passiveSiteKey)
                     .build()) { result ->
                     when (result) {
                         is HCaptchaResponse.Success -> {
@@ -63,7 +71,7 @@ class HCaptchaComposeTest {
         runBlocking { delay(timeout) }
 
         composeTestRule.onNodeWithContentDescription(resultContentDescription)
-                .assertTextEquals("10000000-aaaa-bbbb-cccc-000000000001")
+                .assertTextEquals(TEST_TOKEN)
     }
 
     @Test
@@ -74,5 +82,15 @@ class HCaptchaComposeTest {
 
         composeTestRule.onNodeWithContentDescription(resultContentDescription)
             .assertTextContains(HCaptchaError.ERROR.name)
+    }
+
+    @Test
+    fun passiveSiteKey() {
+        setContent(SITE_KEY, true)
+
+        runBlocking { delay(timeout) }
+
+        composeTestRule.onNodeWithContentDescription(resultContentDescription)
+            .assertTextEquals(TEST_TOKEN)
     }
 }
