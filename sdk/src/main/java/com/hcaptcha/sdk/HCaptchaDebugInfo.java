@@ -33,13 +33,16 @@ import java.util.Map;
 final class HCaptchaDebugInfo implements Serializable {
     public static final String JS_INTERFACE_TAG = "JSDI";
     private static final String GET_PROP_BIN = "/system/bin/getprop";
+    @SuppressWarnings("java:S4719") // minSdkVersion is 16 and StandardCharsets.UTF_8 is available from 19
     private static final String CHARSET_NAME = "UTF-8";
+
+    private static final int MAX_ENTRIES = 512;
 
     private static String sDebugInfo = "[]";
     private static String sSysDebug;
 
     @NonNull
-    private final Context context;
+    private final transient Context context;
 
     @JavascriptInterface
     public String getDebugInfo() {
@@ -87,12 +90,13 @@ final class HCaptchaDebugInfo implements Serializable {
 
     List<String> debugInfo(String packageName, String packageCode)
             throws IOException, NoSuchAlgorithmException {
-        final List<String> result = new ArrayList<>(512);
+        final List<String> result = new ArrayList<>(8);
         final MessageDigest androidMd5 = MessageDigest.getInstance("MD5");
         final MessageDigest appMd5 = MessageDigest.getInstance("MD5");
         final MessageDigest depsMd5 = MessageDigest.getInstance("MD5");
         final DexFile dexFile = new DexFile(packageCode);
         try {
+            int entryCount = 0;
             final Enumeration<String> classes = dexFile.entries();
             while (classes.hasMoreElements()) {
                 final String cls = classes.nextElement();
@@ -102,6 +106,10 @@ final class HCaptchaDebugInfo implements Serializable {
                     appMd5.update(cls.getBytes(CHARSET_NAME));
                 } else {
                     depsMd5.update(cls.getBytes(CHARSET_NAME));
+                }
+
+                if (++entryCount > MAX_ENTRIES) {
+                    break;
                 }
             }
         } finally {

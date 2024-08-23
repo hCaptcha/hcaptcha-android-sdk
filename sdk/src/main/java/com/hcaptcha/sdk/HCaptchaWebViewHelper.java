@@ -162,6 +162,7 @@ final class HCaptchaWebViewHelper {
         }
 
         @Override
+        @SuppressWarnings("java:S1874") // another onReceivedError with non-deprecated signature requires 23 API level
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
             HCaptchaLog.d("[webview] onReceivedError \"%s\" (%d)", description, errorCode);
