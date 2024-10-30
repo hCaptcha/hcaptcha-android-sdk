@@ -70,9 +70,9 @@ android {
 dependencies {
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.3'
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-inline:4.8.1'
