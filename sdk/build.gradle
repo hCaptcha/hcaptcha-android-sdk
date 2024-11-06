@@ -28,11 +28,11 @@ android {
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
-        versionCode 41
+        versionCode 42
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "4.0.2"
+        versionName "4.0.3"
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 
@@ -70,9 +70,9 @@ android {
 dependencies {
     //noinspection GradleDependency
     implementation 'androidx.appcompat:appcompat:1.3.1'
-    implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.3'
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.3'
+    compileOnly 'org.projectlombok:lombok:1.18.32'
+    annotationProcessor 'org.projectlombok:lombok:1.18.32'
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.mockito:mockito-inline:4.8.1'

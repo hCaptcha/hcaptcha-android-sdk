@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.0.3
+
+- Upgrade: third-party dependencies (lombok, jackson-databind) (#167)
+
 # 4.0.2
 
 - Fix: passive site keys (hideDialog=true) broken for `compose-sdk`
