@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.0.4
+
+= Downgrade: jackson-databind to 2.13.* (#170)
+
 # 4.0.3
 
 - Upgrade: third-party dependencies (lombok, jackson-databind) (#167)

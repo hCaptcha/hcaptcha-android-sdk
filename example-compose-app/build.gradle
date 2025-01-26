@@ -8,12 +8,12 @@ def intProp(name, fallback) {
 }
 
 android {
-    compileSdk intProp("exampleCompileSdkVersion", 34)
+    compileSdk intProp("exampleCompileSdkVersion", 35)
     namespace 'com.hcaptcha.example.compose'
 
     defaultConfig {
         minSdkVersion 23
-        targetSdkVersion intProp("exampleTargetSdkVersion", 34)
+        targetSdkVersion intProp("exampleTargetSdkVersion", 35)
         versionCode 1
         versionName "0.0.1"
 
