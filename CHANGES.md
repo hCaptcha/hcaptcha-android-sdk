@@ -1,8 +1,12 @@
 # Changelog
 
+# 4.0.5
+
+- compose-sdk: set minSdk to 21
+
 # 4.0.4
 
-= Downgrade: jackson-databind to 2.13.* (#170)
+- Downgrade: jackson-databind to 2.13.* (#170)
 
 # 4.0.3
 
