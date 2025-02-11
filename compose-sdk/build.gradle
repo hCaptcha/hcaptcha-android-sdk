@@ -15,16 +15,16 @@ android {
     compileSdk 35
 
     defaultConfig {
-        minSdk 23
+        minSdk 21
 
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
-        versionCode 43
+        versionCode 44
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "4.0.4"
+        versionName "4.0.5"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
