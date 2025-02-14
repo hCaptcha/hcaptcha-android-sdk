@@ -2,7 +2,7 @@ checkstyle {
     toolVersion = '8.45.1'
 }
 
-task checkstyle(type: Checkstyle) {
+tasks.register('checkstyle', Checkstyle) {
     description 'Check code standard'
     group 'verification'
     configFile file("${rootDir}/gradle/config/checkstyle.xml")
@@ -19,7 +19,7 @@ pmd {
     toolVersion = "6.51.0"
 }
 
-task pmd(type: Pmd) {
+tasks.register('pmd', Pmd) {
     ruleSetFiles = files("${project.rootDir}/gradle/config/pmd.xml")
     ignoreFailures = false
     ruleSets = []
@@ -56,7 +56,8 @@ gradle.taskGraph.beforeTask { task ->
 }
 
 // https://www.rallyhealth.com/coding/code-coverage-for-android-testing
-task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) {
+tasks.register('jacocoUnitTestReport', JacocoReport) {
+    dependsOn['testDebugUnitTest']
     def coverageSourceDirs = [
             "src/main/java"
     ]
@@ -79,6 +80,8 @@ task jacocoUnitTestReport(type: JacocoReport, dependsOn: ['testDebugUnitTest']) 
         xml.required = true
         html.required = true
     }
+
+    inputs.files(tasks.named("testDebugUnitTest").get().outputs)
 }
 
 check.dependsOn('checkstyle', 'pmd', 'jacocoUnitTestReport')
@@ -93,16 +96,16 @@ sonarqube {
         property "sonar.sourceEncoding", "utf-8"
 
         property "sonar.sources", "src/main"
-        property "sonar.java.binaries", "${project.buildDir}/intermediates/javac/debug/classes"
+        property "sonar.java.binaries", layout.buildDirectory.dir("intermediates/javac/debug/compileDebugJavaWithJavac/classes").get().asFile.absolutePath
         property "sonar.tests", ["src/test/", "../test/src/androidTest/"]
 
-        property "sonar.android.lint.report", "${project.buildDir}/outputs/lint-results.xml"
-        property "sonar.java.spotbugs.reportPaths", ["${project.buildDir}/reports/spotbugs/debug.xml", "${project.buildDir}/reports/spotbugs/release.xml"]
-        property "sonar.java.pmd.reportPaths", "${project.buildDir}/reports/pmd/pmd.xml"
-        property "sonar.java.checkstyle.reportPaths", "${project.buildDir}/reports/checkstyle/checkstyle.xml"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/jacocoUnitTestReport.xml"
+        property "sonar.android.lint.report", layout.buildDirectory.dir("outputs/lint-results.xml").get().asFile.absolutePath
+        property "sonar.java.spotbugs.reportPaths", ["debug", "release"].collect { layout.buildDirectory.dir("reports/spotbugs/${it}.xml").get().asFile.absolutePath }
+        property "sonar.java.pmd.reportPaths", layout.buildDirectory.dir("reports/pmd/pmd.xml").get().asFile.absolutePath
+        property "sonar.java.checkstyle.reportPaths", layout.buildDirectory.dir("reports/checkstyle/checkstyle.xml").get().asFile.absolutePath
+        property "sonar.coverage.jacoco.xmlReportPaths", layout.buildDirectory.dir("reports/jacoco/jacocoUnitTestReport.xml").get().asFile.absolutePath
     }
 }
 
-project.tasks["sonarqube"].dependsOn "check"
+project.tasks.named("sonarqube").configure { dependsOn "check" }
 

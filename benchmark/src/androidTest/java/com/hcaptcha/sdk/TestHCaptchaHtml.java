@@ -2,8 +2,6 @@ package com.hcaptcha.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.hcaptcha.sdk.IHCaptchaHtmlProvider;
-
 class TestHCaptchaHtml implements IHCaptchaHtmlProvider {
 
     @Override

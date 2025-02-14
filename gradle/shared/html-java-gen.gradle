@@ -1,8 +1,8 @@
 android.libraryVariants.all { variant ->
     def packageName = android.namespace
     def variantName = variant.name.capitalize()
-    def outputDir = file("${project.buildDir}/generated/source/hcaptcha/${variant.name}/${packageName.replaceAll('\\.', '/')}")
-    def generateTask = project.task("generate${variantName}JavaClassFromStaticHtml") {
+    def outputDir = layout.buildDirectory.dir("generated/source/hcaptcha/${variant.name}/${packageName.replaceAll('\\.', '/')}").get().asFile
+    def generateTask = tasks.register("generate${variantName}JavaClassFromStaticHtml") {
         group 'Generate'
         description "Generate HTML java class"
 
@@ -27,5 +27,5 @@ android.libraryVariants.all { variant ->
     }
 
     // preBuild.dependsOn generateTask
-    variant.registerJavaGeneratingTask(generateTask, outputDir)
+    variant.registerJavaGeneratingTask(generateTask.get(), outputDir)
 }
