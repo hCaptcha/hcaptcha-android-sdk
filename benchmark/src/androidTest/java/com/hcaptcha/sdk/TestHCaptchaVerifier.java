@@ -2,10 +2,12 @@ package com.hcaptcha.sdk;
 
 import android.app.Activity;
 
+import androidx.annotation.NonNull;
+
 public class TestHCaptchaVerifier implements IHCaptchaVerifier {
 
     @Override
-    public void startVerification(Activity activity) {
+    public void startVerification(@NonNull Activity activity) {
         // no implementation need for performance measurement
     }
 

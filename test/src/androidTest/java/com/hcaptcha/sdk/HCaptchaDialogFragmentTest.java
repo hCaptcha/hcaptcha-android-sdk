@@ -344,7 +344,7 @@ public class HCaptchaDialogFragmentTest {
         final CountDownLatch latch = new CountDownLatch(1);
         try (ActivityScenario<TestActivity> scenario = ActivityScenario.launch(TestActivity.class)) {
             scenario.moveToState(Lifecycle.State.CREATED).onActivity(activity -> {
-                HCaptchaDialogFragment.newInstance(config, internalConfig,
+                HCaptchaDialogFragment.newInstance(activity, config, internalConfig,
                                 new HCaptchaStateTestAdapter())
                         .startVerification(activity);
                 latch.countDown();
