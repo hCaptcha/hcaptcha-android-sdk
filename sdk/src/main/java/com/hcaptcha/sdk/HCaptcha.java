@@ -103,7 +103,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                         .build();
                 captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
             } else if (this.activity instanceof FragmentActivity) {
-                captchaVerifier = HCaptchaDialogFragment.newInstance(inputConfig, internalConfig, listener);
+                captchaVerifier = HCaptchaDialogFragment.newInstance(activity, inputConfig, internalConfig, listener);
                 this.config = inputConfig;
             } else {
                 throw new IllegalStateException("Visual hCaptcha challenge verification requires FragmentActivity.");
