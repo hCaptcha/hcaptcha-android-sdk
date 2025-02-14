@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -78,6 +79,7 @@ public class HCaptchaTest {
         dialogFragmentMock = mockStatic(HCaptchaDialogFragment.class);
         dialogFragmentMock
                 .when(() -> HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
                         any(HCaptchaConfig.class),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)))
@@ -99,6 +101,7 @@ public class HCaptchaTest {
         assertNotNull(HCaptcha.getClient(fragmentActivity).setup(HCaptchaConfigTest.MOCK_SITE_KEY));
 
         dialogFragmentMock.verify(() -> HCaptchaDialogFragment.newInstance(
+                any(Context.class),
                 hCaptchaConfigCaptor.capture(),
                 any(HCaptchaInternalConfig.class),
                 any(HCaptchaStateListener.class)));
@@ -139,6 +142,7 @@ public class HCaptchaTest {
 
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
                         any(HCaptchaConfig.class),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)), never());
@@ -147,6 +151,7 @@ public class HCaptchaTest {
 
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
                         hCaptchaConfigCaptor.capture(),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)));
@@ -174,6 +179,7 @@ public class HCaptchaTest {
         verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
                         hCaptchaConfigCaptor.capture(),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)));
@@ -191,6 +197,7 @@ public class HCaptchaTest {
         verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
                         hCaptchaConfigCaptor.capture(),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)));
@@ -213,6 +220,7 @@ public class HCaptchaTest {
         verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
                         hCaptchaConfigCaptor.capture(),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)), times(2));
@@ -230,6 +238,7 @@ public class HCaptchaTest {
         verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
         dialogFragmentMock.verify(() ->
                 HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
                         hCaptchaConfigCaptor.capture(),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)), times(2));
