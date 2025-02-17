@@ -131,7 +131,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             }
 
             if (sPreloadWebView == null) {
-                HCaptchaLog.w("DialogFragment.onCreate sPreloadWebView wasn't initialized before");
+                HCaptchaLog.w("DialogFragment.onCreate: sPreloadWebView cold init");
                 sPreloadWebView = new HCaptchaWebView(requireContext());
             }
 
@@ -140,7 +140,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                         requireContext(), config, internalConfig, this, sPreloadWebView);
             }
         } catch (AssertionError | BadParcelableException | ClassCastException e) {
-            HCaptchaLog.w("Cannot create fragment");
+            HCaptchaLog.w("DialogFragment.onCreate: cannot create fragment");
             if (listener != null) {
                 listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
             }
@@ -261,7 +261,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (listener != null) {
             listener.onOpen();
         } else {
-            HCaptchaLog.w("Dialog wasn't created, listener == null");
+            HCaptchaLog.w("DialogFragment.hideLoadingContainer: dialog was not created, listener == null");
         }
     }
 
