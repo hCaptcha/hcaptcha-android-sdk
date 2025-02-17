@@ -63,6 +63,8 @@ final class HCaptchaWebViewHelper {
     private void setupWebView(@NonNull final Handler handler) {
         HCaptchaLog.d("WebViewHelper.setupWebView");
 
+        webView.setId(R.id.webView);
+
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
         final HCaptchaDebugInfo debugInfo = new HCaptchaDebugInfo(context);
         final WebSettings settings = webView.getSettings();

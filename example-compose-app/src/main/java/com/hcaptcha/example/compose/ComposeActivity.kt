@@ -21,6 +21,7 @@ import com.hcaptcha.sdk.HCaptchaCompose
 import com.hcaptcha.sdk.HCaptchaConfig
 import com.hcaptcha.sdk.HCaptchaEvent
 import com.hcaptcha.sdk.HCaptchaResponse
+import com.hcaptcha.sdk.HCaptchaSize
 
 class ComposeActivity : ComponentActivity() {
 
@@ -33,7 +34,9 @@ class ComposeActivity : ComponentActivity() {
             var text by remember { mutableStateOf("") }
 
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier.fillMaxSize()
+                    .padding(WindowInsets.systemBars.asPaddingValues())
+                    .padding(16.dp),
                 verticalArrangement = Arrangement.Bottom
             ) {
                 TextField(
@@ -91,6 +94,7 @@ class ComposeActivity : ComponentActivity() {
                     HCaptchaCompose(HCaptchaConfig
                         .builder()
                         .siteKey("10000000-ffff-ffff-ffff-000000000001")
+                        .size(if (hideDialog) HCaptchaSize.INVISIBLE else HCaptchaSize.NORMAL)
                         .hideDialog(hideDialog)
                         .diagnosticLog(true)
                         .build()) { result ->

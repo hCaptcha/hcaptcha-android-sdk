@@ -1,6 +1,6 @@
 android.libraryVariants.all { variant ->
     def variantName = variant.name.capitalize()
-    project.task("report${variantName}AarSize") {
+    tasks.register("report${variantName}AarSize") {
         group 'Help'
         description "Report ${variant.name} AAR size"
         dependsOn variant.packageLibraryProvider
@@ -12,7 +12,7 @@ android.libraryVariants.all { variant ->
         }
     }
 
-    project.tasks.findByName("check").dependsOn(project.task("check${variantName}AarSize") {
+    tasks.register("check${variantName}AarSize") {
         group 'Verification'
         description "Checks ${variant.name} AAR size doesn't exceed ${project.ext}Kb"
         dependsOn variant.packageLibraryProvider
@@ -24,5 +24,7 @@ android.libraryVariants.all { variant ->
                 throw new GradleException("${aarPath} size exceeded! ${aarSizeKb}Kbyte > ${MAX_AAR_SIZE_KB}Kbyte")
             }
         }
-    })
+    }
+
+    tasks.named("check").configure { dependsOn "check${variantName}AarSize" }
 }

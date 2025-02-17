@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.1.0
+
+- Feat: preload WebView on `setup` call
+
 # 4.0.5
 
 - compose-sdk: set minSdk to 21
