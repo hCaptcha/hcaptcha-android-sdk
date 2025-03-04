@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.1.1
+
+- Fix: back button should cancel hCaptcha in compose-sdk
+
 # 4.1.0
 
 - Feat: preload WebView on `setup` call
