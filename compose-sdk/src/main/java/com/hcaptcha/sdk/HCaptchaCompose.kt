@@ -17,6 +17,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -36,21 +37,11 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
             helper.value = HCaptchaWebViewHelper(
                 handler, context, config, internalConfig, verifier, this
             )
-
         }
     }
     var dismissed by remember { mutableStateOf(false) }
 
     HCaptchaLog.d("HCaptchaCompose($config)")
-
-    DisposableEffect(dismissed) {
-        onDispose {
-            if (dismissed) {
-                verifier.onFailure(HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
-                helper.value?.destroy()
-            }
-        }
-    }
 
     if (config.hideDialog) {
         AndroidView(
@@ -63,11 +54,16 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
         ) {
             Column(
                 modifier = Modifier
+                    .testTag("dialogRoot")
                     .fillMaxSize()
                     .clickable(
                         interactionSource = MutableInteractionSource(),
                         indication = null,
-                        onClick = { dismissed = true }
+                        onClick = {
+                            dismissed = true
+                            verifier.onFailure(HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
+                            helper.value?.destroy()
+                        }
                     ),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
