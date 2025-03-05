@@ -1,8 +1,10 @@
 package com.hcaptcha.sdk
 
 import android.app.Activity
+import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.State
 
+@VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
 internal class HCaptchaComposeVerifier(
     private val config: HCaptchaConfig,
     private val onResult: (HCaptchaResponse) -> Unit,
@@ -28,7 +30,9 @@ internal class HCaptchaComposeVerifier(
     }
 
     override fun onFailure(exception: HCaptchaException) {
-        onResult(HCaptchaResponse.Failure(exception.hCaptchaError))
+        helperState.value?.takeIf { it.shouldRetry(exception) }
+            ?.resetAndExecute()
+            ?: onResult(HCaptchaResponse.Failure(exception.hCaptchaError))
     }
 
     override fun startVerification(activity: Activity) {
