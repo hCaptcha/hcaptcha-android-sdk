@@ -18,6 +18,7 @@ import com.hcaptcha.sdk.HCaptchaConfig
 import com.hcaptcha.sdk.HCaptchaError
 import com.hcaptcha.sdk.HCaptchaResponse
 import com.hcaptcha.sdk.HCaptchaSize
+import androidx.test.espresso.Espresso.pressBack
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
@@ -132,6 +133,20 @@ class HCaptchaComposeTest {
 
             click(Offset(x, y))
         }
+
+        runBlocking { delay(timeout / 2) }
+
+        composeTestRule.onNodeWithContentDescription(resultContentDescription)
+            .assertTextContains(HCaptchaError.CHALLENGE_CLOSED.name)
+    }
+
+    @Test
+    fun passiveCheckboxCanceledWithBack() {
+        setContent("00000000-0000-0000-0000-000000000000", false, HCaptchaSize.COMPACT)
+
+        runBlocking { delay(timeout) }
+
+        pressBack()
 
         runBlocking { delay(timeout / 2) }
 

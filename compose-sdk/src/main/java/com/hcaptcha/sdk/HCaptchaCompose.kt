@@ -41,6 +41,12 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
     }
     var dismissed by remember { mutableStateOf(false) }
 
+    val onDismissRequest: () -> Unit = {
+        dismissed = true
+        verifier.onFailure(HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
+        helper.value?.destroy()
+    }
+
     HCaptchaLog.d("HCaptchaCompose($config)")
 
     if (config.hideDialog) {
@@ -50,7 +56,7 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
         )
     } else if (!dismissed) {
         Dialog(
-            onDismissRequest = { dismissed = true }
+            onDismissRequest = onDismissRequest
         ) {
             Column(
                 modifier = Modifier
@@ -59,11 +65,7 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
                     .clickable(
                         interactionSource = MutableInteractionSource(),
                         indication = null,
-                        onClick = {
-                            dismissed = true
-                            verifier.onFailure(HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
-                            helper.value?.destroy()
-                        }
+                        onClick = onDismissRequest
                     ),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
