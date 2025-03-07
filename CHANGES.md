@@ -1,5 +1,10 @@
 # Changelog
 
+# 4.1.2
+
+- Fix: double call with CHALLENGE_CLOSED error
+- Fix: broken retryPredicate config
+
 # 4.1.1
 
 - Fix: back button should cancel hCaptcha in compose-sdk
