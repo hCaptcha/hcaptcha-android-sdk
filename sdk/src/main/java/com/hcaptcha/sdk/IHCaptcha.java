@@ -40,9 +40,9 @@ public interface IHCaptcha {
     /**
      * Prepare the client which allows to display a challenge dialog
      *
-     * @return new {@link HCaptcha} object
+     * @return new {@link IHCaptcha} object
      */
-    HCaptcha setup();
+    IHCaptcha setup();
 
     /**
      * Constructs a new client which allows to display a challenge dialog
@@ -50,7 +50,7 @@ public interface IHCaptcha {
      * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
      * @return new {@link HCaptcha} object
      */
-    HCaptcha setup(@NonNull String siteKey);
+    IHCaptcha setup(@NonNull String siteKey);
 
     /**
      * Constructs a new client which allows to display a challenge dialog
@@ -58,23 +58,22 @@ public interface IHCaptcha {
      * @param config Config to customize: size, theme, locale, endpoint, rqdata, etc.
      * @return new {@link HCaptcha} object
      */
-    HCaptcha setup(@NonNull HCaptchaConfig config);
+    IHCaptcha setup(@NonNull HCaptchaConfig config);
 
     /**
      * Shows a captcha challenge dialog to be completed by the user
      *
      * @return {@link HCaptcha}
      */
-    HCaptcha verifyWithHCaptcha();
+    IHCaptcha verifyWithHCaptcha();
 
     /**
      * Shows a captcha challenge dialog to be completed by the user
      *
      * @param siteKey The hCaptcha site-key. Get one here <a href="https://www.hcaptcha.com">hcaptcha.com</a>
-     * @return {@link HCaptcha}
+     * @return {@link IHCaptcha}
      */
-    HCaptcha verifyWithHCaptcha(@NonNull String siteKey);
-
+    IHCaptcha verifyWithHCaptcha(@NonNull String siteKey);
 
     /**
      * Shows a captcha challenge dialog to be completed by the user
@@ -82,7 +81,7 @@ public interface IHCaptcha {
      * @param config Config to customize: size, theme, locale, endpoint, rqdata, etc.
      * @return {@link HCaptcha}
      */
-    HCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config);
+    IHCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config);
 
     /**
      * Force stop verification and release resources.

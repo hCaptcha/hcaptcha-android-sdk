@@ -8,11 +8,11 @@ import androidx.annotation.Nullable;
 import com.hcaptcha.sdk.HCaptchaError;
 import com.hcaptcha.sdk.HCaptchaException;
 import com.hcaptcha.sdk.HCaptchaLog;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
 
 /**
  * Generic task definition which allows registration of listeners for the result/error of the task.
@@ -21,8 +21,10 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class Task<R> {
 
+    @Getter
     private boolean complete;
 
+    @Getter
     private boolean successful;
 
     private R result;
@@ -52,20 +54,6 @@ public abstract class Task<R> {
         this.successful = false;
         this.result = null;
         this.hCaptchaException = null;
-    }
-
-    /**
-     * @return if current task is complete or not
-     */
-    public boolean isComplete() {
-        return complete;
-    }
-
-    /**
-     * @return if current task is successful or not
-     */
-    public boolean isSuccessful() {
-        return successful;
     }
 
     /**
@@ -122,12 +110,9 @@ public abstract class Task<R> {
      * @param tokenExpiration - token expiration timeout (seconds)
      */
     protected void scheduleCaptchaExpired(final long tokenExpiration) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                for (OnFailureListener listener : onFailureListeners) {
-                    listener.onFailure(new HCaptchaException(HCaptchaError.TOKEN_TIMEOUT));
-                }
+        handler.postDelayed(() -> {
+            for (OnFailureListener listener : onFailureListeners) {
+                listener.onFailure(new HCaptchaException(HCaptchaError.TOKEN_TIMEOUT));
             }
         }, TimeUnit.SECONDS.toMillis(tokenExpiration));
     }

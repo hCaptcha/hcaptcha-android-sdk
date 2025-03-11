@@ -71,6 +71,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     }
 
     @Override
+    @SuppressWarnings("java:S2696")  // allow set sDiagnosticsLogEnabled
     public HCaptcha setup(@NonNull final HCaptchaConfig inputConfig) {
         HCaptchaLog.sDiagnosticsLogEnabled = inputConfig.getDiagnosticLog();
         HCaptchaLog.d("HCaptcha.setup");
@@ -84,7 +85,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             @Override
             void onSuccess(final String token) {
                 HCaptchaLog.d("HCaptcha.onSuccess");
-                scheduleCaptchaExpired(HCaptcha.this.config.getTokenExpiration());
+                scheduleCaptchaExpired(inputConfig.getTokenExpiration());
                 setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));
             }
 
