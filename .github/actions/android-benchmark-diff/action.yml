@@ -18,13 +18,13 @@ outputs:
 runs:
   using: "composite"
   steps:
-  - uses: actions/cache@v3
+  - uses: actions/cache@v4
     with:
       path: ${{ inputs.reference }}
       key: ${{ inputs.reference-cache-key }}
       restore-keys: ${{ inputs.reference-cache-key }}
   - id: diff
-    uses: actions/github-script@v6
+    uses: actions/github-script@v7
     with:
       script: |
         const cli = require('${{ github.workspace }}/.github/actions/android-benchmark-diff/cli.js')
