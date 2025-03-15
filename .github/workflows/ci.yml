@@ -27,7 +27,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
         with:
           cache-read-only: false
       - name: 'Build'
@@ -72,9 +72,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/actions/setup-gradle@v3
-        with:
-          cache-read-only: false
+      - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
       - run: |
           ./gradlew build -PexampleCompileSdkVersion=${{ matrix.compile }} \
                           -PexampleTargetSdkVersion=${{ matrix.target }} \
@@ -91,9 +89,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/actions/setup-gradle@v3
-        with:
-          cache-read-only: false
+      - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
@@ -117,9 +113,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/actions/setup-gradle@v3
-        with:
-          cache-read-only: false
+      - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
@@ -144,9 +138,7 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/actions/setup-gradle@v3
-        with:
-          cache-read-only: false
+      - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         timeout-minutes: 20
@@ -171,13 +163,13 @@ jobs:
           compare-with: benchmark/build/outputs/connected_android_test_additional_output/releaseAndroidTest/connected/test(AVD) - 10/com_hcaptcha_sdk_bench_test-benchmarkData.json
       - name: Log diff benchmark reuslts
         run: echo "${{ steps.diff-benchmark.outputs.markdown-table }}"
-      - uses: peter-evans/find-comment@v3
+      - uses: hCaptcha/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e
         if: github.ref != 'refs/heads/main'
         id: find_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: Benchmark report
-      - uses: peter-evans/create-or-update-comment@v4
+      - uses: hCaptcha/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
         if: ${{ github.ref != 'refs/heads/main' && (steps.diff-benchmark.outputs.markdown-table != null || steps.find_comment.outputs.comment-id != null) }}
         with:
           body: |
@@ -210,10 +202,8 @@ jobs:
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
-      - uses: gradle/actions/setup-gradle@v3
+      - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
         if: steps.write_access.outputs.granted == 'true'
-        with:
-          cache-read-only: false
       - uses: actions/cache@v4
         if: steps.write_access.outputs.granted == 'true'
         with:
@@ -225,13 +215,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - uses: peter-evans/find-comment@v3
+      - uses: hCaptcha/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e
         if: github.event_name == 'pull_request'
         id: find_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: SonarQube Execution
-      - uses: peter-evans/create-or-update-comment@v4
+      - uses: hCaptcha/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
         if: github.event_name == 'pull_request' && steps.find_comment.outputs.comment-id == null && steps.write_access.outputs.granted == 'false'
         with:
           body: |
@@ -240,7 +230,7 @@ jobs:
           comment-id: ${{ steps.find_comment.outputs.comment-id }}
           issue-number: ${{ github.event.pull_request.number }}
           token: ${{ secrets.GITHUB_TOKEN }}
-      - uses: peter-evans/create-or-update-comment@v4
+      - uses: hCaptcha/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
         if: github.event_name == 'pull_request' && steps.find_comment.outputs.comment-id != null && steps.write_access.outputs.granted == 'true'
         with:
           body: |
@@ -264,7 +254,7 @@ jobs:
       with:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: adopt
-    - uses: gradle/actions/setup-gradle@v3
+    - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
       with:
         cache-read-only: false
     - name: 'Build'
@@ -277,16 +267,16 @@ jobs:
         ./gradlew clean build --stacktrace
         cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
     - id: diffuse
-      uses: usefulness/diffuse-action@v1
+      uses: usefulness/diffuse-action@41995fe8ff6be0a8847e63bdc5a4679c704b455c
       with:
         old-file-path: sdk-main.aar
         new-file-path: sdk-pr.aar
-    - uses: peter-evans/find-comment@v3
+    - uses: hCaptcha/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e
       id: find_comment
       with:
         issue-number: ${{ github.event.pull_request.number }}
         body-includes: Diffuse report
-    - uses: peter-evans/create-or-update-comment@v4
+    - uses: hCaptcha/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
       if: ${{ steps.diffuse.outputs.diff-raw != null || steps.find_comment.outputs.comment-id != null }}
       with:
         body: |
