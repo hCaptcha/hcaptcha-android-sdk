@@ -92,6 +92,7 @@ public class HCaptchaWebViewHelperTest {
     }
 
     @Test
+    @SuppressWarnings("java:S2699") // expect no exception thrown for public API call
     public void test_destroy_webview_parent_null() {
         final HCaptchaWebViewHelper webViewHelper = new HCaptchaWebViewHelper(handler, context, config,
                 internalConfig, captchaVerifier, webView);
