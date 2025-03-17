@@ -10,7 +10,6 @@ import androidx.compose.runtime.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.ui.Alignment
@@ -25,100 +24,113 @@ import com.hcaptcha.sdk.HCaptchaSize
 
 class ComposeActivity : ComponentActivity() {
 
+    private enum class CaptchaState { Idle, Started, Loaded }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var hCaptchaStarted by remember { mutableStateOf(false) }
-            var hCaptchaLoaded by remember { mutableStateOf(false) }
             var hideDialog by remember { mutableStateOf(false) }
+            var captchaState by remember { mutableStateOf(CaptchaState.Idle) }
             var text by remember { mutableStateOf("") }
 
-            Column(
-                modifier = Modifier.fillMaxSize()
-                    .padding(WindowInsets.systemBars.asPaddingValues())
-                    .padding(16.dp),
-                verticalArrangement = Arrangement.Bottom
-            ) {
-                TextField(
-                    value = text,
-                    placeholder = { Text("Verification result will be here...") },
-                    onValueChange = { newText -> text = newText },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(200.dp)
-                        .background(Color.Gray)
+            val hCaptchaConfig = remember(hideDialog) {
+                HCaptchaConfig.builder()
+                    .siteKey("10000000-ffff-ffff-ffff-000000000001")
+                    .size(if (hideDialog) HCaptchaSize.INVISIBLE else HCaptchaSize.NORMAL)
+                    .hideDialog(hideDialog)
+                    .diagnosticLog(true)
+                    .build()
+            }
+
+            if (captchaState != CaptchaState.Idle) {
+                HCaptchaCompose(hCaptchaConfig) { result ->
+                    val message = when (result) {
+                        is HCaptchaResponse.Success -> {
+                            captchaState = CaptchaState.Idle
+                            "Success: ${result.token}"
+                        }
+                        is HCaptchaResponse.Failure -> {
+                            captchaState = CaptchaState.Idle
+                            "Failure: ${result.error.message}"
+                        }
+                        is HCaptchaResponse.Event -> {
+                            if (result.event == HCaptchaEvent.Opened) {
+                                captchaState = CaptchaState.Loaded
+                            }
+                            "Event: ${result.event}"
+                        }
+                    }
+                    text += "\n${message}"
+                    println(message)
+                }
+            }
+
+            CaptchaControlUI(
+                hideDialog = hideDialog,
+                onHideDialogChanged = { hideDialog = it },
+                text = text,
+                onVerifyClick = {
+                    captchaState = CaptchaState.Started
+                    text = ""
+                },
+                showProgress = captchaState == CaptchaState.Started
+            )
+        }
+    }
+
+    @Composable
+    private fun CaptchaControlUI(
+        hideDialog: Boolean,
+        onHideDialogChanged: (Boolean) -> Unit,
+        text: String,
+        onVerifyClick: () -> Unit,
+        showProgress: Boolean
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(WindowInsets.systemBars.asPaddingValues())
+                .padding(16.dp),
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            TextField(
+                value = text,
+                onValueChange = {},
+                placeholder = { Text("Verification result will be here...") },
+                readOnly = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(200.dp)
+                    .background(Color.Gray)
+            )
+
+            Spacer(modifier = Modifier.weight(1f))
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = hideDialog,
+                    onCheckedChange = onHideDialogChanged
                 )
+                Text(text = "Hide Dialog (Passive Site Key)")
+            }
 
-                Spacer(modifier = Modifier.weight(1f))
+            Button(
+                onClick = onVerifyClick,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp)
+            ) {
+                Text(text = "Verify with HCaptcha")
+            }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
+            if (showProgress) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
                 ) {
-                    Checkbox(
-                        checked = hideDialog,
-                        onCheckedChange = { isChecked ->
-                            hideDialog = isChecked
-                        }
+                    CircularProgressIndicator(
+                        modifier = Modifier.width(64.dp),
                     )
-
-                    Text(
-                        text = "Hide Dialog (Passive Site Key)",
-                    )
-                }
-
-                Button(
-                    onClick = {
-                        hCaptchaStarted = !hCaptchaStarted
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 16.dp)
-                ) {
-                    Text(text = "Verify with HCaptcha")
-                }
-
-                if (hCaptchaStarted && !hCaptchaLoaded) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.width(64.dp),
-                            color = MaterialTheme.colorScheme.secondary,
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
-                        )
-                    }
-                }
-
-                if (hCaptchaStarted) {
-                    HCaptchaCompose(HCaptchaConfig
-                        .builder()
-                        .siteKey("10000000-ffff-ffff-ffff-000000000001")
-                        .size(if (hideDialog) HCaptchaSize.INVISIBLE else HCaptchaSize.NORMAL)
-                        .hideDialog(hideDialog)
-                        .diagnosticLog(true)
-                        .build()) { result ->
-                        when (result) {
-                            is HCaptchaResponse.Success -> {
-                                text = "Success: ${result.token}"
-                                hCaptchaStarted = false
-                                hCaptchaLoaded = false
-                                println(text)
-                            }
-                            is HCaptchaResponse.Failure -> {
-                                hCaptchaStarted = false
-                                hCaptchaLoaded = false
-                                text = "Failure: ${result.error.message}"
-                                println(text)
-                            }
-                            is HCaptchaResponse.Event -> {
-                                if (result.event == HCaptchaEvent.Opened) {
-                                    hCaptchaLoaded = true
-                                }
-                                println("Event: ${result.event}")
-                            }
-                        }
-                    }
                 }
             }
         }
