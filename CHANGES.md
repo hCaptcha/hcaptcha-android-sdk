@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.2.0
+
+- Fix: java.lang.IllegalStateException: The specified child already has a parent for reloadedWebView in compose-sdk
+
 # 4.1.2
 
 - Fix: double call with CHALLENGE_CLOSED error
