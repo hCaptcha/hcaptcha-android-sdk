@@ -1,6 +1,6 @@
 package com.hcaptcha.sdk;
 
-import static com.hcaptcha.sdk.compose.HCaptchaComposeTest.SITE_KEY;
+import static com.hcaptcha.sdk.compose.HCaptchaComposeTest.PASSIVE_SITE_KEY;
 import static org.junit.Assert.assertTrue;
 
 import android.os.Parcel;
@@ -16,7 +16,7 @@ public class HCaptchaConfigTest {
     @Test
     public void testParcelable() {
         HCaptchaConfig config = HCaptchaConfig.builder()
-                .siteKey(SITE_KEY)
+                .siteKey(PASSIVE_SITE_KEY)
                 .build();
         Parcel parcel = Parcel.obtain();
         parcel.writeSerializable(config);

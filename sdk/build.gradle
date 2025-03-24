@@ -28,11 +28,11 @@ android {
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
-        versionCode 47
+        versionCode 48
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "4.1.2"
+        versionName "4.2.0"
 
         buildConfigField 'String', 'VERSION_NAME', "\"${defaultConfig.versionName}_${defaultConfig.versionCode}\""
 

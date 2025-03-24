@@ -1,7 +1,10 @@
 package com.hcaptcha.sdk
 
+import android.content.Context
 import android.os.Handler
 import android.os.Looper
+import android.view.View
+import android.view.ViewGroup
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -9,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,12 +49,18 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
         helper.value?.destroy()
     }
 
+    val webViewFactory: (Context) -> View = {
+        preloadedWebView.apply {
+            (parent as? ViewGroup)?.removeView(this)
+        }
+    }
+
     HCaptchaLog.d("HCaptchaCompose($config)")
 
     if (config.hideDialog) {
         AndroidView(
             modifier = Modifier.size(0.dp),
-            factory = { preloadedWebView }
+            factory = webViewFactory
         )
     } else if (!dismissed) {
         Dialog(
@@ -70,9 +78,7 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                AndroidView(
-                    factory = { preloadedWebView }
-                )
+                AndroidView(factory = webViewFactory)
             }
         }
     }
