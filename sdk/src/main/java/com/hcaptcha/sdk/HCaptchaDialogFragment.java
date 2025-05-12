@@ -124,6 +124,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 // According to Firebase Analytics, there are cases where Bundle args are empty.
                 // > 90% of these cases occur on Android 6, and the count of crashes <<< the count of sessions.
                 // This is a quick fix to prevent crashes in production
+                HCaptchaLog.w("DialogFragment.onCreate getArguments is incomplete");
                 if (listener != null) {
                     listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
                 }
@@ -362,6 +363,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             final ViewGroup parent = (ViewGroup) rootView;
             final int index = parent.indexOfChild(stub);
             parent.removeView(stub);
+            if (sPreloadWebView == null) {
+                HCaptchaLog.w("DialogFragment.prepareWebView: sPreloadWebView cold init");
+                sPreloadWebView = new HCaptchaWebView(requireContext());
+            }
             if (sPreloadWebView.getParent() != null) {
                 ((ViewGroup) sPreloadWebView.getParent()).removeView(sPreloadWebView);
             }
@@ -378,6 +383,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                     return view.performClick();
                 });
             }
+        } else {
+            HCaptchaLog.w("DialogFragment.prepareWebView invalid state " + stub.getClass());
         }
     }
 }
