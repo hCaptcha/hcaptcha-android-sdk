@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.2.1
+
+- Fix: java.lang.NullPointerException: during WebView preparation (#189)
+
 # 4.2.0
 
 - Fix: java.lang.IllegalStateException: The specified child already has a parent for reloadedWebView in compose-sdk
