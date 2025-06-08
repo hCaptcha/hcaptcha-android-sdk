@@ -26,6 +26,7 @@ class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
                 + "    <input id=\"input-text\" />\n"
                 + "    <button id=\"on-error\" onclick=\"onError()\">Error</button>\n"
                 + "    <button id=\"on-pass\" onclick=\"onPass()\">Pass</button>\n"
+                + "    <a id=\"on-sms\" href=\"sms:+123-456-789?body=Hello%20World\">Send SMS</a>\n"
                 + "    <script type=\"text/javascript\">\n"
                 + "        console.assert(window.JSDI.getDebugInfo() instanceof Array);\n"
                 + "        console.assert(typeof window.JSDI.getSysDebug() === 'object');\n"
