@@ -2,6 +2,7 @@ package com.hcaptcha.sdk;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -132,6 +133,26 @@ final class HCaptchaWebViewHelper {
 
         private String stripUrl(String url) {
             return url.split("[?#]")[0] + "...";
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+            final String url = request.getUrl().toString();
+
+            if (url.startsWith("sms:")) {
+                try {
+                    final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    context.startActivity(intent);
+                    HCaptchaLog.d("[webview] messaging app launched");
+                } catch (Exception e) {
+                    HCaptchaLog.w("[webview] messaging app launch failed: " + e.getMessage());
+                    captchaVerifier.onFailure(new HCaptchaException(
+                            HCaptchaError.INTERNAL_ERROR, "Messaging app cannot be launched"));
+                }
+                return true;
+            }
+            return false;
         }
 
         @Override

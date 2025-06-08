@@ -2,12 +2,17 @@ package com.hcaptcha.sdk;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.web.assertion.WebViewAssertions.webMatches;
+import static androidx.test.espresso.web.model.Atoms.getCurrentUrl;
 import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.clearElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
+import static androidx.test.espresso.intent.Intents.intended;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewErrorByInput;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
@@ -15,6 +20,8 @@ import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_INTERNAL_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
+import static org.hamcrest.CoreMatchers.startsWith;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -26,6 +33,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import android.app.Dialog;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
@@ -37,6 +46,7 @@ import android.view.View;
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.web.webdriver.DriverAtoms;
 import androidx.test.espresso.web.webdriver.Locator;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -476,5 +486,26 @@ public class HCaptchaDialogFragmentTest {
                 assertFalse(dialog.dispatchKeyEvent(keyEvent));
             });
         }
+    }
+
+    @Test
+    public void testSmsHandled() {
+        try {
+            Intents.init();
+
+            launchInContainer();
+
+            onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
+            onWebView().withElement(DriverAtoms.findElement(Locator.ID, "on-sms"))
+                    .perform(DriverAtoms.webClick());
+
+            intended(allOf(
+                    hasAction(Intent.ACTION_VIEW),
+                    hasData(Uri.parse("sms:+123-456-789?body=Hello%20World"))
+            ));
+        } finally {
+            Intents.release();
+        }
+
     }
 }
