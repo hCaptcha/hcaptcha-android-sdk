@@ -1,5 +1,10 @@
 # Changelog
 
+# 4.2.2
+
+- Chore: Restructured example-compose-app (#182)
+- Feature: handle `sms:` schemas in WebView (#192)
+
 # 4.2.1
 
 - Fix: java.lang.NullPointerException: during WebView preparation (#189)
