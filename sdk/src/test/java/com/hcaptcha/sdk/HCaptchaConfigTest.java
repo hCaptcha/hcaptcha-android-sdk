@@ -90,4 +90,12 @@ public class HCaptchaConfigTest {
                 deserializedObject.toBuilder().retryPredicate(null).build());
     }
 
+    @Test
+    public void host_parses_hostname_from_url_and_warns() {
+        final HCaptchaConfig cfg1 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("http://example.com:8080").build();
+        final HCaptchaConfig cfg2 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("https://sub.example.com/path").build();
+        assertEquals("example.com", cfg1.getHost());
+        assertEquals("sub.example.com", cfg2.getHost());
+    }
+
 }

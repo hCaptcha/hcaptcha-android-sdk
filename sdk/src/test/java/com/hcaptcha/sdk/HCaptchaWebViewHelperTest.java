@@ -100,9 +100,9 @@ public class HCaptchaWebViewHelperTest {
     }
 
     @Test
-    public void test_config_host_pased() {
+    public void test_config_host_used_as_https_base_url() {
         final String host = "https://my.awesome.host";
-        when(config.getHost()).thenReturn(host);
+        when(config.getBaseUrl()).thenReturn(host);
         new HCaptchaWebViewHelper(handler, context, config, internalConfig, captchaVerifier, webView);
         verify(webView).loadDataWithBaseURL(host, MOCK_HTML, "text/html", "UTF-8", null);
     }

@@ -87,7 +87,7 @@ final class HCaptchaWebViewHelper {
         }
         webView.addJavascriptInterface(jsInterface, HCaptchaJSInterface.JS_INTERFACE_TAG);
         webView.addJavascriptInterface(debugInfo, HCaptchaDebugInfo.JS_INTERFACE_TAG);
-        webView.loadDataWithBaseURL(config.getHost(), htmlProvider.getHtml(), "text/html", "UTF-8", null);
+        webView.loadDataWithBaseURL(config.getBaseUrl(), htmlProvider.getHtml(), "text/html", "UTF-8", null);
         HCaptchaLog.d("WebViewHelper.loadData. Hardware acceleration enabled: %b", webView.isHardwareAccelerated());
     }
 

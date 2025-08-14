@@ -15,6 +15,7 @@ import androidx.test.ext.junit.rules.ActivityScenarioRule;
 import com.hcaptcha.sdk.test.TestActivity;
 
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -38,6 +39,7 @@ public class HCaptchaWebViewHelperTest {
             .build();
 
     @Test
+    @Ignore("Host URI is now rejected; no insecure HTTP request is triggered. See issue #194.")
     public void testInsecureHttpRequestErrorHandling() throws Exception {
         Assume.assumeTrue("Skip test for release, because impossible to mock IHCaptchaVerifier", BuildConfig.DEBUG);
 
