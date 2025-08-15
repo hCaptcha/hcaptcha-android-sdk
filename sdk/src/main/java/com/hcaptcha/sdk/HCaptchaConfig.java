@@ -196,46 +196,23 @@ public class HCaptchaConfig implements Serializable {
         }
 
         /**
-         * Sanitizes and sets host. Accepts either hostname or full URL; if URL is provided,
-         * extracts hostname and logs a warning.
+         * Sanitizes and sets host. Accepts hostname only; throws IllegalArgumentException if URL is provided.
          */
         public HCaptchaConfigBuilder host(String host) {
-            this.host$value = sanitizeHost(host);
+            if (host != null) {
+                final String trimmed = host.trim();
+                if (trimmed.isEmpty()) {
+                    this.host$value = null;
+                } else if (trimmed.contains("://")) {
+                    throw new IllegalArgumentException(
+                            "Config 'host' must be a hostname, not a URL. "
+                                    + "Remove scheme from: '" + trimmed + "'");
+                } else {
+                    this.host$value = trimmed;
+                }
+            }
             this.host$set = true;
             return this;
-        }
-
-        private static String sanitizeHost(final String rawHost) {
-            if (rawHost == null) {
-                return null;
-            }
-            final String trimmed = rawHost.trim();
-            if (trimmed.isEmpty()) {
-                return null;
-            }
-            try {
-                // If provided with a URL, extract the hostname only
-                if (trimmed.contains("://")) {
-                    final java.net.URL url = new java.net.URL(trimmed);
-                    final String parsedHost = url.getHost();
-                    if (parsedHost != null && !parsedHost.isEmpty()) {
-                        HCaptchaLog.w(
-                                "Config 'host' provided as URL. Using hostname '"
-                                        + parsedHost
-                                        + "'. Remove scheme in configuration.");
-                        return parsedHost;
-                    }
-                    HCaptchaLog.w("Config 'host' provided as URL but hostname could not be parsed. Ignoring value.");
-                    return null;
-                }
-            } catch (java.net.MalformedURLException ignore) {
-                HCaptchaLog.w(
-                        "Config 'host' contains a scheme but is not a valid URL. "
-                                + "Treating value as hostname: '"
-                                + trimmed
-                                + "'.");
-            }
-            return trimmed;
         }
     }
 }
