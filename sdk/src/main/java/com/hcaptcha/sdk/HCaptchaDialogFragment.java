@@ -103,7 +103,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @SuppressWarnings("PMD.AssignmentToNonFinalStatic")
     HCaptchaDialogFragment(Context context, HCaptchaConfig config, HCaptchaInternalConfig internalConfig) {
         this();
-        sPreloadWebView = new HCaptchaWebView(context); //NOSONAR
+        sPreloadWebView = new HCaptchaWebView(context);
         webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
                 context, config, internalConfig, this, sPreloadWebView);
     }
@@ -188,6 +188,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         super.onDestroy();
         if (webViewHelper != null) {
             webViewHelper.reset();
+            webViewHelper = null;
         }
     }
 
@@ -327,10 +328,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void reset() {
         if (webViewHelper != null) {
             webViewHelper.reset();
+            webViewHelper = null;
         }
         if (isAdded()) {
             dismissAllowingStateLoss();
         }
+        // Clear the static WebView reference to prevent memory leaks
+        sPreloadWebView = null;
     }
 
     private View prepareRootView(@NonNull LayoutInflater inflater,
