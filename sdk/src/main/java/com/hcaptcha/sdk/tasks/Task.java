@@ -10,8 +10,7 @@ import com.hcaptcha.sdk.HCaptchaException;
 import com.hcaptcha.sdk.HCaptchaLog;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -31,11 +30,11 @@ public abstract class Task<R> {
 
     private HCaptchaException hCaptchaException;
 
-    private final List<OnSuccessListener<R>> onSuccessListeners;
+    private final CopyOnWriteArrayList<OnSuccessListener<R>> onSuccessListeners;
 
-    private final List<OnFailureListener> onFailureListeners;
+    private final CopyOnWriteArrayList<OnFailureListener> onFailureListeners;
 
-    private final List<OnOpenListener> onOpenListeners;
+    private final CopyOnWriteArrayList<OnOpenListener> onOpenListeners;
 
     protected final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -43,9 +42,9 @@ public abstract class Task<R> {
      * Creates a new Task object
      */
     protected Task() {
-        this.onSuccessListeners = new ArrayList<>();
-        this.onFailureListeners = new ArrayList<>();
-        this.onOpenListeners = new ArrayList<>();
+        this.onSuccessListeners = new CopyOnWriteArrayList<>();
+        this.onFailureListeners = new CopyOnWriteArrayList<>();
+        this.onOpenListeners = new CopyOnWriteArrayList<>();
         this.reset();
     }
 
