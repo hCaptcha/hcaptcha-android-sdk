@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:theme="@style/Theme.AppCompat"
+    android:paddingTop="60dp"
     tools:context=".MainActivity">
 
     <com.google.android.flexbox.FlexboxLayout
@@ -18,7 +19,8 @@
             android:theme="@style/ThemeOverlay.AppCompat.Light"
             android:spinnerMode="dropdown"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="12dp" />
         <CheckBox
             android:id="@+id/loading"
             android:layout_width="wrap_content"
