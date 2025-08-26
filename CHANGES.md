@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.2.3
+
+- Fix: Activity memory leak (#195)
+
 # 4.2.2
 
 - Chore: Restructured example-compose-app (#182)
