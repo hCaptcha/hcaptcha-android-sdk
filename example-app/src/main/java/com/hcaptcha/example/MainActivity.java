@@ -30,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
     private HCaptcha hCaptcha;
     private HCaptchaTokenResponse tokenResponse;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +51,12 @@ public class MainActivity extends AppCompatActivity {
         debugCheckBox.setOnCheckedChangeListener((checkBox, checked) -> {
             android.webkit.WebView.setWebContentsDebuggingEnabled(checked);
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        hCaptcha.reset();
+        super.onDestroy();
     }
 
     private HCaptchaSize getSizeFromSpinner() {

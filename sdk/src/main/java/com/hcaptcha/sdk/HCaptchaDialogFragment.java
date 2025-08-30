@@ -68,7 +68,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     private boolean readyForInteraction = false;
 
-    @NonNull
+    @Nullable
     private static HCaptchaWebView sPreloadWebView;
 
     /**
@@ -103,9 +103,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @SuppressWarnings("PMD.AssignmentToNonFinalStatic")
     HCaptchaDialogFragment(Context context, HCaptchaConfig config, HCaptchaInternalConfig internalConfig) {
         this();
-        sPreloadWebView = new HCaptchaWebView(context);
+        final HCaptchaWebView webView = new HCaptchaWebView(context);
         webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
-                context, config, internalConfig, this, sPreloadWebView);
+                context, config, internalConfig, this, webView);
+        sPreloadWebView = webView;
     }
 
     @Override
@@ -136,9 +137,11 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 sPreloadWebView = new HCaptchaWebView(requireContext());
             }
 
+            final HCaptchaWebView webView = sPreloadWebView;
+
             if (webViewHelper == null) {
                 webViewHelper = new HCaptchaWebViewHelper(new Handler(Looper.getMainLooper()),
-                        requireContext(), config, internalConfig, this, sPreloadWebView);
+                        requireContext(), config, internalConfig, this, webView);
             }
         } catch (AssertionError | BadParcelableException | ClassCastException e) {
             HCaptchaLog.w("DialogFragment.onCreate: cannot create fragment");
@@ -188,7 +191,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         super.onDestroy();
         if (webViewHelper != null) {
             webViewHelper.reset();
-            webViewHelper = null;
         }
     }
 
@@ -241,7 +243,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onLoaded() {
-        assert webViewHelper != null;
+        if (webViewHelper == null) {
+            HCaptchaLog.w("DialogFragment.onLoaded webViewHelper == null, likely about to destroy");
+            return;
+        }
 
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
             // checkbox will be shown
@@ -252,7 +257,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onOpen() {
-        assert webViewHelper != null;
+        if (webViewHelper == null) {
+            HCaptchaLog.w("DialogFragment.onOpen webViewHelper == null, likely about to destroy");
+            return;
+        }
 
         if (webViewHelper.getConfig().getSize() == HCaptchaSize.INVISIBLE) {
             hideLoadingContainer();
@@ -328,7 +336,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void reset() {
         if (webViewHelper != null) {
             webViewHelper.reset();
-            webViewHelper = null;
         }
         if (isAdded()) {
             dismissAllowingStateLoss();
