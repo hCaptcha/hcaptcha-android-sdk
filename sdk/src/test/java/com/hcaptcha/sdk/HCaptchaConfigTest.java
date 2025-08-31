@@ -2,6 +2,7 @@ package com.hcaptcha.sdk;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
 
@@ -14,6 +15,7 @@ import java.util.Locale;
 public class HCaptchaConfigTest {
 
     public static final String MOCK_SITE_KEY = "mocked-site-key";
+    public static final String TEST_IP_ADDRESS = "192.168.1.1"; // NOPMD
 
     @Test
     public void custom_locale() {
@@ -88,6 +90,51 @@ public class HCaptchaConfigTest {
 
         assertEquals(config.toBuilder().retryPredicate(null).build(),
                 deserializedObject.toBuilder().retryPredicate(null).build());
+    }
+
+    @Test
+    public void host_throws_exception_when_url_provided() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("http://example.com:8080").build();
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("https://sub.example.com/path").build();
+        });
+
+        assertThrows(IllegalArgumentException.class, () -> {
+            HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("ftp://example.com").build();
+        });
+    }
+
+    @Test
+    public void host_accepts_valid_hostnames() {
+        final HCaptchaConfig cfg1 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("example.com").build();
+        final HCaptchaConfig cfg2 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("sub.example.com").build();
+        final HCaptchaConfig cfg3 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("localhost").build();
+        final HCaptchaConfig cfg4 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host(TEST_IP_ADDRESS).build();
+
+        assertEquals("example.com", cfg1.getHost());
+        assertEquals("sub.example.com", cfg2.getHost());
+        assertEquals("localhost", cfg3.getHost());
+        assertEquals(TEST_IP_ADDRESS, cfg4.getHost());
+    }
+
+    @Test
+    public void host_handles_null_and_empty_values() {
+        final HCaptchaConfig cfg1 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host(null).build();
+        final HCaptchaConfig cfg2 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("").build();
+        final HCaptchaConfig cfg3 = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("   ").build();
+
+        assertNull(cfg1.getHost());
+        assertNull(cfg2.getHost());
+        assertNull(cfg3.getHost());
+    }
+
+    @Test
+    public void host_trims_whitespace() {
+        final HCaptchaConfig cfg = HCaptchaConfig.builder().siteKey(MOCK_SITE_KEY).host("  example.com  ").build();
+        assertEquals("example.com", cfg.getHost());
     }
 
 }

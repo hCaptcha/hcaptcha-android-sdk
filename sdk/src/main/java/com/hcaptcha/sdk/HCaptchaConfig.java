@@ -172,6 +172,19 @@ public class HCaptchaConfig implements Serializable {
         return jsSrc;
     }
 
+    /**
+     * Returns a base URL built from the sanitized host using HTTPS scheme.
+     * Example: host "example.com" -> "https://example.com". Returns null if host is not set.
+     */
+    @JsonIgnore
+    String getBaseUrl() {
+        final String sanitizedHost = this.host;
+        if (sanitizedHost == null || sanitizedHost.isEmpty()) {
+            return null;
+        }
+        return "https://" + sanitizedHost;
+    }
+
     public static class HCaptchaConfigBuilder {
         /**
          * @deprecated use {@link #jsSrc} setter instead
@@ -179,6 +192,26 @@ public class HCaptchaConfig implements Serializable {
         @Deprecated
         public HCaptchaConfigBuilder apiEndpoint(String url) { //NOSONAR
             this.jsSrc(url);
+            return this;
+        }
+
+        /**
+         * Sanitizes and sets host. Accepts hostname only; throws IllegalArgumentException if URL is provided.
+         */
+        public HCaptchaConfigBuilder host(String host) {
+            if (host != null) {
+                final String trimmed = host.trim();
+                if (trimmed.isEmpty()) {
+                    this.host$value = null;
+                } else if (trimmed.contains("://")) {
+                    throw new IllegalArgumentException(
+                            "Config 'host' must be a hostname, not a URL. "
+                                    + "Remove scheme from: '" + trimmed + "'");
+                } else {
+                    this.host$value = trimmed;
+                }
+            }
+            this.host$set = true;
             return this;
         }
     }
