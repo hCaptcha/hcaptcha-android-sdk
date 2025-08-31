@@ -365,6 +365,14 @@ SDK expect to be initialized with `FragmentActivity` instance in regular scenari
 
 In case if you use passive `siteKey` make sure that you called `hideDialog(true)` on `HCaptchaCconfig.builder()`
 
+> I'm getting build conflicts with `android:usesCleartextTraffic` attribute. What should I do?
+
+The SDK sets `android:usesCleartextTraffic="false"` in the application manifest to ensure secure network communication by default. If your app already has another library that sets this attribute to `true`, you may encounter build conflicts.
+
+**Solution:** It's safe to override this value to `true` if your app specifically requires cleartext traffic. However, cleartext traffic is not secure and should only be enabled if absolutely necessary. Consider using HTTPS for all network communications instead.
+
+For more information about this attribute and security implications, see the [Android Developer Documentation](https://developer.android.com/guide/topics/manifest/application-element#usesCleartextTraffic).
+
 ## For maintainers
 
 If you plan to contribute to the repo, please see [MAINTAINERS.md](./MAINTAINERS.md) for detailed build, test, and release instructions.
