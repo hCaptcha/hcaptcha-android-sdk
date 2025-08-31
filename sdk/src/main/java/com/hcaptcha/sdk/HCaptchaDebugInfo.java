@@ -15,6 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.lang.ref.WeakReference;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -42,7 +43,11 @@ final class HCaptchaDebugInfo implements Serializable {
     private static String sSysDebug;
 
     @NonNull
-    private final transient Context context;
+    private final transient WeakReference<Context> contextRef;
+
+    HCaptchaDebugInfo(@NonNull Context context) {
+        this.contextRef = new WeakReference<>(context);
+    }
 
     @JavascriptInterface
     public String getDebugInfo() {
@@ -52,6 +57,12 @@ final class HCaptchaDebugInfo implements Serializable {
         synchronized (this) {
             if (sDebugInfo != null) {
                 return sDebugInfo;
+            }
+
+            final Context context = contextRef.get();
+            if (context == null) {
+                Log.w(JS_INTERFACE_TAG, "Context is null, cannot build debugInfo");
+                return "[]";
             }
 
             try {
