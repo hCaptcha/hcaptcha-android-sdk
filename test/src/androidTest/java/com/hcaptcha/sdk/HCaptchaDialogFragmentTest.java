@@ -17,6 +17,7 @@ import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewErrorByInput;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
 import static com.hcaptcha.sdk.AssertUtil.waitToDisappear;
+import static com.hcaptcha.sdk.AssertUtil.withBackgroundColor;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_INTERNAL_CONFIG;
 import static com.hcaptcha.sdk.HCaptchaDialogFragment.KEY_LISTENER;
@@ -146,9 +147,20 @@ public class HCaptchaDialogFragmentTest {
     public void loaderVisible() {
         launchInContainer();
         onView(withId(R.id.loadingContainer)).check(matches(isDisplayed()));
+        onView(withId(R.id.loadingContainer)).check(matches(withBackgroundColor(android.graphics.Color.WHITE)));
         onView(withId(R.id.webView)).perform(waitToBeDisplayed());
         final long waitToDisappearMs = 10000;
         onView(withId(R.id.loadingContainer)).perform(waitToDisappear(waitToDisappearMs));
+    }
+
+    @Test
+    public void loaderBackgroundDarkTheme() {
+        final HCaptchaConfig darkConfig = config.toBuilder()
+                .theme(HCaptchaTheme.DARK)
+                .build();
+        launchInContainer(darkConfig, new HCaptchaStateTestAdapter());
+        onView(withId(R.id.loadingContainer)).check(matches(isDisplayed()));
+        onView(withId(R.id.loadingContainer)).check(matches(withBackgroundColor(android.graphics.Color.BLACK)));
     }
 
     @Test
