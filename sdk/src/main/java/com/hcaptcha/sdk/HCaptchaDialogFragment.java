@@ -170,7 +170,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
             loadingContainer = rootView.findViewById(R.id.loadingContainer);
             if (loadingContainer != null) {
-                // Keep loader background color different depending on HCaptchaConfig theme
                 final HCaptchaTheme theme = config.getTheme();
                 final int backgroundColor = (theme == HCaptchaTheme.DARK || theme == HCaptchaTheme.CONTRAST)
                         ? Color.BLACK : Color.WHITE;
