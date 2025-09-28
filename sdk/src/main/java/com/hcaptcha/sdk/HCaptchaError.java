@@ -68,6 +68,11 @@ public enum HCaptchaError implements Serializable {
     INSECURE_HTTP_REQUEST_ERROR(33, "Insecure resource requested"),
 
     /**
+     * Error handling verify parameters on JavaScript side
+     */
+    VERIFY_PARAMS_ERROR(34, "Error handling verify parameters"),
+
+    /**
      * Generic error for unknown situations - should never happen.
      */
     ERROR(29, "Unknown error");

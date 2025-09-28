@@ -6,6 +6,7 @@ import android.os.Looper;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
+import androidx.annotation.Nullable;
 
 import lombok.Getter;
 import lombok.NonNull;
@@ -24,6 +25,9 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     private boolean webViewLoaded;
     private boolean shouldExecuteOnLoad;
     private boolean shouldResetOnLoad;
+
+    @Nullable
+    private HCaptchaVerifyParams verifyParams;
 
     HCaptchaHeadlessWebView(@NonNull final Activity activity,
                             @NonNull final HCaptchaConfig config,
@@ -44,10 +48,11 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     }
 
     @Override
-    public void startVerification(@NonNull Activity activity) {
+    public void startVerification(@NonNull Activity activity, @Nullable HCaptchaVerifyParams params) {
+        this.verifyParams = params;
         if (webViewLoaded) {
             // Safe to execute
-            webViewHelper.resetAndExecute();
+            webViewHelper.resetAndExecute(params);
         } else {
             shouldExecuteOnLoad = true;
         }
@@ -57,7 +62,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     public void onFailure(@NonNull final HCaptchaException exception) {
         final boolean silentRetry = webViewHelper.shouldRetry(exception);
         if (silentRetry) {
-            webViewHelper.resetAndExecute();
+            webViewHelper.resetAndExecute(verifyParams);
         } else {
             listener.onFailure(exception);
         }
@@ -76,7 +81,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
             reset();
         } else if (shouldExecuteOnLoad) {
             shouldExecuteOnLoad = false;
-            webViewHelper.resetAndExecute();
+            webViewHelper.resetAndExecute(verifyParams);
         }
     }
 

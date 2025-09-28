@@ -11,10 +11,14 @@ internal class HCaptchaComposeVerifier(
     private val helperState: State<HCaptchaWebViewHelper?>
 ) : IHCaptchaVerifier {
 
+    private var verifyParams: HCaptchaVerifyParams? = null
+
     override fun onLoaded() {
         onResult(HCaptchaResponse.Event(HCaptchaEvent.Loaded))
         if (config.hideDialog) {
-            helperState.value?.resetAndExecute() ?: run {
+            helperState.value?.let { helper ->
+                helper.resetAndExecute(verifyParams)
+            } ?: run {
                 HCaptchaLog.w("HCaptchaWebViewHelper wasn't created, report but to developer")
                 onResult(HCaptchaResponse.Failure(HCaptchaError.INTERNAL_ERROR))
             }
@@ -31,11 +35,12 @@ internal class HCaptchaComposeVerifier(
 
     override fun onFailure(exception: HCaptchaException) {
         helperState.value?.takeIf { it.shouldRetry(exception) }
-            ?.resetAndExecute()
+            ?.resetAndExecute(verifyParams)
             ?: onResult(HCaptchaResponse.Failure(exception.hCaptchaError))
     }
 
-    override fun startVerification(activity: Activity) {
+    override fun startVerification(activity: Activity, verifyParams: HCaptchaVerifyParams?) {
+        this.verifyParams = verifyParams
         error("startVerification should never be reached")
     }
 
