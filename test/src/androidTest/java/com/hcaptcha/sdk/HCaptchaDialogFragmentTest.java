@@ -356,7 +356,7 @@ public class HCaptchaDialogFragmentTest {
             scenario.moveToState(Lifecycle.State.CREATED).onActivity(activity -> {
                 HCaptchaDialogFragment.newInstance(activity, config, internalConfig,
                                 new HCaptchaStateTestAdapter())
-                        .startVerification(activity);
+                        .startVerification(activity, null);
                 latch.countDown();
             });
         }
