@@ -72,10 +72,40 @@
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
     var hCaptchaID = null;
     /**
+     * Process verify params
+     */
+    function setVerifyParams(verifyParams) {
+        console.log("setVerifyParams", verifyParams);
+        try {
+            if (verifyParams.phonePrefix) {
+                if (typeof hcaptcha.setPhonePrefix === 'function') {
+                    hcaptcha.setPhonePrefix(verifyParams.phonePrefix);
+                } else {
+                    BridgeObject.onError(35);
+                    return;
+                }
+            }
+
+            if (verifyParams.phoneNumber) {
+                if (typeof hcaptcha.setPhoneNumber === 'function') {
+                    hcaptcha.setPhoneNumber(verifyParams.phoneNumber);
+                } else {
+                    BridgeObject.onError(35);
+                    return;
+                }
+            }
+        } catch (e) {
+            BridgeObject.onError(34);
+        }
+    }
+    /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
-    function resetAndExecute() {
+    function resetAndExecute(verifyParams) {
         hcaptcha.reset();
+
+        setVerifyParams(verifyParams);
+
         hcaptcha.execute(hCaptchaID);
     }
     function reset() {

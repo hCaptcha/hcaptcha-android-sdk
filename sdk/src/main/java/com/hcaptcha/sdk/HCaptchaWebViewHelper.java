@@ -18,8 +18,10 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -40,6 +42,9 @@ final class HCaptchaWebViewHelper {
 
     @NonNull
     private final IHCaptchaHtmlProvider htmlProvider;
+
+    @Nullable
+    private HCaptchaVerifyParams verifyParams;
 
     HCaptchaWebViewHelper(@NonNull final Handler handler,
                           @NonNull final Context context,
@@ -105,8 +110,32 @@ final class HCaptchaWebViewHelper {
         webView.destroy();
     }
 
-    void resetAndExecute() {
-        webView.loadUrl("javascript:resetAndExecute();");
+    public void setVerifyParams(@Nullable HCaptchaVerifyParams verifyParams) {
+        if (verifyParams != null) {
+            try {
+                final ObjectMapper objectMapper = new ObjectMapper();
+                final String verifyParamsJson = objectMapper.writeValueAsString(verifyParams);
+                webView.loadUrl("javascript:setVerifyParams(" + verifyParamsJson + ");");
+            } catch (Exception e) {
+                HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
+            }
+        }
+    }
+
+    void resetAndExecute(@Nullable HCaptchaVerifyParams params) {
+        if (params != null) {
+            // Pass verify params as JSON object directly
+            try {
+                final ObjectMapper objectMapper = new ObjectMapper();
+                final String verifyParamsJson = objectMapper.writeValueAsString(params);
+                webView.loadUrl("javascript:resetAndExecute(" + verifyParamsJson + ");");
+            } catch (Exception e) {
+                HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
+                webView.loadUrl("javascript:resetAndExecute();");
+            }
+        } else {
+            webView.loadUrl("javascript:resetAndExecute();");
+        }
     }
 
     void reset() {

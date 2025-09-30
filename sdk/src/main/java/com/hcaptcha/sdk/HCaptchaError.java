@@ -68,6 +68,16 @@ public enum HCaptchaError implements Serializable {
     INSECURE_HTTP_REQUEST_ERROR(33, "Insecure resource requested"),
 
     /**
+     * Internal error handling verify parameters
+     */
+    VERIFY_PARAMS_ERROR(34, "Error handling verify parameters"),
+
+    /**
+     * Phone prefix API not available on SDK
+     */
+    VERIFY_PHONE_API_UNAVAILABLE(35, "Verify phone API not available"),
+
+    /**
      * Generic error for unknown situations - should never happen.
      */
     ERROR(29, "Unknown error");

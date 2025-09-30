@@ -148,6 +148,28 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     }
 
     @Override
+    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaVerifyParams verifyParams) {
+        if (captchaVerifier == null) {
+            // Cold start at verification time.
+            setup();
+        }
+
+        return startVerification(verifyParams);
+    }
+
+    @Override
+    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig inputConfig,
+                                       @NonNull final HCaptchaVerifyParams verifyParams) {
+        if (captchaVerifier == null || !inputConfig.equals(this.config)) {
+            // Cold start at verification time.
+            // Or new config detected, thus new setup is needed.
+            setup(inputConfig);
+        }
+
+        return startVerification(verifyParams);
+    }
+
+    @Override
     public void reset() {
         if (captchaVerifier != null) {
             captchaVerifier.reset();
@@ -157,11 +179,16 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     private HCaptcha startVerification() {
         HCaptchaLog.d("HCaptcha.startVerification");
+        return startVerification(null);
+    }
+
+    private HCaptcha startVerification(@Nullable final HCaptchaVerifyParams verifyParams) {
+        HCaptchaLog.d("HCaptcha.startVerification" + (verifyParams != null ? " with params" : ""));
         handler.removeCallbacksAndMessages(null);
         if (captchaVerifier == null) {
             setException(new HCaptchaException(HCaptchaError.ERROR));
         } else {
-            captchaVerifier.startVerification(activity);
+            captchaVerifier.startVerification(activity, verifyParams);
         }
         return this;
     }

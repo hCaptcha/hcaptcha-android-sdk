@@ -59,7 +59,7 @@ public class HCaptchaWebViewHelperTest {
             }
 
             @Override
-            public void startVerification(Activity activity) {
+            public void startVerification(Activity activity, HCaptchaVerifyParams verifyParams) {
                 failAsNonReachable();
             }
 

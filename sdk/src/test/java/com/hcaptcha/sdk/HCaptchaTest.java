@@ -155,7 +155,7 @@ public class HCaptchaTest {
                         hCaptchaConfigCaptor.capture(),
                         any(HCaptchaInternalConfig.class),
                         any(HCaptchaStateListener.class)));
-        verify(fragment).startVerification(fragmentActivity);
+        verify(fragment).startVerification(fragmentActivity, null);
 
         final HCaptchaConfig capturedConfig = hCaptchaConfigCaptor.getValue();
         assertNotNull(capturedConfig);
@@ -251,6 +251,48 @@ public class HCaptchaTest {
     public void test_reset() {
         HCaptcha.getClient(fragmentActivity).setup(config).reset();
         verify(fragment).reset();
+    }
+
+    @Test
+    public void test_verify_with_hcaptcha_params() {
+        final HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
+
+                .phoneNumber("+44123456789")
+                .build();
+
+        HCaptcha.getClient(fragmentActivity)
+                .setup(HCaptchaConfigTest.MOCK_SITE_KEY)
+                .verifyWithHCaptcha(verifyParams);
+
+        verify(fragment).startVerification(fragmentActivity, verifyParams);
+    }
+
+    @Test
+    public void test_verify_with_hcaptcha_config_and_params() {
+        final HCaptchaConfig verifyConfig = HCaptchaConfig.builder()
+                .siteKey(HCaptchaConfigTest.MOCK_SITE_KEY + "-on-verify")
+                .size(HCaptchaSize.INVISIBLE)
+                .loading(false)
+                .build();
+
+        final HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
+                .phonePrefix("1")
+                .build();
+
+        HCaptcha.getClient(fragmentActivity)
+                .setup(config)
+                .verifyWithHCaptcha(verifyConfig, verifyParams);
+
+        verify(fragment).startVerification(fragmentActivity, verifyParams);
+    }
+
+    @Test
+    public void test_verify_without_params_passes_null() {
+        HCaptcha.getClient(fragmentActivity)
+                .setup(HCaptchaConfigTest.MOCK_SITE_KEY)
+                .verifyWithHCaptcha();
+
+        verify(fragment).startVerification(fragmentActivity, null);
     }
 
     @Test
