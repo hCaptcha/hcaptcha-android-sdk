@@ -1,7 +1,13 @@
 # Changelog
 
+# 4.2.4
+
+- Fix: loading dialog background depends on `HCaptchaConfig.theme` (#201)
+
 # 4.2.3
 
+- Fix: java.util.ConcurrentModificationException on multiple hCaptcha verify calls (#198)
+- Fix: accept hostname instead of url in host config (#196)
 - Fix: Activity memory leak (#195)
 
 # 4.2.2

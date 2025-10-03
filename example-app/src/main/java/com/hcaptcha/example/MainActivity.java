@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox hideDialog;
     private CheckBox loading;
     private CheckBox disableHardwareAccel;
+    private CheckBox themeDark;
     private TextView tokenTextView;
     private TextView errorTextView;
     private HCaptcha hCaptcha;
@@ -40,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         hideDialog = findViewById(R.id.hide_dialog);
         loading = findViewById(R.id.loading);
         disableHardwareAccel = findViewById(R.id.hwAccel);
+        themeDark = findViewById(R.id.themeDark);
         final ArrayAdapter<HCaptchaSize> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
                 Arrays.asList(HCaptchaSize.NORMAL, HCaptchaSize.INVISIBLE, HCaptchaSize.COMPACT));
@@ -65,11 +67,13 @@ public class MainActivity extends AppCompatActivity {
 
     private HCaptchaConfig getConfig() {
         final HCaptchaSize size = getSizeFromSpinner();
+        final boolean isDark = themeDark.isChecked();
         return HCaptchaConfig.builder()
                 .siteKey(SITEKEY)
                 .size(size)
                 .loading(loading.isChecked())
                 .hideDialog(hideDialog.isChecked())
+                .theme(isDark ? HCaptchaTheme.DARK : HCaptchaTheme.LIGHT)
                 .disableHardwareAcceleration(disableHardwareAccel.isChecked())
                 .tokenExpiration(10)
                 .diagnosticLog(true)
