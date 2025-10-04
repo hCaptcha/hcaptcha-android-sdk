@@ -2,14 +2,16 @@ package com.hcaptcha.sdk;
 
 import androidx.annotation.NonNull;
 
-import java.io.Serializable;
+import lombok.Getter;
 
+import java.io.Serializable;
 
 /**
  * Enum with all possible hCaptcha errors.
  * It contains both errors related to the android sdk instance and js client errors.
  * More info about js client errors here: https://docs.hcaptcha.com/configuration#error-codes
  */
+@Getter
 public enum HCaptchaError implements Serializable {
 
     /**
@@ -77,27 +79,19 @@ public enum HCaptchaError implements Serializable {
      */
     ERROR(29, "Unknown error");
 
+    /**
+     * The integer encoding of the enum
+     */
     private final int errorId;
 
+    /**
+     * The error message
+     */
     private final String message;
 
     HCaptchaError(final int errorId, final String message) {
         this.errorId = errorId;
         this.message = message;
-    }
-
-    /**
-     * @return the integer encoding of the enum
-     */
-    public int getErrorId() {
-        return this.errorId;
-    }
-
-    /**
-     * @return the error message
-     */
-    public String getMessage() {
-        return this.message;
     }
 
     @NonNull
