@@ -2,9 +2,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/root"
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
     android:theme="@style/Theme.AppCompat"
     android:paddingTop="60dp"
     tools:context=".MainActivity">
@@ -53,6 +55,15 @@
             android:minHeight="48dp"
             android:checked="true"
             android:text="@string/hw_accel"
+            style="@style/CheckBoxText" />
+
+        <CheckBox
+            android:id="@+id/themeDark"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="false"
+            android:text="@string/theme_dark"
             style="@style/CheckBoxText" />
     </com.google.android.flexbox.FlexboxLayout>
 
@@ -164,7 +175,12 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingLeft="@dimen/hcaptcha_safe_padding"
+        android:paddingRight="@dimen/hcaptcha_safe_padding"
+        android:paddingTop="@dimen/hcaptcha_safe_padding"
+        android:paddingBottom="@dimen/hcaptcha_safe_padding">
 
         <Button
             android:layout_width="wrap_content"

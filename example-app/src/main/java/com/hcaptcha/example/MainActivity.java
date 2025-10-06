@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox hideDialog;
     private CheckBox loading;
     private CheckBox disableHardwareAccel;
+    private CheckBox themeDark;
     private TextView tokenTextView;
     private TextView errorTextView;
     private TextView phonePrefixInput;
@@ -44,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         hideDialog = findViewById(R.id.hide_dialog);
         loading = findViewById(R.id.loading);
         disableHardwareAccel = findViewById(R.id.hwAccel);
+        themeDark = findViewById(R.id.themeDark);
         phonePrefixInput = findViewById(R.id.phonePrefix);
         phoneModeSwitch = findViewById(R.id.phoneModeSwitch);
         // Initialize phone mode UI and toggle label/color dynamically
@@ -76,11 +78,13 @@ public class MainActivity extends AppCompatActivity {
 
     private HCaptchaConfig getConfig() {
         final HCaptchaSize size = getSizeFromSpinner();
+        final boolean isDark = themeDark.isChecked();
         return HCaptchaConfig.builder()
                 .siteKey(SITEKEY)
                 .size(size)
                 .loading(loading.isChecked())
                 .hideDialog(hideDialog.isChecked())
+                .theme(isDark ? HCaptchaTheme.DARK : HCaptchaTheme.LIGHT)
                 .disableHardwareAcceleration(disableHardwareAccel.isChecked())
                 .tokenExpiration(10)
                 .diagnosticLog(true)

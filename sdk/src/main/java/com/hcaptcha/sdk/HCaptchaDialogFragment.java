@@ -172,6 +172,11 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             prepareWebView(rootView, config);
 
             loadingContainer = rootView.findViewById(R.id.loadingContainer);
+            if (loadingContainer != null) {
+                final HCaptchaTheme theme = config.getTheme();
+                final int backgroundColor = theme == HCaptchaTheme.DARK ? Color.BLACK : Color.WHITE;
+                loadingContainer.setBackgroundColor(backgroundColor);
+            }
             loadingContainer.setVisibility(Boolean.TRUE.equals(config.getLoading())
                     && !readyForInteraction ? View.VISIBLE : View.GONE);
 

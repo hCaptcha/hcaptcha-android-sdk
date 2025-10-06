@@ -15,7 +15,9 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
+import androidx.annotation.ColorInt;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import androidx.test.espresso.PerformException;
@@ -200,5 +202,23 @@ public final class AssertUtil {
 
     public static void failAsNonReachable() {
         fail("Should not be called for this test");
+    }
+
+    public static org.hamcrest.Matcher<View> withBackgroundColor(@ColorInt final int expectedColor) {
+        return new org.hamcrest.TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(org.hamcrest.Description description) {
+                description.appendText("with background color: ").appendValue(expectedColor);
+            }
+
+            @Override
+            protected boolean matchesSafely(View view) {
+                if (view.getBackground() instanceof ColorDrawable) {
+                    final int actualColor = ((ColorDrawable) view.getBackground()).getColor();
+                    return actualColor == expectedColor;
+                }
+                return false;
+            }
+        };
     }
 }
