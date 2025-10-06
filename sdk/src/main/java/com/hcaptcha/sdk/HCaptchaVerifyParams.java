@@ -19,8 +19,7 @@ public class HCaptchaVerifyParams implements Serializable {
     private String phonePrefix;
 
     /**
-     * Optional full phone number in E.164 or local format as expected by JS.
-     * When provided, JS will call hcaptcha.setPhoneNumber(value) if available.
+     * Optional full phone number in E.164 format ("+44123..."), for use in MFA.
      */
     private String phoneNumber;
 }
