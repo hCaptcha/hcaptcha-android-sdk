@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.3.0
+
+- Feature: implement HCaptchaVerifyParams with phone prefix/number support
+
 # 4.2.4
 
 - Fix: loading dialog background depends on `HCaptchaConfig.theme` (#201)
