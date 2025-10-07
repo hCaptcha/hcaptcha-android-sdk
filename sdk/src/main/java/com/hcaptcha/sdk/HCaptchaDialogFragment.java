@@ -71,6 +71,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @Nullable
     private static HCaptchaWebView sPreloadWebView;
 
+    @Nullable
+    private HCaptchaVerifyParams verifyParams;
+
     /**
      * Creates a new instance
      *
@@ -256,6 +259,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
             // checkbox will be shown
             readyForInteraction = true;
+            webViewHelper.setVerifyParams(verifyParams);
             hideLoadingContainer();
         }
     }
@@ -288,7 +292,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         }
         if (webViewHelper != null) {
             if (silentRetry) {
-                webViewHelper.resetAndExecute();
+                webViewHelper.resetAndExecute(verifyParams);
             } else if (listener != null) {
                 listener.onFailure(exception);
             } else {
@@ -312,7 +316,11 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     }
 
     @Override
-    public void startVerification(@NonNull Activity fragmentActivity) {
+    public void startVerification(@NonNull Activity fragmentActivity, @Nullable HCaptchaVerifyParams params) {
+        // Store the verify params for later use in webview
+        if (params != null) {
+            this.verifyParams = params;
+        }
         final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
         if (oldFragment != null && oldFragment.isAdded()) {

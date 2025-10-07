@@ -15,7 +15,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:flexDirection="row"
-        app:flexWrap="wrap">
+        app:flexWrap="wrap"
+        app:alignItems="center">
         <Spinner
             android:id="@+id/sizes"
             android:theme="@style/ThemeOverlay.AppCompat.Light"
@@ -65,6 +66,36 @@
             android:text="@string/theme_dark"
             style="@style/CheckBoxText" />
     </com.google.android.flexbox.FlexboxLayout>
+
+    <!-- Phone input row -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="8dp"
+        android:paddingHorizontal="4dp">
+
+        <EditText
+            android:id="@+id/phonePrefix"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_weight="1"
+            android:inputType="phone"
+            android:gravity="center_vertical|start"
+            android:textColor="@android:color/black"
+            android:textColorHint="@android:color/darker_gray"
+            android:hint="Phone prefix" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/phoneModeSwitch"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:text="Full number"
+            android:textColor="@android:color/black"
+            app:switchPadding="12dp" />
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"

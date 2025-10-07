@@ -3,11 +3,12 @@ package com.hcaptcha.sdk;
 import android.app.Activity;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class TestHCaptchaVerifier implements IHCaptchaVerifier {
 
     @Override
-    public void startVerification(@NonNull Activity activity) {
+    public void startVerification(@NonNull Activity activity, @Nullable HCaptchaVerifyParams verifyParams) {
         // no implementation need for performance measurement
     }
 

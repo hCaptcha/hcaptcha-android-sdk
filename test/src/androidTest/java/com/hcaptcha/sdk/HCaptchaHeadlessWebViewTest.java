@@ -64,7 +64,7 @@ public class HCaptchaHeadlessWebViewTest {
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
                     activity, config, internalConfig, listener);
-            subject.startVerification(activity);
+            subject.startVerification(activity, null);
         });
 
         waitHCaptchaWebViewToken(latch, AWAIT_CALLBACK_MS);
@@ -90,7 +90,7 @@ public class HCaptchaHeadlessWebViewTest {
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
                     activity, config, internalConfig, listener);
-            subject.startVerification(activity);
+            subject.startVerification(activity, null);
         });
 
         waitHCaptchaWebViewError(latch, HCaptchaError.ERROR, AWAIT_CALLBACK_MS);
@@ -124,7 +124,7 @@ public class HCaptchaHeadlessWebViewTest {
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
                     activity, updatedWithRetry, internalConfig, listener);
-            subject.startVerification(activity);
+            subject.startVerification(activity, null);
         });
 
         waitHCaptchaWebViewError(failureLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);
@@ -160,7 +160,7 @@ public class HCaptchaHeadlessWebViewTest {
         scenario.onActivity(activity -> {
             final HCaptchaHeadlessWebView subject = new HCaptchaHeadlessWebView(
                     activity, updatedWithRetry, internalConfig, listener);
-            subject.startVerification(activity);
+            subject.startVerification(activity, null);
         });
 
         waitHCaptchaWebViewError(retryLatch, HCaptchaError.NETWORK_ERROR, AWAIT_CALLBACK_MS);

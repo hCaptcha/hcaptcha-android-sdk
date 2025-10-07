@@ -72,10 +72,30 @@
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
     var hCaptchaID = null;
     /**
+     * Process verify params
+     */
+    function setVerifyParams(verifyParams) {
+        try {
+            var phone = verifyParams && verifyParams.phoneNumber;
+            var prefix = verifyParams && verifyParams.phonePrefix;
+            var data = {};
+            if (phone) { data.mfa_phone = phone; }
+            if (prefix) { data.mfa_phoneprefix = prefix; }
+            if (Object.keys(data).length > 0) {
+                hcaptcha.setData(hCaptchaID, data);
+            }
+        } catch (e) {
+            BridgeObject.onError(34);
+        }
+    }
+    /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
-    function resetAndExecute() {
+    function resetAndExecute(verifyParams) {
         hcaptcha.reset();
+
+        setVerifyParams(verifyParams);
+
         hcaptcha.execute(hCaptchaID);
     }
     function reset() {

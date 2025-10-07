@@ -3,6 +3,7 @@ package com.hcaptcha.example;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.text.InputType;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import com.hcaptcha.sdk.*;
 
 import java.util.Arrays;
@@ -28,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox themeDark;
     private TextView tokenTextView;
     private TextView errorTextView;
+    private TextView phonePrefixInput;
+    private androidx.appcompat.widget.SwitchCompat phoneModeSwitch;
     private HCaptcha hCaptcha;
     private HCaptchaTokenResponse tokenResponse;
 
@@ -42,6 +46,13 @@ public class MainActivity extends AppCompatActivity {
         loading = findViewById(R.id.loading);
         disableHardwareAccel = findViewById(R.id.hwAccel);
         themeDark = findViewById(R.id.themeDark);
+        phonePrefixInput = findViewById(R.id.phonePrefix);
+        phoneModeSwitch = findViewById(R.id.phoneModeSwitch);
+        // Initialize phone mode UI and toggle label/color dynamically
+        setPhoneModeUi(phoneModeSwitch != null && phoneModeSwitch.isChecked());
+        if (phoneModeSwitch != null) {
+            phoneModeSwitch.setOnCheckedChangeListener((button, checked) -> setPhoneModeUi(checked));
+        }
         final ArrayAdapter<HCaptchaSize> adapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_dropdown_item,
                 Arrays.asList(HCaptchaSize.NORMAL, HCaptchaSize.INVISIBLE, HCaptchaSize.COMPACT));
@@ -91,6 +102,17 @@ public class MainActivity extends AppCompatActivity {
         errorTextView.setText(error);
     }
 
+    private void setPhoneModeUi(final boolean fullNumberMode) {
+        if (phoneModeSwitch != null) {
+            phoneModeSwitch.setText(fullNumberMode ? "Phone" : "Prefix");
+            phoneModeSwitch.setTextColor(ContextCompat.getColor(this, android.R.color.black));
+        }
+        if (phonePrefixInput != null) {
+            phonePrefixInput.setHint(fullNumberMode ? "Full phone number" : "Phone prefix");
+            phonePrefixInput.setInputType(fullNumberMode ? InputType.TYPE_CLASS_PHONE : InputType.TYPE_CLASS_NUMBER);
+        }
+    }
+
     public void onClickReset(final View view) {
         if (hCaptcha != null) {
             hCaptcha.reset();
@@ -106,10 +128,26 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickVerify(final View v) {
         setTokenTextView("-");
-        if (hCaptcha != null) {
-            hCaptcha.verifyWithHCaptcha();
+        
+        // Always build verifyParams regardless of hCaptcha state
+        final String input = phonePrefixInput.getText() != null ? phonePrefixInput.getText().toString().trim() : null;
+        final HCaptchaVerifyParams verifyParams;
+        if (input != null && !input.isEmpty()) {
+            final HCaptchaVerifyParams.HCaptchaVerifyParamsBuilder builder = HCaptchaVerifyParams.builder();
+            if (phoneModeSwitch.isChecked()) {
+                builder.phoneNumber(input);
+            } else {
+                builder.phonePrefix(input);
+            }
+            verifyParams = builder.build();
         } else {
-            hCaptcha = HCaptcha.getClient(this).verifyWithHCaptcha(getConfig());
+            verifyParams = null;
+        }
+        
+        if (hCaptcha != null) {
+            hCaptcha.verifyWithHCaptcha(verifyParams);
+        } else {
+            hCaptcha = HCaptcha.getClient(this).verifyWithHCaptcha(getConfig(), verifyParams);
             setupClient(hCaptcha);
         }
     }

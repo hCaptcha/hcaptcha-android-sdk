@@ -84,6 +84,23 @@ public interface IHCaptcha {
     IHCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config);
 
     /**
+     * Shows a captcha challenge dialog to be completed by the user
+     *
+     * @param verifyParams Parameters for verification including phone prefix and phone number
+     * @return {@link IHCaptcha}
+     */
+    IHCaptcha verifyWithHCaptcha(@NonNull HCaptchaVerifyParams verifyParams);
+
+    /**
+     * Shows a captcha challenge dialog to be completed by the user
+     *
+     * @param config Config to customize: size, theme, locale, endpoint, rqdata, etc.
+     * @param verifyParams Parameters for verification including phone prefix and phone number
+     * @return {@link IHCaptcha}
+     */
+    IHCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config, @NonNull HCaptchaVerifyParams verifyParams);
+
+    /**
      * Force stop verification and release resources.
      */
     void reset();
