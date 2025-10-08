@@ -78,9 +78,11 @@
         try {
             var phone = verifyParams && verifyParams.phoneNumber;
             var prefix = verifyParams && verifyParams.phonePrefix;
+            var rqdata = verifyParams && verifyParams.rqdata;
             var data = {};
             if (phone) { data.mfa_phone = phone; }
             if (prefix) { data.mfa_phoneprefix = prefix; }
+            if (rqdata) { data.rqdata = rqdata; }
             if (Object.keys(data).length > 0) {
                 hcaptcha.setData(hCaptchaID, data);
             }

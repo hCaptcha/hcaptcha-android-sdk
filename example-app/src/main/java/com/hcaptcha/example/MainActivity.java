@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private TextView errorTextView;
     private TextView phonePrefixInput;
     private androidx.appcompat.widget.SwitchCompat phoneModeSwitch;
+    private TextView rqdataInput;
     private HCaptcha hCaptcha;
     private HCaptchaTokenResponse tokenResponse;
 
@@ -48,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         themeDark = findViewById(R.id.themeDark);
         phonePrefixInput = findViewById(R.id.phonePrefix);
         phoneModeSwitch = findViewById(R.id.phoneModeSwitch);
+        rqdataInput = findViewById(R.id.rqdataInput);
         // Initialize phone mode UI and toggle label/color dynamically
         setPhoneModeUi(phoneModeSwitch != null && phoneModeSwitch.isChecked());
         if (phoneModeSwitch != null) {
@@ -131,13 +133,19 @@ public class MainActivity extends AppCompatActivity {
         
         // Always build verifyParams regardless of hCaptcha state
         final String input = phonePrefixInput.getText() != null ? phonePrefixInput.getText().toString().trim() : null;
+        final String rqdata = rqdataInput.getText() != null ? rqdataInput.getText().toString().trim() : null;
         final HCaptchaVerifyParams verifyParams;
-        if (input != null && !input.isEmpty()) {
+        if ((input != null && !input.isEmpty()) || (rqdata != null && !rqdata.isEmpty())) {
             final HCaptchaVerifyParams.HCaptchaVerifyParamsBuilder builder = HCaptchaVerifyParams.builder();
-            if (phoneModeSwitch.isChecked()) {
-                builder.phoneNumber(input);
-            } else {
-                builder.phonePrefix(input);
+            if (input != null && !input.isEmpty()) {
+                if (phoneModeSwitch.isChecked()) {
+                    builder.phoneNumber(input);
+                } else {
+                    builder.phonePrefix(input);
+                }
+            }
+            if (rqdata != null && !rqdata.isEmpty()) {
+                builder.rqdata(rqdata);
             }
             verifyParams = builder.build();
         } else {

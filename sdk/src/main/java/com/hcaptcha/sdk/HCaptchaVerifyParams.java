@@ -22,4 +22,10 @@ public class HCaptchaVerifyParams implements Serializable {
      * Optional full phone number in E.164 format ("+44123..."), for use in MFA.
      */
     private String phoneNumber;
+
+    /**
+     * Optional request data string to be passed to hCaptcha.
+     * When provided, JS will call hcaptcha.setData({rqdata: value}) if available.
+     */
+    private String rqdata;
 }
