@@ -174,10 +174,9 @@ HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
     .build();
 hCaptcha.verifyWithHCaptcha(verifyParams);
 
-// Using both with custom data
+// Using phonePrefix with rqdata
 HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
     .phonePrefix("44")
-    .phoneNumber("+44123456789")
     .rqdata("custom-verification-data")
     .build();
 hCaptcha.verifyWithHCaptcha(verifyParams);
