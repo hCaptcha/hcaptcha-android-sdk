@@ -94,6 +94,7 @@ jobs:
         uses: ./.github/actions/android-emulator-run
         with:
           script: "parallel --retries 3 ::: './gradlew test:connectedCheck'"
+          fresh-avd: true
       - if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -118,6 +119,7 @@ jobs:
         uses: ./.github/actions/android-emulator-run
         with:
           script: "parallel --retries 3 ::: './gradlew test:connectedCheck -P testingMinimizedBuild=true -P android.enableR8.fullMode=false'"
+          fresh-avd: true
       - if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:

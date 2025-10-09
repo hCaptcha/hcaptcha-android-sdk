@@ -157,6 +157,35 @@ hCaptcha.removeOnSuccessListener(firstListener)
     .verifyWithHCaptcha();
 ```
 
+### MFA Phone Support
+
+The SDK supports phone prefix and phone number parameters for MFA (Multi-Factor Authentication) flows. You can pass these parameters using `HCaptchaVerifyParams`:
+
+```java
+// Using phone prefix (country code without '+')
+HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
+    .phonePrefix("44")
+    .build();
+hCaptcha.verifyWithHCaptcha(verifyParams);
+
+// Using phone number (full E.164 format)
+HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
+    .phoneNumber("+44123456789")
+    .build();
+hCaptcha.verifyWithHCaptcha(verifyParams);
+
+// Using phonePrefix with rqdata
+HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
+    .phonePrefix("44")
+    .rqdata("custom-verification-data")
+    .build();
+hCaptcha.verifyWithHCaptcha(verifyParams);
+```
+
+You should use only one of `phonePrefix` or `phoneNumber`. If you pass both, `phoneNumber` will be used and `phonePrefix` will be ignored.
+
+**Note**: The `rqdata` parameter has been moved from `HCaptchaConfig` to `HCaptchaVerifyParams` for better API consistency. The old `rqdata` property in `HCaptchaConfig` is now deprecated, and will be removed in a future major version.
+
 ### For Jetpack Compose
 
 ```kotlin
@@ -243,7 +272,7 @@ The following list contains configuration properties to allows customization of 
 | `retryPredicate`              | Lambda<sup>[*](#retry-predicate-serialization)</sup> | No       | -                                | Automatically trigger a new verification when some error occurs.                                                                                                     |
 | `jsSrc`                       | String (URL)                                         | No       | https://js.hcaptcha.com/1/api.js | See Enterprise docs.                                                                                                                                                 |
 | `sentry`                      | Boolean                                              | No       | True                             | See Enterprise docs.                                                                                                                                                 |
-| `rqdata`                      | String                                               | No       | -                                | See Enterprise docs.                                                                                                                                                 |
+| `rqdata`                      | String                                               | No       | -                                | **Deprecated**: Use `rqdata` in `HCaptchaVerifyParams` instead. Will be removed in future releases.                                                               |
 | `apiEndpoint`                 | String (URL)                                         | No       | -                                | (DEPRECATED, use `jsSrc`) See Enterprise docs.                                                                                                                       |
 | `endpoint`                    | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
 | `reportapi`                   | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
@@ -256,6 +285,16 @@ The following list contains configuration properties to allows customization of 
 | `tokenExpiration`             | long                                                 | No       | 120                              | hCaptcha token expiration timeout (seconds).                                                                                                                         |
 | `diagnosticLog`               | Boolean                                              | No       | False                            | Emit detailed console logs for debugging                                                                                                                             |
 | `disableHardwareAcceleration` | Boolean                                              | No       | True                             | Disable WebView hardware acceleration                                                                                                                                |
+
+## Verify Params
+
+The following list contains parameters for `HCaptchaVerifyParams` used during verification calls.
+
+| Name                          | Values/Type                                          | Required | Default                          | Description                                                                                                                                                          |
+|-------------------------------|------------------------------------------------------|----------|----------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `phonePrefix`                 | String                                               | No       | -                                | Optional phone country calling code (without '+'), e.g., "44". Used in MFA flows.                                                                                    |
+| `phoneNumber`                 | String                                               | No       | -                                | Optional full phone number in E.164 format ("+44123..."), for use in MFA.                                                                                            |
+| `rqdata`                      | String                                               | No       | -                                | Custom supplied challenge data. See Enterprise docs.                                                                                                                 |
 
 ### Config Examples
 
@@ -277,6 +316,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
                 .theme(HCaptchaTheme.DARK)
                 .build();
 ```
+
 
 ## Error handling
 

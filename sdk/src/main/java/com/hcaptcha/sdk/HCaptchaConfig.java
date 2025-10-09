@@ -44,7 +44,9 @@ public class HCaptchaConfig implements Serializable {
 
     /**
      * Custom supplied challenge data.
+     * @deprecated Use rqdata in HCaptchaVerifyParams instead.
      */
+    @Deprecated
     private String rqdata;
 
     /**
