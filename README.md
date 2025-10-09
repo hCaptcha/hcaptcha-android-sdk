@@ -182,6 +182,8 @@ HCaptchaVerifyParams verifyParams = HCaptchaVerifyParams.builder()
 hCaptcha.verifyWithHCaptcha(verifyParams);
 ```
 
+You should use only one of `phonePrefix` or `phoneNumber`. If you pass both, `phoneNumber` will be used and `phonePrefix` will be ignored.
+
 **Note**: The `rqdata` parameter has been moved from `HCaptchaConfig` to `HCaptchaVerifyParams` for better API consistency. The old `rqdata` property in `HCaptchaConfig` is now deprecated, and will be removed in a future major version.
 
 ### For Jetpack Compose
