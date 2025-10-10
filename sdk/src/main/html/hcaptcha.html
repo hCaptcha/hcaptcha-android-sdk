@@ -75,6 +75,7 @@
      * Process verify params
      */
     function setVerifyParams(verifyParams) {
+        console.log("setVerifyParams(", verifyParams, ")");
         try {
             var phone = verifyParams && verifyParams.phoneNumber;
             var prefix = verifyParams && verifyParams.phonePrefix;
