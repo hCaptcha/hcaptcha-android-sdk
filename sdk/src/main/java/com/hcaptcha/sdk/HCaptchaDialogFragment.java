@@ -30,8 +30,7 @@ import androidx.fragment.app.FragmentManager;
 
 /**
  * HCaptcha Dialog Fragment Class.
- *
- * Must have `public` modifier, so it can be properly recreated from instance state!
+ * Must have a `public` modifier, so it can be properly recreated from the instance state!
  */
 public final class HCaptchaDialogFragment extends DialogFragment implements IHCaptchaVerifier {
 
@@ -176,9 +175,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 final HCaptchaTheme theme = config.getTheme();
                 final int backgroundColor = theme == HCaptchaTheme.DARK ? Color.BLACK : Color.WHITE;
                 loadingContainer.setBackgroundColor(backgroundColor);
+                loadingContainer.setVisibility(Boolean.TRUE.equals(config.getLoading())
+                        && !readyForInteraction ? View.VISIBLE : View.GONE);
             }
-            loadingContainer.setVisibility(Boolean.TRUE.equals(config.getLoading())
-                    && !readyForInteraction ? View.VISIBLE : View.GONE);
 
             return rootView;
         } catch (AssertionError | BadParcelableException | InflateException | ClassCastException e) {
@@ -325,6 +324,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 webViewHelper.setVerifyParams(params);
             }
         }
+
         final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
         if (oldFragment != null && oldFragment.isAdded()) {
