@@ -5,11 +5,11 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.AndroidRuntimeException;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
 import com.hcaptcha.sdk.tasks.Task;
-import lombok.NonNull;
 
 public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
@@ -148,7 +148,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     }
 
     @Override
-    public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaVerifyParams verifyParams) {
+    public HCaptcha verifyWithHCaptcha(@Nullable final HCaptchaVerifyParams verifyParams) {
         if (captchaVerifier == null) {
             // Cold start at verification time.
             setup();
@@ -159,7 +159,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @Override
     public HCaptcha verifyWithHCaptcha(@NonNull final HCaptchaConfig inputConfig,
-                                       @NonNull final HCaptchaVerifyParams verifyParams) {
+                                       @Nullable final HCaptchaVerifyParams verifyParams) {
         if (captchaVerifier == null || !inputConfig.equals(this.config)) {
             // Cold start at verification time.
             // Or new config detected, thus new setup is needed.
