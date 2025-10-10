@@ -321,6 +321,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         // Store the verify params for later use in webview
         if (params != null) {
             this.verifyParams = params;
+            if (readyForInteraction && webViewHelper != null) {
+                webViewHelper.setVerifyParams(params);
+            }
         }
         final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
