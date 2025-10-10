@@ -43,9 +43,6 @@ final class HCaptchaWebViewHelper {
     @NonNull
     private final IHCaptchaHtmlProvider htmlProvider;
 
-    @Nullable
-    private HCaptchaVerifyParams verifyParams;
-
     HCaptchaWebViewHelper(@NonNull final Handler handler,
                           @NonNull final Context context,
                           @NonNull final HCaptchaConfig config,

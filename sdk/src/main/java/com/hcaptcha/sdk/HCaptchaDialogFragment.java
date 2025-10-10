@@ -256,10 +256,11 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             return;
         }
 
+        webViewHelper.setVerifyParams(verifyParams);
+
         if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
             // checkbox will be shown
             readyForInteraction = true;
-            webViewHelper.setVerifyParams(verifyParams);
             hideLoadingContainer();
         }
     }
