@@ -186,6 +186,8 @@ You should use only one of `phonePrefix` or `phoneNumber`. If you pass both, `ph
 
 **Note**: The `rqdata` parameter has been moved from `HCaptchaConfig` to `HCaptchaVerifyParams` for better API consistency. The old `rqdata` property in `HCaptchaConfig` is now deprecated, and will be removed in a future major version.
 
+**Note**: If you update verify parameters and call `validate` a second time, call `reset()` before the second validation to ensure updated parameters are recognized by hCaptcha.
+
 ### For Jetpack Compose
 
 ```kotlin
