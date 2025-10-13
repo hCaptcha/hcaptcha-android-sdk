@@ -6,6 +6,11 @@ android.libraryVariants.all { variant ->
         group 'Generate'
         description "Generate HTML java class"
 
+        // Declare inputs for proper incremental build support
+        inputs.file("$projectDir/src/main/html/hcaptcha.html")
+        inputs.file("$projectDir/src/main/html/HCaptchaHtml.java.tml")
+        outputs.file("$outputDir/HCaptchaHtml.java")
+
         doFirst {
             def outputJavaClass = file("$outputDir/HCaptchaHtml.java")
             def template = file("$projectDir/src/main/html/HCaptchaHtml.java.tml").text
@@ -26,6 +31,6 @@ android.libraryVariants.all { variant ->
         }
     }
 
-    // preBuild.dependsOn generateTask
+    // Ensure the generation task runs before compilation
     variant.registerJavaGeneratingTask(generateTask.get(), outputDir)
 }
