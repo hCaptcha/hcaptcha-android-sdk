@@ -1,5 +1,10 @@
 # Changelog
 
+# 4.3.2
+
+- Fix: backward compatibility with HCaptchaConfig.rqdata
+- Feature: `HCaptchaDialogFragment` automatically call `reset` if `HCaptchaVerifyParams` changed
+
 # 4.3.1
 
 - Fix: enable incremental builds for HTML-to-Java generation tasks
