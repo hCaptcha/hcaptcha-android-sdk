@@ -52,6 +52,12 @@ class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
                 + "            const errorCode = arg || parseInt(document.getElementById(\"input-text\").value);\n"
                 + "            BridgeObject.onError(errorCode);\n"
                 + "        }\n"
+                + "        function setVerifyParams(arg) {\n"
+                + "            TestObject.setVerifyParams(JSON.stringify(arg));\n"
+                + "        }\n"
+                + "        function reset() {\n"
+                + "            document.getElementById(\"input-text\").value = \"reset\";\n"
+                + "        }\n"
                 + (callBridgeOnLoaded ? "onHcaptchaLoaded();\n" : "")
                 + "    </script>\n"
                 + "</body>\n"

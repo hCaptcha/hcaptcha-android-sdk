@@ -28,6 +28,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
+import java.util.Objects;
+
 /**
  * HCaptcha Dialog Fragment Class.
  * Must have a `public` modifier, so it can be properly recreated from the instance state!
@@ -317,13 +319,13 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void startVerification(@NonNull Activity fragmentActivity, @Nullable HCaptchaVerifyParams params) {
-        // Store the verify params for later use in webview
-        if (params != null) {
-            this.verifyParams = params;
-            if (readyForInteraction && webViewHelper != null) {
-                webViewHelper.setVerifyParams(params);
-            }
+        if (!Objects.equals(this.verifyParams, params) && webViewHelper != null) {
+            webViewHelper.reset();
         }
+        if (readyForInteraction && webViewHelper != null) {
+            webViewHelper.setVerifyParams(params);
+        }
+        this.verifyParams = params;
 
         final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);

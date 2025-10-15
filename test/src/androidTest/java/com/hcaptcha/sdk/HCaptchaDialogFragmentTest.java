@@ -518,6 +518,5 @@ public class HCaptchaDialogFragmentTest {
         } finally {
             Intents.release();
         }
-
     }
 }

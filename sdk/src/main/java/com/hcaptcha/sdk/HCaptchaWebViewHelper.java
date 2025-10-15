@@ -108,14 +108,27 @@ final class HCaptchaWebViewHelper {
     }
 
     public void setVerifyParams(@Nullable HCaptchaVerifyParams verifyParams) {
-        if (verifyParams != null) {
+        HCaptchaVerifyParams actualVerifyParams = verifyParams;
+        if (config.getRqdata() != null) {
+            if (verifyParams == null) {
+                actualVerifyParams = new HCaptchaVerifyParams();
+            }
+
+            if (actualVerifyParams.getRqdata() == null) {
+                actualVerifyParams.setRqdata(config.getRqdata());
+            }
+        }
+
+        if (actualVerifyParams != null) {
             try {
                 final ObjectMapper objectMapper = new ObjectMapper();
-                final String verifyParamsJson = objectMapper.writeValueAsString(verifyParams);
+                final String verifyParamsJson = objectMapper.writeValueAsString(actualVerifyParams);
                 webView.loadUrl("javascript:setVerifyParams(" + verifyParamsJson + ");");
             } catch (Exception e) {
                 HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
             }
+        } else {
+            webView.loadUrl("javascript:setVerifyParams({});");
         }
     }
 
@@ -128,10 +141,10 @@ final class HCaptchaWebViewHelper {
                 webView.loadUrl("javascript:resetAndExecute(" + verifyParamsJson + ");");
             } catch (Exception e) {
                 HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
-                webView.loadUrl("javascript:resetAndExecute();");
+                webView.loadUrl("javascript:resetAndExecute({});");
             }
         } else {
-            webView.loadUrl("javascript:resetAndExecute();");
+            webView.loadUrl("javascript:resetAndExecute({});");
         }
     }
 
