@@ -118,7 +118,7 @@ final class HCaptchaWebViewHelper {
         if (rqdata == null || rqdata.isEmpty()) {
             final String configRqdata = config.getRqdata();
             if (configRqdata != null && !configRqdata.isEmpty()) {
-                verifyParams.setRqdata(rqdata);
+                verifyParams.setRqdata(configRqdata);
             }
         }
 

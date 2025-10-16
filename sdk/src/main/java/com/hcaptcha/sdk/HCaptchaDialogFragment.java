@@ -28,8 +28,6 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
-import java.util.Objects;
-
 /**
  * HCaptcha Dialog Fragment Class.
  * Must have a `public` modifier, so it can be properly recreated from the instance state!

@@ -1,6 +1,5 @@
 package com.hcaptcha.example;
 
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.text.InputType;
@@ -11,7 +10,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import com.hcaptcha.sdk.*;
