@@ -119,16 +119,17 @@ public class HCaptchaHtmlTest {
 
     @Test
     public void testResetAndExecuteWithJsonParams() throws InterruptedException {
-        final String verifyParams = "{\"phoneNumber\": \"+1234567890\"}";
+        final String verifyParams = "{\"mfa_phoneprefix\": \"1\"}";
         setupWebView(() -> {
-            // Test resetAndExecute with JSON parameters
-            webView.evaluateJavascript("resetAndExecute(" + verifyParams + ")", null);
+            webView.evaluateJavascript("reset()", null);
+            webView.evaluateJavascript("setData(" + verifyParams + ")", null);
+            webView.evaluateJavascript("execute()", null);
         });
 
         // Check if mock hcaptcha.setData() was called with the JSON parameters
         assertTrue("Mock hcaptcha.setData() should be called", mockHCaptcha.isSetDataCalled());
 
-        // Note: android not support JS object serialization
+        // Note: android does not support JS object serialization.
         String setDataParams = mockHCaptcha.getLastSetDataParams();
         assertEquals("setData should contain expected JSON data",
                 "undefined", setDataParams);
