@@ -19,7 +19,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
@@ -28,7 +27,6 @@ import static androidx.test.espresso.web.model.Atoms.script;
 import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.hcaptcha.sdk.test.TestActivity;
@@ -51,9 +49,7 @@ public class HCaptchaHtmlTest {
     @After
     public void tearDown() {
         if (activityScenario != null) {
-            activityScenario.onActivity(activity -> {
-                webView.destroy();
-            });
+            activityScenario.onActivity(activity -> webView.destroy());
             activityScenario.close();
         }
     }
@@ -82,7 +78,7 @@ public class HCaptchaHtmlTest {
     }
 
     @Test
-    public void testLoadApiAddsScriptNodeWithUndefinedSrc() throws InterruptedException {
+    public void testLoadApiAddsScriptNodeWithUndefinedSrc() {
         setupWebView(null);
 
         onView(withId(android.R.id.content))
