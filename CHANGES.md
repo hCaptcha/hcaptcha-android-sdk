@@ -11,6 +11,8 @@
 - Fix: correct nullability annotation to prevent `NullPointerException`
 - Docs: add note about `reset` call for updated HCaptchaVerifyParams on next verify call
 
+
+
 # 4.3.0
 
 - Feature: implement HCaptchaVerifyParams with phone prefix/number support
