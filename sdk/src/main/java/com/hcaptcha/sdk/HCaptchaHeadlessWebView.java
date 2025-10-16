@@ -48,11 +48,7 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     }
 
     private void execute() {
-        if (this.verifyParams != null) {
-            webViewHelper.reset();
-            webViewHelper.setVerifyParams(this.verifyParams);
-        }
-
+        webViewHelper.setVerifyParams(this.verifyParams);
         webViewHelper.execute();
     }
 

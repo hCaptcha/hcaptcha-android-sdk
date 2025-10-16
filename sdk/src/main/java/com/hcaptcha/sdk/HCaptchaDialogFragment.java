@@ -343,7 +343,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
             final HCaptchaConfig config = webViewHelper.getConfig();
             if (config.getSize() == HCaptchaSize.INVISIBLE) {
-                // Need to re-execute since we closed the challenge above.
                 webViewHelper.execute();
             }
         }
