@@ -72,12 +72,13 @@
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
     var hCaptchaID = null;
     /**
-     * Process verify params
+     * Called programmatically from HCaptchaWebViewHelper.
      */
-    function setVerifyParams(verifyParams) {
+    function setData(data) {
         try {
-            verifyParams = verifyParams || {};
-            hcaptcha.setData(hCaptchaID, verifyParams);
+            if (data) {
+                hcaptcha.setData(hCaptchaID, data);
+            }
         } catch (e) {
             BridgeObject.onError(34);
         }
@@ -85,9 +86,7 @@
     /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
-    function resetAndExecute(verifyParams) {
-        hcaptcha.reset();
-        setVerifyParams(verifyParams);
+    function execute() {
         hcaptcha.execute(hCaptchaID);
     }
     function reset() {
@@ -192,15 +191,17 @@
         };
         document.head.appendChild(script);
     }
+
     var container = document.getElementById("hcaptcha-container");
     container.addEventListener("click", function () {
         if (window.hcaptcha) {
-            // Allows dismissal of checkbox view
+            // Allows dismissal of the checkbox view.
             window.hcaptcha.close();
         } else {
             BridgeObject.onError(30);
         }
     });
+
     loadApi();
 </script>
 </body>

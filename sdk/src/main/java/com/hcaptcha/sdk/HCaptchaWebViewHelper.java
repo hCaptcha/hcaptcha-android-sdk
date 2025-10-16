@@ -124,33 +124,29 @@ final class HCaptchaWebViewHelper {
 
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
-            final String verifyParamsJson = objectMapper.writeValueAsString(verifyParams);
-            webView.loadUrl("javascript:setVerifyParams(" + verifyParamsJson + ");");
+            final String data = objectMapper.writeValueAsString(verifyParams);
+            webView.loadUrl("javascript:setData(" + data + ");");
         } catch (Exception e) {
-            HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
+            HCaptchaLog.w("Failed to call javascript:setData(): " + e.getMessage());
         }
     }
 
     void resetAndExecute(@Nullable HCaptchaVerifyParams verifyParams) {
-        if (verifyParams == null) {
-            verifyParams = new HCaptchaVerifyParams();
-        }
+        this.reset();
+        this.setVerifyParams(verifyParams);
 
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            final String verifyParamsJson = objectMapper.writeValueAsString(verifyParams);
-            webView.loadUrl("javascript:resetAndExecute(" + verifyParamsJson + ");");
+            webView.loadUrl("javascript:execute();");
         } catch (Exception e) {
-            HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
-            webView.loadUrl("javascript:resetAndExecute({});");
+            HCaptchaLog.w("Failed to call javascript:execute(): " + e.getMessage());
         }
     }
 
     void reset() {
-        if (webView.isDestroyed()) {
-            HCaptchaLog.w("WebView is destroyed already");
-        } else {
+        try {
             webView.loadUrl("javascript:reset();");
+        } catch (Exception e) {
+            HCaptchaLog.w("Failed to call javascript:reset(): " + e.getMessage());
         }
     }
 
