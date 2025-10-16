@@ -15,7 +15,7 @@ internal class HCaptchaComposeVerifier(
 
     override fun onLoaded() {
         onResult(HCaptchaResponse.Event(HCaptchaEvent.Loaded))
-        if (config.hideDialog) {
+        if (config.hideDialog || config.size == HCaptchaSize.INVISIBLE) {
             helperState.value?.let { helper ->
                 helper.resetAndExecute(verifyParams)
             } ?: run {
