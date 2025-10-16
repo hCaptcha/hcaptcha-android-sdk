@@ -108,42 +108,40 @@ final class HCaptchaWebViewHelper {
     }
 
     public void setVerifyParams(@Nullable HCaptchaVerifyParams verifyParams) {
-        HCaptchaVerifyParams actualVerifyParams = verifyParams;
-        if (config.getRqdata() != null) {
-            if (verifyParams == null) {
-                actualVerifyParams = new HCaptchaVerifyParams();
-            }
+        if (verifyParams == null) {
+            verifyParams = new HCaptchaVerifyParams();
+        }
 
-            if (actualVerifyParams.getRqdata() == null) {
-                actualVerifyParams.setRqdata(config.getRqdata());
+        final String rqdata = verifyParams.getRqdata();
+
+        // This allows backwards compatibility for deprecated config.rqdata.
+        if (rqdata == null || rqdata.isEmpty()) {
+            final String configRqdata = config.getRqdata();
+            if (configRqdata != null && !configRqdata.isEmpty()) {
+                verifyParams.setRqdata(rqdata);
             }
         }
 
-        if (actualVerifyParams != null) {
-            try {
-                final ObjectMapper objectMapper = new ObjectMapper();
-                final String verifyParamsJson = objectMapper.writeValueAsString(actualVerifyParams);
-                webView.loadUrl("javascript:setVerifyParams(" + verifyParamsJson + ");");
-            } catch (Exception e) {
-                HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
-            }
-        } else {
-            webView.loadUrl("javascript:setVerifyParams({});");
+        try {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            final String verifyParamsJson = objectMapper.writeValueAsString(verifyParams);
+            webView.loadUrl("javascript:setVerifyParams(" + verifyParamsJson + ");");
+        } catch (Exception e) {
+            HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
         }
     }
 
-    void resetAndExecute(@Nullable HCaptchaVerifyParams params) {
-        if (params != null) {
-            // Pass verify params as JSON object directly
-            try {
-                final ObjectMapper objectMapper = new ObjectMapper();
-                final String verifyParamsJson = objectMapper.writeValueAsString(params);
-                webView.loadUrl("javascript:resetAndExecute(" + verifyParamsJson + ");");
-            } catch (Exception e) {
-                HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
-                webView.loadUrl("javascript:resetAndExecute({});");
-            }
-        } else {
+    void resetAndExecute(@Nullable HCaptchaVerifyParams verifyParams) {
+        if (verifyParams == null) {
+            verifyParams = new HCaptchaVerifyParams();
+        }
+
+        try {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            final String verifyParamsJson = objectMapper.writeValueAsString(verifyParams);
+            webView.loadUrl("javascript:resetAndExecute(" + verifyParamsJson + ");");
+        } catch (Exception e) {
+            HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
             webView.loadUrl("javascript:resetAndExecute({});");
         }
     }

@@ -36,5 +36,6 @@ public class HCaptchaVerifyParams implements Serializable {
      * Optional request data string to be passed to hCaptcha.
      * When provided, JS will call hcaptcha.setData({rqdata: value}) if available.
      */
+    @JsonProperty("rqdata")
     private String rqdata;
 }
