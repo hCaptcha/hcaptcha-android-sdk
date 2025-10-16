@@ -23,13 +23,13 @@ public class HCaptchaVerifyParams implements Serializable {
      * Optional phone country calling code (without '+'), e.g., "44".
      * Used in MFA flows.
      */
-    @JsonProperty("mfa_phone")
+    @JsonProperty("mfa_phoneprefix")
     private String phonePrefix;
 
     /**
      * Optional full phone number in E.164 format ("+44123..."), for use in MFA.
      */
-    @JsonProperty("mfa_phoneprefix")
+    @JsonProperty("mfa_phone")
     private String phoneNumber;
 
     /**

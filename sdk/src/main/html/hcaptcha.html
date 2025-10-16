@@ -76,7 +76,8 @@
      */
     function setVerifyParams(verifyParams) {
         try {
-           hcaptcha.setData(hCaptchaID, verifyParams);
+            verifyParams = verifyParams || {};
+            hcaptcha.setData(hCaptchaID, verifyParams);
         } catch (e) {
             BridgeObject.onError(34);
         }
@@ -86,9 +87,7 @@
      */
     function resetAndExecute(verifyParams) {
         hcaptcha.reset();
-
         setVerifyParams(verifyParams);
-
         hcaptcha.execute(hCaptchaID);
     }
     function reset() {
