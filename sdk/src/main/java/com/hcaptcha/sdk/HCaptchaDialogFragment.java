@@ -258,20 +258,22 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         }
 
         final HCaptchaConfig config = webViewHelper.getConfig();
+        final boolean isInvisible = config.getSize() == HCaptchaSize.INVISIBLE;
 
-        if (config.getSize() != HCaptchaSize.INVISIBLE) {
-            // Checkbox will be shown.
+        if (!isInvisible) {
             readyForInteraction = true;
             hideLoadingContainer();
         }
 
-        if (config.getSize() == HCaptchaSize.INVISIBLE && !config.getHideDialog()) {
+        if (this.verifyParams != null) {
+            webViewHelper.setVerifyParams(this.verifyParams);
+        }
+
+        if (isInvisible && !config.getHideDialog()) {
             // We want to auto-execute in case of `invisible` checkbox.
             // But not in the case of `hideDialog` since the verification process
             // might be desired to happen at a later time.
-            webViewHelper.resetAndExecute(verifyParams);
-        } else {
-            webViewHelper.setVerifyParams(verifyParams);
+            webViewHelper.execute();
         }
     }
 
@@ -303,7 +305,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         }
         if (webViewHelper != null) {
             if (silentRetry) {
-                webViewHelper.resetAndExecute(verifyParams);
+                if (this.verifyParams != null) {
+                    webViewHelper.setVerifyParams(this.verifyParams);
+                }
+                webViewHelper.execute();
             } else if (listener != null) {
                 listener.onFailure(exception);
             } else {
@@ -328,13 +333,20 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void startVerification(@NonNull Activity fragmentActivity, @Nullable HCaptchaVerifyParams params) {
-        if (!Objects.equals(this.verifyParams, params) && webViewHelper != null) {
-            webViewHelper.reset();
-        }
-        if (readyForInteraction && webViewHelper != null) {
-            webViewHelper.setVerifyParams(params);
-        }
+        final boolean newParams = !Objects.equals(this.verifyParams, params);
         this.verifyParams = params;
+
+        if (readyForInteraction && webViewHelper != null && this.verifyParams != null && newParams) {
+            // We want to close any opened challenged to apply new verify params.
+            webViewHelper.close();
+            webViewHelper.setVerifyParams(this.verifyParams);
+
+            final HCaptchaConfig config = webViewHelper.getConfig();
+            if (config.getSize() == HCaptchaSize.INVISIBLE) {
+                // Need to re-execute since we closed the challenge above.
+                webViewHelper.execute();
+            }
+        }
 
         final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
         final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);

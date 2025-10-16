@@ -69,15 +69,15 @@
             return console.log('cb: challenge is visible');
         }
     };
+
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
-    var hCaptchaID = null;
+
     /**
-     * Process verify params
+     * Called programmatically from HCaptchaWebViewHelper.
      */
-    function setVerifyParams(verifyParams) {
+    function setData(data) {
         try {
-            verifyParams = verifyParams || {};
-            hcaptcha.setData(hCaptchaID, verifyParams);
+            hcaptcha.setData(data);
         } catch (e) {
             BridgeObject.onError(34);
         }
@@ -85,14 +85,17 @@
     /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
-    function resetAndExecute(verifyParams) {
-        hcaptcha.reset();
-        setVerifyParams(verifyParams);
-        hcaptcha.execute(hCaptchaID);
+    function execute() {
+        hcaptcha.execute();
     }
     function reset() {
         hcaptcha.reset();
     }
+
+    function close() {
+        hcaptcha.close();
+    }
+
     function getTheme(bridgeConfig) {
         var theme = bridgeConfig.theme;
         var customTheme = bridgeConfig.customTheme;
@@ -147,7 +150,7 @@
     function onHcaptchaLoaded() {
         try {
             var renderConfig = getRenderConfig();
-            hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
+            hcaptcha.render('hcaptcha-container', renderConfig);
             BridgeObject.onLoaded();
         } catch (e) {
             console.error(e);
@@ -192,15 +195,17 @@
         };
         document.head.appendChild(script);
     }
+
     var container = document.getElementById("hcaptcha-container");
     container.addEventListener("click", function () {
         if (window.hcaptcha) {
-            // Allows dismissal of checkbox view
+            // Allows dismissal of the checkbox view.
             window.hcaptcha.close();
         } else {
             BridgeObject.onError(30);
         }
     });
+
     loadApi();
 </script>
 </body>

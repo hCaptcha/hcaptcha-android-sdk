@@ -16,8 +16,14 @@ internal class HCaptchaComposeVerifier(
     override fun onLoaded() {
         onResult(HCaptchaResponse.Event(HCaptchaEvent.Loaded))
         if (config.hideDialog) {
-            helperState.value?.let { helper ->
-                helper.resetAndExecute(verifyParams)
+            helperState.value?.let {
+                helper -> {
+                    if (verifyParams != null) {
+                        helper.reset()
+                        helper.setVerifyParams(verifyParams)
+                    }
+                    helper.execute()
+                }
             } ?: run {
                 HCaptchaLog.w("HCaptchaWebViewHelper wasn't created, report but to developer")
                 onResult(HCaptchaResponse.Failure(HCaptchaError.INTERNAL_ERROR))
@@ -34,9 +40,15 @@ internal class HCaptchaComposeVerifier(
     }
 
     override fun onFailure(exception: HCaptchaException) {
-        helperState.value?.takeIf { it.shouldRetry(exception) }
-            ?.resetAndExecute(verifyParams)
-            ?: onResult(HCaptchaResponse.Failure(exception.hCaptchaError))
+        helperState.value?.takeIf { it.shouldRetry(exception) }?.let {
+            helper -> {
+                if (verifyParams != null) {
+                    helper.reset()
+                    helper.setVerifyParams(verifyParams)
+                }
+                helper.execute()
+            }
+        } ?: onResult(HCaptchaResponse.Failure(exception.hCaptchaError))
     }
 
     override fun startVerification(activity: Activity, verifyParams: HCaptchaVerifyParams?) {

@@ -130,7 +130,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void onClickVerify(final View v) {
         setTokenTextView("-");
-        
+        setErrorTextView("-");
+
         // Always build verifyParams regardless of hCaptcha state
         final String input = phonePrefixInput.getText() != null ? phonePrefixInput.getText().toString().trim() : null;
         final String rqdata = rqdataInput.getText() != null ? rqdataInput.getText().toString().trim() : null;
