@@ -71,6 +71,13 @@
     };
     var bridgeConfig = JSON.parse(BridgeObject.getConfig());
     var hCaptchaID = null;
+
+    function logError(e) {
+        try {
+            console.error(JSON.stringify(e));
+        } catch (error) {}
+    }
+
     /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
@@ -81,14 +88,21 @@
             }
         } catch (e) {
             BridgeObject.onError(34);
+            logError(e);
         }
     }
     /**
      * Called programmatically from HCaptchaWebViewHelper.
      */
     function execute() {
-        hcaptcha.execute(hCaptchaID);
+        try {
+            hcaptcha.execute(hCaptchaID);
+        } catch (e) {
+            BridgeObject.onError(29);
+            logError(e);
+        }
     }
+
     function reset() {
         hcaptcha.reset();
     }
@@ -99,8 +113,8 @@
             try {
                 return JSON.parse(customTheme);
             } catch (e) {
-                console.error(e);
                 BridgeObject.onError(32);
+                logError(e);
             }
         }
         return theme;
@@ -134,7 +148,7 @@
                         return BridgeObject.onError(10);
                     default:
                         // Error not handled? Log it for debugging purposes
-                        console.error(error);
+                        logError(error);
                         return BridgeObject.onError(29);
                 }
             },
@@ -149,8 +163,8 @@
             hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
             BridgeObject.onLoaded();
         } catch (e) {
-            console.error(e);
             BridgeObject.onError(29);
+            logError(e);
         }
     }
     function addQueryParamIfDefined(url, queryName, queryValue) {

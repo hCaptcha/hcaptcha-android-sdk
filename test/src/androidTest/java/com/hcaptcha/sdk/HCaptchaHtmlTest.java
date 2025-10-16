@@ -168,7 +168,7 @@ public class HCaptchaHtmlTest {
     }
 
     /**
-     * Mock implementation of hcaptcha object for testing
+     * Mock implementation of window.hcaptcha for testing.
      */
     public static class MockHcaptcha {
         private final CountDownLatch setDataLatch = new CountDownLatch(1);

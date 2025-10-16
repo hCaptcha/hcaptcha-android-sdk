@@ -108,10 +108,10 @@ final class HCaptchaWebViewHelper {
     }
 
     public void setVerifyParams(@Nullable HCaptchaVerifyParams params) {
-        final HCaptchaVerifyParams verifyParams = params != null ? params : new HCaptchaVerifyParams();
-        final String rqdata = verifyParams.getRqdata();
+        final HCaptchaVerifyParams verifyParams = params != null ? params :  new HCaptchaVerifyParams();
 
         // This allows backwards compatibility for deprecated config.rqdata.
+        final String rqdata = verifyParams.getRqdata();
         if (rqdata == null || rqdata.isEmpty()) {
             final String configRqdata = config.getRqdata();
             if (configRqdata != null && !configRqdata.isEmpty()) {
@@ -131,7 +131,10 @@ final class HCaptchaWebViewHelper {
     void resetAndExecute(@Nullable HCaptchaVerifyParams verifyParams) {
         this.reset();
         this.setVerifyParams(verifyParams);
+        this.execute();
+    }
 
+    void execute() {
         try {
             webView.loadUrl("javascript:execute();");
         } catch (Exception e) {

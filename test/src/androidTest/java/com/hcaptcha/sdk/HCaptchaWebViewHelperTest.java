@@ -2,9 +2,7 @@ package com.hcaptcha.sdk;
 
 import static com.hcaptcha.sdk.AssertUtil.failAsNonReachable;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import android.app.Activity;
 import android.os.Handler;
@@ -14,7 +12,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import androidx.test.core.app.ActivityScenario;
-import androidx.test.ext.junit.rules.ActivityScenarioRule;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcaptcha.sdk.test.TestActivity;
@@ -126,7 +123,7 @@ public class HCaptchaWebViewHelperTest {
         });
 
         // Wait for and get the parsed JSON
-        HCaptchaVerifyParams receivedParams = testObject.waitForVerifyParams();
+        HCaptchaVerifyParams receivedParams = testObject.waitForSetData();
 
         // Verify the phone number was passed correctly
         assertEquals("+1234567890", receivedParams.getPhoneNumber());
@@ -139,10 +136,10 @@ public class HCaptchaWebViewHelperTest {
         });
 
         // Wait for and get the parsed JSON
-        HCaptchaVerifyParams receivedParams = testObject.waitForVerifyParams();
+        HCaptchaVerifyParams receivedParams = testObject.waitForSetData();
 
         // Verify null case is handled correctly
-        assertNull("Should return null for null parameters", receivedParams);
+        assertEquals("Should return empty verify params for null parameters", new HCaptchaVerifyParams(), receivedParams);
     }
 
     @Test
@@ -155,7 +152,7 @@ public class HCaptchaWebViewHelperTest {
         });
 
         // Wait for and get the parsed JSON
-        HCaptchaVerifyParams receivedParams = testObject.waitForVerifyParams();
+        HCaptchaVerifyParams receivedParams = testObject.waitForSetData();
 
         // Verify the phone prefix was passed correctly
         assertEquals("+1", receivedParams.getPhonePrefix());
@@ -171,7 +168,7 @@ public class HCaptchaWebViewHelperTest {
         });
 
         // Wait for and get the parsed JSON
-        HCaptchaVerifyParams receivedParams = testObject.waitForVerifyParams();
+        HCaptchaVerifyParams receivedParams = testObject.waitForSetData();
 
         // Verify the rqdata was passed correctly
         assertEquals("test-rqdata-from-params", receivedParams.getRqdata());
@@ -194,7 +191,7 @@ public class HCaptchaWebViewHelperTest {
         });
 
         // Wait for and get the parsed JSON
-        HCaptchaVerifyParams receivedParams = testObject.waitForVerifyParams();
+        HCaptchaVerifyParams receivedParams = testObject.waitForSetData();
 
         // Verify the rqdata from config was passed correctly
         assertEquals("test-rqdata-from-config", receivedParams.getRqdata());
@@ -220,7 +217,7 @@ public class HCaptchaWebViewHelperTest {
         });
 
         // Wait for and get the parsed JSON
-        HCaptchaVerifyParams receivedParams = testObject.waitForVerifyParams();
+        HCaptchaVerifyParams receivedParams = testObject.waitForSetData();
 
         // Verify the rqdata from params has priority over config
         assertEquals("test-rqdata-from-params", receivedParams.getRqdata());
@@ -259,12 +256,12 @@ public class HCaptchaWebViewHelperTest {
     }
 
     private static class TestObject {
-        private final CountDownLatch setParamsLatch = new CountDownLatch(1);
+        private final CountDownLatch setDataLatch = new CountDownLatch(1);
         private final ObjectMapper objectMapper = new ObjectMapper();
         private HCaptchaVerifyParams receivedParams;
 
         @JavascriptInterface
-        public void setVerifyParams(String jsonParams) {
+        public void setData(String jsonParams) {
             try {
                 if (jsonParams != null && !jsonParams.equals("null")) {
                     this.receivedParams = objectMapper.readValue(jsonParams, HCaptchaVerifyParams.class);
@@ -274,15 +271,15 @@ public class HCaptchaWebViewHelperTest {
             } catch (Exception e) {
                 this.receivedParams = null;
             }
-            setParamsLatch.countDown();
+            setDataLatch.countDown();
         }
 
         /**
          * Wait for setVerifyParams to be called and return the parsed JSON
          */
-        public HCaptchaVerifyParams waitForVerifyParams() throws InterruptedException {
-            assertTrue("setVerifyParams should be called within timeout",
-                setParamsLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+        public HCaptchaVerifyParams waitForSetData() throws InterruptedException {
+            assertTrue("setData should be called within timeout",
+                setDataLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
             return receivedParams;
         }
     }

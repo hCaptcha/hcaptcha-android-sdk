@@ -59,7 +59,6 @@ class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
                 + "            document.getElementById(\"input-text\").value = \"reset\";\n"
                 + "        }\n"
                 + "        function execute() {\n"
-                + "            TestObject.execute();\n"
                 + "        }\n"
                 + (callBridgeOnLoaded ? "onHcaptchaLoaded();\n" : "")
                 + "    </script>\n"
