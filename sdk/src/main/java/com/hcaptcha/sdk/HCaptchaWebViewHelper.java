@@ -107,11 +107,8 @@ final class HCaptchaWebViewHelper {
         webView.destroy();
     }
 
-    public void setVerifyParams(@Nullable HCaptchaVerifyParams verifyParams) {
-        if (verifyParams == null) {
-            verifyParams = new HCaptchaVerifyParams();
-        }
-
+    public void setVerifyParams(@Nullable HCaptchaVerifyParams params) {
+        final HCaptchaVerifyParams verifyParams = params != null ? params : new HCaptchaVerifyParams();
         final String rqdata = verifyParams.getRqdata();
 
         // This allows backwards compatibility for deprecated config.rqdata.
