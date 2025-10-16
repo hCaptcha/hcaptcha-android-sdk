@@ -149,13 +149,6 @@
             var renderConfig = getRenderConfig();
             hCaptchaID = hcaptcha.render('hcaptcha-container', renderConfig);
             BridgeObject.onLoaded();
-
-            if (renderConfig.size === 'invisible' && !bridgeConfig.hideDialog) {
-                // We want to auto execute in case of `invisible` checkbox.
-                // But not in case of `hideDialog` since verification process
-                // might be desired to happen at a later time.
-                hcaptcha.execute(hCaptchaID);
-            }
         } catch (e) {
             console.error(e);
             BridgeObject.onError(29);

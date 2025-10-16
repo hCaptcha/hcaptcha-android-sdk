@@ -257,12 +257,21 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             return;
         }
 
-        webViewHelper.setVerifyParams(verifyParams);
+        final HCaptchaConfig config = webViewHelper.getConfig();
 
-        if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
-            // checkbox will be shown
+        if (config.getSize() != HCaptchaSize.INVISIBLE) {
+            // Checkbox will be shown.
             readyForInteraction = true;
             hideLoadingContainer();
+        }
+
+        if (config.getSize() == HCaptchaSize.INVISIBLE && !config.getHideDialog()) {
+            // We want to auto-execute in case of `invisible` checkbox.
+            // But not in the case of `hideDialog` since the verification process
+            // might be desired to happen at a later time.
+            webViewHelper.resetAndExecute(verifyParams);
+        } else {
+            webViewHelper.setVerifyParams(verifyParams);
         }
     }
 
