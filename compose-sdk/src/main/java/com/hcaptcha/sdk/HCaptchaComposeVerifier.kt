@@ -15,11 +15,16 @@ internal class HCaptchaComposeVerifier(
 
     override fun onLoaded() {
         onResult(HCaptchaResponse.Event(HCaptchaEvent.Loaded))
-        if (config.hideDialog) {
+
+        if (config.hideDialog || config.size == HCaptchaSize.INVISIBLE) {
             helperState.value?.let { helper ->
-                helper.resetAndExecute(verifyParams)
+                if (verifyParams != null) {
+                    helper.resetAndExecute(verifyParams)
+                } else {
+                    helper.execute()
+                }
             } ?: run {
-                HCaptchaLog.w("HCaptchaWebViewHelper wasn't created, report but to developer")
+                HCaptchaLog.w("HCaptchaWebViewHelper wasn't created, report bug to developer")
                 onResult(HCaptchaResponse.Failure(HCaptchaError.INTERNAL_ERROR))
             }
         }

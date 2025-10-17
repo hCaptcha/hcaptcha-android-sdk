@@ -1,10 +1,16 @@
 # Changelog
 
+# 4.3.2
+
+- Fix: backward compatibility with HCaptchaConfig.rqdata
+
 # 4.3.1
 
 - Fix: enable incremental builds for HTML-to-Java generation tasks
 - Fix: correct nullability annotation to prevent `NullPointerException`
 - Docs: add note about `reset` call for updated HCaptchaVerifyParams on next verify call
+
+
 
 # 4.3.0
 

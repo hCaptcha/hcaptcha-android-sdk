@@ -103,6 +103,7 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-web:3.5.1'
     androidTestImplementation 'androidx.test.espresso:espresso-intents:3.5.1'
     androidTestImplementation 'org.mockito:mockito-android:5.3.1'
+    androidTestImplementation 'com.fasterxml.jackson.core:jackson-databind:2.13.5' // max version https://github.com/FasterXML/jackson-databind/issues/3657
 
     implementation project(path: ':compose-sdk')
     implementation 'androidx.compose.material3:material3:1.2.1'

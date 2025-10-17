@@ -18,7 +18,7 @@ class TestHCaptchaHtml implements IHCaptchaHtmlProvider {
                 + "        console.assert(typeof JSON.parse(window.JSDI.getSysDebug()) === 'object');\n"
                 + "        console.assert(typeof JSON.parse(window.JSInterface.getConfig()) === 'object');\n"
                 + "        var BridgeObject = window.JSInterface;\n"
-                + "        function resetAndExecute(arg) {\n"
+                + "        function execute(arg) {\n"
                 + "            BridgeObject.onPass('token');\n"
                 + "        }\n"
                 + "        BridgeObject.onLoaded();\n"

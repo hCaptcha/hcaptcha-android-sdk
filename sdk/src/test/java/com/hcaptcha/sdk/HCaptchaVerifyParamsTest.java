@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -60,5 +62,29 @@ public class HCaptchaVerifyParamsTest {
         assertNotNull(params);
         assertNull(params.getPhonePrefix());
         assertNull(params.getPhoneNumber());
+    }
+
+    @Test
+    public void test_json_serialization_annotations_not_swapped() throws Exception {
+        final HCaptchaVerifyParams params = HCaptchaVerifyParams.builder()
+                .phonePrefix(TEST_PHONE_PREFIX)
+                .phoneNumber(TEST_PHONE_NUMBER)
+                .rqdata(TEST_RQDATA)
+                .build();
+
+        final ObjectMapper mapper = new ObjectMapper();
+        final String json = mapper.writeValueAsString(params);
+
+        final JSONObject jsonObject = new JSONObject(json);
+
+        // Verify that the JSON field names match the @JsonProperty annotations
+        assertNotNull(jsonObject);
+        assertEquals(TEST_PHONE_PREFIX, jsonObject.getString("mfa_phoneprefix"));
+        assertEquals(TEST_PHONE_NUMBER, jsonObject.getString("mfa_phone"));
+        assertEquals(TEST_RQDATA, jsonObject.getString("rqdata"));
+
+        // Verify that the original field names are NOT present in JSON
+        assertEquals(false, jsonObject.has("phonePrefix"));
+        assertEquals(false, jsonObject.has("phoneNumber"));
     }
 }

@@ -255,12 +255,24 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             return;
         }
 
-        webViewHelper.setVerifyParams(verifyParams);
+        final HCaptchaConfig config = webViewHelper.getConfig();
+        final boolean isInvisible = config.getSize() == HCaptchaSize.INVISIBLE;
 
-        if (webViewHelper.getConfig().getSize() != HCaptchaSize.INVISIBLE) {
-            // checkbox will be shown
+        if (!isInvisible) {
+            // Checkbox will be shown.
             readyForInteraction = true;
             hideLoadingContainer();
+        }
+
+        if (webViewHelper != null) {
+            if (isInvisible && !config.getHideDialog()) {
+                // We want to auto-execute in case of `invisible` checkbox.
+                // But not in the case of `hideDialog` since the verification process
+                // might be desired to happen at a later time.
+                webViewHelper.resetAndExecute(verifyParams);
+            } else {
+                webViewHelper.setVerifyParams(verifyParams);
+            }
         }
     }
 
@@ -317,12 +329,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void startVerification(@NonNull Activity fragmentActivity, @Nullable HCaptchaVerifyParams params) {
-        // Store the verify params for later use in webview
-        if (params != null) {
-            this.verifyParams = params;
-            if (readyForInteraction && webViewHelper != null) {
-                webViewHelper.setVerifyParams(params);
-            }
+        this.verifyParams = params;
+
+        if (readyForInteraction && webViewHelper != null) {
+            webViewHelper.setVerifyParams(params);
         }
 
         final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();

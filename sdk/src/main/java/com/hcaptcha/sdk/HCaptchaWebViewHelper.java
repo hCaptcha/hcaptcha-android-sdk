@@ -107,39 +107,46 @@ final class HCaptchaWebViewHelper {
         webView.destroy();
     }
 
-    public void setVerifyParams(@Nullable HCaptchaVerifyParams verifyParams) {
-        if (verifyParams != null) {
-            try {
-                final ObjectMapper objectMapper = new ObjectMapper();
-                final String verifyParamsJson = objectMapper.writeValueAsString(verifyParams);
-                webView.loadUrl("javascript:setVerifyParams(" + verifyParamsJson + ");");
-            } catch (Exception e) {
-                HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
+    public void setVerifyParams(@Nullable HCaptchaVerifyParams params) {
+        final HCaptchaVerifyParams verifyParams = params != null ? params :  new HCaptchaVerifyParams();
+
+        // This allows backwards compatibility for deprecated config.rqdata.
+        final String rqdata = verifyParams.getRqdata();
+        if (rqdata == null || rqdata.isEmpty()) {
+            final String configRqdata = config.getRqdata();
+            if (configRqdata != null && !configRqdata.isEmpty()) {
+                verifyParams.setRqdata(configRqdata);
             }
+        }
+
+        try {
+            final ObjectMapper objectMapper = new ObjectMapper();
+            final String data = objectMapper.writeValueAsString(verifyParams);
+            webView.loadUrl("javascript:setData(" + data + ");");
+        } catch (Exception e) {
+            HCaptchaLog.w("Failed to call javascript:setData(): " + e.getMessage());
         }
     }
 
-    void resetAndExecute(@Nullable HCaptchaVerifyParams params) {
-        if (params != null) {
-            // Pass verify params as JSON object directly
-            try {
-                final ObjectMapper objectMapper = new ObjectMapper();
-                final String verifyParamsJson = objectMapper.writeValueAsString(params);
-                webView.loadUrl("javascript:resetAndExecute(" + verifyParamsJson + ");");
-            } catch (Exception e) {
-                HCaptchaLog.w("Failed to serialize verify params: " + e.getMessage());
-                webView.loadUrl("javascript:resetAndExecute();");
-            }
-        } else {
-            webView.loadUrl("javascript:resetAndExecute();");
+    void resetAndExecute(@Nullable HCaptchaVerifyParams verifyParams) {
+        this.reset();
+        this.setVerifyParams(verifyParams);
+        this.execute();
+    }
+
+    void execute() {
+        try {
+            webView.loadUrl("javascript:execute();");
+        } catch (Exception e) {
+            HCaptchaLog.w("Failed to call javascript:execute(): " + e.getMessage());
         }
     }
 
     void reset() {
-        if (webView.isDestroyed()) {
-            HCaptchaLog.w("WebView is destroyed already");
-        } else {
+        try {
             webView.loadUrl("javascript:reset();");
+        } catch (Exception e) {
+            HCaptchaLog.w("Failed to call javascript:reset(): " + e.getMessage());
         }
     }
 
