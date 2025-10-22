@@ -259,6 +259,12 @@ Note: If you do not call `.reset()` you will likely see a warning from tools lik
    2. the config option [`HCaptchaConfig.retryPredicate`](#retry-failed-verification) is used to automatically trigger a new verification when some error occurs. If `HCaptchaConfig.retryPredicate` returns `true`, this will result in a new success or error callback.
    3. `onFailure` with `TOKEN_TIMEOUT` will be called once the token is expired. To prevent this you can call `HCaptchaTokenResponse.markUsed` once the token is utilized. Also, you can change expiration timeout with `HCaptchaConfigBuilder.tokenExpiration(timeout)` (default 2 min.)
 
+### leakcanary Compatibility with Old Android Versions
+
+Debug builds of the SDK use `leakcanary`, which has incompatibility issues with very old Android versions.
+
+If you're testing debug builds with an old Android version and notice a `ResourceNotFound` crash when tapping on some modal elements, please remove leakcanary and retest.
+
 ## Config Params
 
 The following list contains configuration properties to allows customization of the hCaptcha verification flow.
