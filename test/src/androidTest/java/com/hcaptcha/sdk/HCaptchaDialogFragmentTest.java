@@ -519,4 +519,25 @@ public class HCaptchaDialogFragmentTest {
             Intents.release();
         }
     }
+
+    @Test
+    public void testTargetBlankHandled() {
+        try {
+            Intents.init();
+
+            launchInContainer();
+
+            onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
+            onWebView().withElement(DriverAtoms.findElement(Locator.ID, "on-target-blank"))
+                    .perform(DriverAtoms.webClick());
+
+            intended(allOf(
+                    hasAction(Intent.ACTION_VIEW),
+                    hasData(Uri.parse("https://example.com/"))
+
+            ));
+        } finally {
+            Intents.release();
+        }
+    }
 }
