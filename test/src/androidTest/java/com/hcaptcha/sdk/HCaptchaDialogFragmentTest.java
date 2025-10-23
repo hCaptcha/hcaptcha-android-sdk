@@ -2,6 +2,7 @@ package com.hcaptcha.sdk;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -33,7 +34,9 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -524,6 +527,10 @@ public class HCaptchaDialogFragmentTest {
     public void testTargetBlankHandled() {
         try {
             Intents.init();
+
+            // Stub out all ACTION_VIEW intents so no chooser/browser opens
+            intending(hasAction(Intent.ACTION_VIEW))
+                    .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
 
             launchInContainer();
 
