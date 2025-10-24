@@ -9,3 +9,4 @@ build
 .externalNativeBuild
 .cxx
 node_modules
+example-app/local.properties

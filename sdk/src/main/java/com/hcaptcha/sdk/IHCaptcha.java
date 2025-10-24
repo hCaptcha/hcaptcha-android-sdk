@@ -104,4 +104,10 @@ public interface IHCaptcha {
      * Force stop verification and release resources.
      */
     void reset();
+
+    /**
+     * Fully destroy resources, including the underlying WebView and any preloaded state.
+     * Use this in Activity/Fragment teardown to prevent retaining the host context.
+     */
+    void destroy();
 }

@@ -371,6 +371,21 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         sPreloadWebView = null;
     }
 
+    /**
+     * Fully destroy WebView resources and clear preload reference.
+     */
+    @Override
+    public void destroy() {
+        if (webViewHelper != null) {
+            webViewHelper.destroy();
+        }
+        if (isAdded()) {
+            dismissAllowingStateLoss();
+        }
+        // Clear the static WebView reference to prevent memory leaks
+        sPreloadWebView = null;
+    }
+
     private View prepareRootView(@NonNull LayoutInflater inflater,
                                  @Nullable ViewGroup container,
                                  @NonNull HCaptchaConfig config) {

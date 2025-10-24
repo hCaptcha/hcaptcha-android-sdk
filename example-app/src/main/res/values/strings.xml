@@ -4,6 +4,7 @@
     <string name="setup">Setup</string>
     <string name="verify">Verify</string>
     <string name="mark_used">Mark used</string>
+    <string name="destroy">Destroy</string>
     <string name="loading">Loading</string>
     <string name="web_view_debug">Web Debug</string>
     <string name="hw_accel">Disable HW Accel</string>
