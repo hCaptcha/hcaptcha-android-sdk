@@ -424,3 +424,45 @@ For more information about this attribute and security implications, see the [An
 ## For maintainers
 
 If you plan to contribute to the repo, please see [MAINTAINERS.md](./MAINTAINERS.md) for detailed build, test, and release instructions.
+
+## Implementation Notes
+
+### Memory Lifecycle Management
+
+Some resources are cached to speed up subsequent calls. Once you call `HCaptcha.reset()` it releases these resources.
+
+### Retry handling
+
+`retryPredicate` is the only mechanism used to auto-retry and the default only honors `resetOnTimeout` for SESSION_TIMEOUT (15). It does not retry NETWORK_ERROR (7), so add your own predicate if you want that behavior (be sure to bound retries/backoff).
+
+### FragmentActivity requirement
+
+Visual challenges throw if you pass a non-FragmentActivity. A plain Activity is only supported for headless mode (hideDialog=true) with a Passive sitekey.
+
+### Listener management
+
+Listeners persist across verifications and are not auto-removed. If you won’t reuse the same HCaptcha instance or want to avoid duplicate callbacks/leaks, remove them in teardown: `removeOn...Listener` or `removeAllListeners()`, and call `HCaptcha.reset()` when done to release the dialog/webview.
+
+### Configuration changes
+
+The dialog is a DialogFragment; Android will recreate it on configuration changes. The SDK will re-render the challenge, but it does not live‑update theme/locale mid-session. To apply new locale or light/dark mode, recreate with an updated HCaptchaConfig and re‑verify. If you need to preserve UX across changes, handle it in the host, e.g. restart verification with updated config, or constrain orientation while a challenge is active.
+
+### HCaptcha.reset() usage
+
+This tears down the current verifier and releases UI resources. It dismisses the dialog if shown, resets/destroys the WebView, clears the cached/preloaded WebView, and drops the internal verifier reference.
+
+
+#### When to call
+
+Call on Activity teardown if you won't reuse the same HCaptcha instance. This avoids leaks from the cached fragment/WebView.
+
+If you expect multiple verifications in the same screen, don't call reset() between them: the SDK caches the WebView/fragment to speed up subsequent calls.
+
+### Before initializing
+
+This is safe but usually unnecessary. `setup()` / `verifyWithHCaptcha()` already re-initializes as needed, so calling reset() first just forces a fresh verifier. If you're creating a brand‑new HCaptcha instance, calling reset() on it is a no‑op.
+
+#### Cleanup
+Listeners persist: `reset()` does not remove them. If your listeners capture an Activity/Fragment, remove them during teardown to avoid leaks: `removeOn...Listener(...)` or `removeAllListeners()`
+
+After a successful solve, the SDK schedules a token timeout callback. Call `HCaptchaTokenResponse.markUsed()` once you've used the token to cancel that timer and prevent a later TOKEN_TIMEOUT callback
