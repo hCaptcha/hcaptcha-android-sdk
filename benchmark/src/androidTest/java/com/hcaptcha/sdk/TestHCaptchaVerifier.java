@@ -36,4 +36,9 @@ public class TestHCaptchaVerifier implements IHCaptchaVerifier {
     public void reset() {
         // no implementation need for performance measurement
     }
+
+    @Override
+    public void destroy() {
+        // no implementation need for performance measurement
+    }
 }

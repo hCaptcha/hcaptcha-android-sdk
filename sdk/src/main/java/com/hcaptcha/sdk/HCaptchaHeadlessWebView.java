@@ -102,4 +102,9 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
             shouldResetOnLoad = true;
         }
     }
+
+    @Override
+    public void destroy() {
+        webViewHelper.destroy();
+    }
 }

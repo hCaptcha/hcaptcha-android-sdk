@@ -11,6 +11,15 @@ You can manually test before pushing by running both unit tests and instrumented
 * `./gradlew test:connectedAndroidTest`
 * `./gradlew test:connectedAndroidTest -P testingMinimizedBuild=true -P android.enableR8.fullMode=false`
 
+## JDK Versions
+
+Testing requires JDK 17+ for pre-commit hooks. Quickstart on Mac:
+
+```bash
+brew install --cask temurin@17
+JAVA_HOME=$(/usr/libexec/java_home -v 17) PATH="$JAVA_HOME/bin:$PATH" git commit -m "my msg"
+```
+
 ## Manual testing
 
 + {normal,invisible,compact} -> verify -> success -> mark used

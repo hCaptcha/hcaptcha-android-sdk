@@ -52,4 +52,8 @@ internal class HCaptchaComposeVerifier(
     override fun reset() {
         error("reset should never be reached")
     }
+
+    override fun destroy() {
+        helperState.value?.destroy() ?: error("destroy should never be reached")
+    }
 }

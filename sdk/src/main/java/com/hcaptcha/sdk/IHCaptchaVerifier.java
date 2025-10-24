@@ -27,4 +27,10 @@ interface IHCaptchaVerifier extends
      * Force stop verification and release resources.
      */
     void reset();
+
+    /**
+     * Fully destroy underlying WebView and release all resources.
+     * Unlike {@link #reset()}, this tears down preloaded state as well.
+     */
+    void destroy();
 }
