@@ -463,7 +463,6 @@ If you expect multiple verifications in the same screen, don't call reset() betw
 This is safe but usually unnecessary. `setup()` / `verifyWithHCaptcha()` already re-initializes as needed, so calling reset() first just forces a fresh verifier. If you're creating a brand‑new HCaptcha instance, calling reset() on it is a no‑op.
 
 #### Cleanup
+Listeners persist: `reset()` does not remove them. If your listeners capture an Activity/Fragment, remove them during teardown to avoid leaks: `removeOn...Listener(...)` or `removeAllListeners()`
 
-- Listeners persist; reset() does not remove them. If your listeners capture an Activity/Fragment, remove them during teardown to avoid leaks: removeOn...Listener(...) or removeAllListeners()
-
-- After a successful solve, the SDK schedules a token timeout callback. Call `HCaptchaTokenResponse.markUsed()` once you've used the token to cancel that timer and prevent a later TOKEN_TIMEOUT callback
+After a successful solve, the SDK schedules a token timeout callback. Call `HCaptchaTokenResponse.markUsed()` once you've used the token to cancel that timer and prevent a later TOKEN_TIMEOUT callback
