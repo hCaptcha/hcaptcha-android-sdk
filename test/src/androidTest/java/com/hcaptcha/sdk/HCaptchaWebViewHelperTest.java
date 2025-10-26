@@ -245,6 +245,11 @@ public class HCaptchaWebViewHelperTest {
         }
 
         @Override
+        public void destroy() {
+            failAsNonReachable();
+        }
+
+        @Override
         public void onSuccess(String token) {
             failAsNonReachable();
         }

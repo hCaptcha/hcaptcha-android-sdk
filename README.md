@@ -247,9 +247,24 @@ val intent = Intent(context, HCaptchaActivity::class.java)
 
 We cache the fragment instance inside the SDK to speed up the next HCaptcha.verifyWithHCaptcha calls.
 
-Once you are done with verification, you can call `HCaptcha.reset()` to release all allocated resources including the strong reference to `com.hcaptcha.sdk.HCaptchaDialogFragment`.
+Once you are done with verification, you have two options:
+- `HCaptcha.reset()` — releases the dialog fragment and internal state, but preserves preloaded WebView resources for faster subsequent verifications within the same Activity/session.
+- `HCaptcha.destroy()` — fully tears down resources, including destroying the underlying WebView to ensure no Activity context is retained by Chromium internals. Call this from your Activity/Fragment `onDestroy()` when you are done with hCaptcha in that lifecycle.
 
-Note: If you do not call `.reset()` you will likely see a warning from tools like LeakCanary.
+Example:
+```java
+@Override
+protected void onDestroy() {
+    if (hCaptcha != null) {
+        hCaptcha.destroy();
+    }
+    super.onDestroy();
+}
+```
+
+Note: If you reuse the same `HCaptcha` instance across multiple verifications, prefer `reset()` between runs to keep preload benefits, and use `destroy()` only for final teardown.
+
+ 
 
 ### Good to know
 1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:

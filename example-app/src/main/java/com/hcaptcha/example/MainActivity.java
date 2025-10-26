@@ -68,7 +68,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        hCaptcha.reset();
+        if (hCaptcha != null) {
+            hCaptcha.destroy();
+        }
         super.onDestroy();
     }
 
@@ -118,6 +120,14 @@ public class MainActivity extends AppCompatActivity {
             hCaptcha.reset();
         }
         setTokenTextView("-");
+        hCaptcha = null;
+    }
+
+    public void onClickDestroy(final View view) {
+        if (hCaptcha != null) {
+            hCaptcha.destroy();
+        }
+        setTokenTextView("destroy called");
         hCaptcha = null;
     }
 

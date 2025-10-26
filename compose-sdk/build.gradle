@@ -24,7 +24,7 @@ android {
 
         // version number visible to the user
         // should follow semantic versioning (See https://semver.org)
-        versionName "4.3.3"
+        versionName "4.4.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"

@@ -101,7 +101,13 @@ public interface IHCaptcha {
     IHCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config, @NonNull HCaptchaVerifyParams verifyParams);
 
     /**
-     * Force stop verification and release resources.
+     * Force stop verification and clear hCaptcha state.
      */
     void reset();
+
+    /**
+     * Fully destroy resources, including the underlying WebView and any preloaded state.
+     * Use this in Activity/Fragment teardown to prevent retaining the host context.
+     */
+    void destroy();
 }

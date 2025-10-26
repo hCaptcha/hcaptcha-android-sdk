@@ -147,6 +147,21 @@
 
     </LinearLayout>
 
+    <!-- Second row for actions that shouldn't wrap awkwardly -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="8dp">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/destroy"
+            android:onClick="onClickDestroy" />
+
+    </LinearLayout>
+
     <LinearLayout
         android:background="@android:color/holo_green_light"
         android:orientation="horizontal"

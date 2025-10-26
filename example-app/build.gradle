@@ -49,7 +49,9 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${prop('exampleAppcompatVersion', '1.3.1')}"
     implementation "com.google.android.flexbox:flexbox:3.0.0"
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
+    if (!prop('disableLeakCanary', 'false').toBoolean()) {
+        debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
+    }
 
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
