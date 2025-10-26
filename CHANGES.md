@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.3.3
+
+- Fix: handle target="_blank" links by opening in browser app
+
 # 4.3.2
 
 - Fix: backward compatibility with HCaptchaConfig.rqdata
