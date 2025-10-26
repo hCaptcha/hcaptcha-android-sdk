@@ -2,7 +2,8 @@
 
 # 4.4.0
 
-- Add explicit `HCaptcha.destroy()` API to fully tear down WebView and related resources.
+- Feat: add explicit `HCaptcha.destroy()` API to fully tear down WebView and related resources.
+- Fix: handle target="_blank" links by opening in browser app
 
 # 4.3.2
 
