@@ -1,7 +1,9 @@
 package com.hcaptcha.sdk;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -13,6 +15,7 @@ import static androidx.test.espresso.web.webdriver.DriverAtoms.clearElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
 import static androidx.test.espresso.intent.Intents.intended;
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewErrorByInput;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
@@ -28,25 +31,34 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import android.app.Activity;
 import android.app.Dialog;
+import android.app.Instrumentation;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.DisplayMetrics;
 import android.view.InflateException;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.webkit.WebView;
+
 import androidx.fragment.app.testing.FragmentScenario;
 import androidx.lifecycle.Lifecycle;
 import androidx.test.core.app.ActivityScenario;
+import androidx.test.espresso.ViewAction;
+import androidx.test.espresso.action.ViewActions;
 import androidx.test.espresso.intent.Intents;
 import androidx.test.espresso.web.webdriver.DriverAtoms;
 import androidx.test.espresso.web.webdriver.Locator;
@@ -242,7 +254,7 @@ public class HCaptchaDialogFragmentTest {
 
     @Test
     public void webViewNotInstalled() throws InterruptedException {
-        Assume.assumeTrue("Skip test for release, because impossible to mock LayoutInflater", BuildConfig.DEBUG);
+        assumeTrue("Skip test for release, because impossible to mock LayoutInflater", BuildConfig.DEBUG);
 
         final LayoutInflater inflater = mock(LayoutInflater.class);
         when(inflater.inflate(eq(R.layout.hcaptcha_fragment), any(), eq(false)))
@@ -514,6 +526,32 @@ public class HCaptchaDialogFragmentTest {
             intended(allOf(
                     hasAction(Intent.ACTION_VIEW),
                     hasData(Uri.parse("sms:+123-456-789?body=Hello%20World"))
+            ));
+        } finally {
+            Intents.release();
+        }
+    }
+
+    @Test
+    public void testTargetBlankHandled() throws InterruptedException {
+        try {
+            Intents.init();
+
+            launchInContainer();
+
+            onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
+
+            // WORKAROUND: https://stackoverflow.com/questions/54066941/using-espresso-to-click-on-a-webview-with-href
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                onWebView().withElement(DriverAtoms.findElement(Locator.ID, "on-target-blank"))
+                        .perform(DriverAtoms.webClick());
+            } else {
+                onView(withId(R.id.webView)).perform(AssertUtil.clickAt(-5, -5, Gravity.BOTTOM | Gravity.RIGHT));
+            }
+
+            intended(allOf(
+                    hasAction(Intent.ACTION_VIEW),
+                    hasData(Uri.parse("https://example.com/"))
             ));
         } finally {
             Intents.release();
