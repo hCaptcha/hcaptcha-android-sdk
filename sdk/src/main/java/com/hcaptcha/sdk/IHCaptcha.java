@@ -101,7 +101,7 @@ public interface IHCaptcha {
     IHCaptcha verifyWithHCaptcha(@NonNull HCaptchaConfig config, @NonNull HCaptchaVerifyParams verifyParams);
 
     /**
-     * Force stop verification and release resources.
+     * Force stop verification and clear hCaptcha state.
      */
     void reset();
 
