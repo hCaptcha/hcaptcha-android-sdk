@@ -15,8 +15,6 @@ import static org.hamcrest.CoreMatchers.startsWith;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import android.view.Gravity;
-
 import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import androidx.annotation.ColorInt;
@@ -25,9 +23,6 @@ import android.webkit.WebView;
 import androidx.test.espresso.PerformException;
 import androidx.test.espresso.UiController;
 import androidx.test.espresso.ViewAction;
-import androidx.test.espresso.action.GeneralClickAction;
-import androidx.test.espresso.action.Press;
-import androidx.test.espresso.action.Tap;
 import androidx.test.espresso.util.HumanReadables;
 import androidx.test.espresso.util.TreeIterables;
 import androidx.test.espresso.web.webdriver.DriverAtoms;
@@ -50,46 +45,6 @@ public final class AssertUtil {
     private static final long WAIT_TO_BE_DISPLAYED_MS = 1000;
 
     private AssertUtil() {
-    }
-
-    private static float getGravityCoefficient(final int gravity, final boolean isHorizontal) {
-        if (isHorizontal) {
-            if ((gravity & Gravity.RIGHT) == Gravity.RIGHT) {
-                return 1.0f;
-            } else if ((gravity & Gravity.CENTER_HORIZONTAL) == Gravity.CENTER_HORIZONTAL) {
-                return 0.5f;
-            }
-        } else {
-            if ((gravity & Gravity.BOTTOM) == Gravity.BOTTOM) {
-                return 1.0f;
-            } else if ((gravity & Gravity.CENTER_VERTICAL) == Gravity.CENTER_VERTICAL) {
-                return 0.5f;
-            }
-        }
-        return 0.0f; // TOP or LEFT
-    }
-
-    public static ViewAction clickAt(final int x, final int y, final int gravity) {
-        return new GeneralClickAction(
-            Tap.SINGLE,
-            view -> {
-                final int[] screenPos = new int[2];
-                view.getLocationOnScreen(screenPos);
-
-                float viewX = screenPos[0];
-                float viewY = screenPos[1];
-
-                float cornerX = view.getWidth() * getGravityCoefficient(gravity, true);
-                float cornerY = view.getHeight() * getGravityCoefficient(gravity, false);
-
-                float screenX = viewX + cornerX + x;
-                float screenY = viewY + cornerY + y;
-
-                return new float[]{screenX, screenY};
-            },
-            Press.FINGER,
-            0,
-            0);
     }
 
     public static ViewAction waitToBeDisplayed() {

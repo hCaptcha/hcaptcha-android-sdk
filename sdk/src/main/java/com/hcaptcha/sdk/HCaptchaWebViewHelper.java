@@ -8,7 +8,6 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -78,11 +77,12 @@ final class HCaptchaWebViewHelper {
         settings.setGeolocationEnabled(false);
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
-        settings.setSupportMultipleWindows(true);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             webView.setWebViewClient(new HCaptchaWebClient(handler));
         }
-        webView.setWebChromeClient(new HCaptchaWebChromeClient());
+        if (HCaptchaLog.sDiagnosticsLogEnabled) {
+            webView.setWebChromeClient(new HCaptchaWebChromeClient());
+        }
         webView.setBackgroundColor(Color.TRANSPARENT);
         if (config.getDisableHardwareAcceleration()) {
             webView.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
@@ -225,27 +225,7 @@ final class HCaptchaWebViewHelper {
         }
     }
 
-    private class HCaptchaWebChromeClient extends WebChromeClient {
-        @Override
-        public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-            if (isUserGesture) {
-                try {
-                    final WebView.HitTestResult result = view.getHitTestResult();
-                    if (result.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE) {
-                        final Uri url = Uri.parse(result.getExtra());
-                        final Intent intent = new Intent(Intent.ACTION_VIEW, url);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        context.startActivity(intent);
-                        HCaptchaLog.d("[webview] opened target=_blank link in browser: " + url);
-                        return true;
-                    }
-                } catch (Exception e) {
-                    HCaptchaLog.w("[webview] failed to open target=_blank link in browser: " + e.getMessage());
-                }
-            }
-            return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
-        }
-
+    private static class HCaptchaWebChromeClient extends WebChromeClient {
         @Override
         public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
             HCaptchaLog.d("[webview] onConsoleMessage " + consoleMessage.message());

@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.4.1
+
+- Fix: revert target="_blank" link handling changes due to MFA interactions
+
 # 4.4.0
 
 - Feat: add explicit `HCaptcha.destroy()` API to fully tear down WebView and related resources.
