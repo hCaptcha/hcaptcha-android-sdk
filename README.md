@@ -88,7 +88,7 @@ hCaptcha
   .addOnOpenListener(new OnOpenListener() {
     @Override
     public void onOpen() {
-        // Usefull for analytics purposes
+        // Analytics event
         Log.d("hCaptcha", "hCaptcha is now visible.");
     }
   });
@@ -214,7 +214,7 @@ class HCaptchaActivity : AppCompatActivity() {
             setResult(RESULT_CANCELED)
             finish()
         }.addOnOpenListener { 
-            // Usefull for analytics purposes
+            // Analytics event
             Log.d("hCaptcha", "hCaptcha is now visible.")
         }
     }
