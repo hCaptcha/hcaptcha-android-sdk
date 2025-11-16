@@ -38,4 +38,11 @@ public class HCaptchaVerifyParams implements Serializable {
      */
     @JsonProperty("rqdata")
     private String rqdata;
+
+    /**
+     * Optional user journey events to be passed to hCaptcha.
+     * Contains user interaction events for analytics.
+     */
+    @JsonProperty("user_journey")
+    private Object userJourney;
 }
