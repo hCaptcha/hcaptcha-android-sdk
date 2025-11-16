@@ -30,14 +30,16 @@ class ComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             var hideDialog by remember { mutableStateOf(false) }
+            var userJourney by remember { mutableStateOf(false) }
             var captchaState by remember { mutableStateOf(CaptchaState.Idle) }
             var text by remember { mutableStateOf("") }
 
-            val hCaptchaConfig = remember(hideDialog) {
+            val hCaptchaConfig = remember(hideDialog, userJourney) {
                 HCaptchaConfig.builder()
                     .siteKey("10000000-ffff-ffff-ffff-000000000001")
                     .size(if (hideDialog) HCaptchaSize.INVISIBLE else HCaptchaSize.NORMAL)
                     .hideDialog(hideDialog)
+                    .userJourney(userJourney)
                     .diagnosticLog(true)
                     .build()
             }
@@ -68,6 +70,8 @@ class ComposeActivity : ComponentActivity() {
             CaptchaControlUI(
                 hideDialog = hideDialog,
                 onHideDialogChanged = { hideDialog = it },
+                userJourney = userJourney,
+                onUserJourneyChanged = { userJourney = it },
                 text = text,
                 onVerifyClick = {
                     captchaState = CaptchaState.Started
@@ -82,6 +86,8 @@ class ComposeActivity : ComponentActivity() {
     private fun CaptchaControlUI(
         hideDialog: Boolean,
         onHideDialogChanged: (Boolean) -> Unit,
+        userJourney: Boolean,
+        onUserJourneyChanged: (Boolean) -> Unit,
         text: String,
         onVerifyClick: () -> Unit,
         showProgress: Boolean
@@ -112,6 +118,14 @@ class ComposeActivity : ComponentActivity() {
                     onCheckedChange = onHideDialogChanged
                 )
                 Text(text = "Hide Dialog (Passive Site Key)")
+            }
+
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = userJourney,
+                    onCheckedChange = onUserJourneyChanged
+                )
+                Text(text = "User Journey")
             }
 
             Button(
