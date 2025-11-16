@@ -167,6 +167,12 @@ public class HCaptchaConfig implements Serializable {
     private Boolean disableHardwareAcceleration = true;
 
     /**
+     * Enable / Disable user journey analytics tracking.
+     */
+    @Builder.Default
+    private Boolean userJourney = false;
+
+    /**
      * @deprecated use {@link #getJsSrc()} getter instead
      */
     @Deprecated
