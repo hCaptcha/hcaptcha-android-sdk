@@ -65,6 +65,14 @@
             android:checked="false"
             android:text="@string/theme_dark"
             style="@style/CheckBoxText" />
+        <CheckBox
+            android:id="@+id/userJourney"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:checked="false"
+            android:text="@string/user_journey"
+            style="@style/CheckBoxText" />
     </com.google.android.flexbox.FlexboxLayout>
 
     <!-- Phone input row -->

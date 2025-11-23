@@ -9,7 +9,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.hcaptcha.sdk.journeylitics.InMemorySink;
+import com.hcaptcha.sdk.journeylitics.JLConfig;
+import com.hcaptcha.sdk.journeylitics.JLEvent;
+import com.hcaptcha.sdk.journeylitics.Journeylitics;
 import com.hcaptcha.sdk.tasks.Task;
+
+import java.util.List;
 
 public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
@@ -25,6 +31,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @NonNull
     private final HCaptchaInternalConfig internalConfig;
+
+    @Nullable
+    private InMemorySink journeySink;
 
     private HCaptcha(@NonNull final Activity activity, @NonNull final HCaptchaInternalConfig internalConfig) {
         this.activity = activity;
@@ -96,6 +105,13 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
         };
         try {
+            // Initialize user journey tracking if enabled
+            if (Boolean.TRUE.equals(inputConfig.getUserJourney()) && journeySink == null) {
+                journeySink = new InMemorySink();
+                final JLConfig jlConfig = new JLConfig(journeySink);
+                Journeylitics.start(activity, jlConfig);
+            }
+
             if (Boolean.TRUE.equals(inputConfig.getHideDialog())) {
                 // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
                 this.config = inputConfig.toBuilder()
@@ -196,7 +212,22 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier == null) {
             setException(new HCaptchaException(HCaptchaError.ERROR));
         } else {
-            captchaVerifier.startVerification(activity, verifyParams);
+            HCaptchaVerifyParams finalParams = verifyParams;
+            if (journeySink != null && config != null && Boolean.TRUE.equals(config.getUserJourney())) {
+                final List<JLEvent> events = journeySink.getAndClearEvents();
+                if (!events.isEmpty()) {
+                    if (finalParams == null) {
+                        finalParams = HCaptchaVerifyParams.builder()
+                                .userJourney(events)
+                                .build();
+                    } else {
+                        finalParams = finalParams.toBuilder()
+                                .userJourney(events)
+                                .build();
+                    }
+                }
+            }
+            captchaVerifier.startVerification(activity, finalParams);
         }
         return this;
     }
