@@ -1,5 +1,9 @@
 name: 'ci'
 
+permissions:
+  contents: read
+  actions: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -23,13 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
         with:
-          cache-read-only: false
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: 'Build'
         run: ./gradlew build --stacktrace
       - name: 'HTML ES5 test'
@@ -68,11 +74,15 @@ jobs:
             appcompat: 1.3.1
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
       - run: |
           ./gradlew build -PexampleCompileSdkVersion=${{ matrix.compile }} \
                           -PexampleTargetSdkVersion=${{ matrix.target }} \
@@ -85,11 +95,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
@@ -110,11 +124,15 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
@@ -134,13 +152,22 @@ jobs:
     # ubuntu-latest fails with JNI ERROR (app bug): weak global reference table overflow (max=51200)
     # macos-latest i.e. macos-14 https://github.com/ReactiveCircus/android-emulator-runner/issues/324
     runs-on: macos-13
+    permissions:
+      pull-requests: write
+      contents: read
+      issues: write
+      actions: read
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
       - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
         with:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: adopt
       - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         timeout-minutes: 20
@@ -166,13 +193,13 @@ jobs:
       - name: Log diff benchmark reuslts
         run: echo "${{ steps.diff-benchmark.outputs.markdown-table }}"
       - uses: hCaptcha/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e
-        if: github.ref != 'refs/heads/main'
+        if: github.event_name == 'pull_request' && github.ref != 'refs/heads/main'
         id: find_comment
         with:
           issue-number: ${{ github.event.pull_request.number }}
           body-includes: Benchmark report
       - uses: hCaptcha/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
-        if: ${{ github.ref != 'refs/heads/main' && (steps.diff-benchmark.outputs.markdown-table != null || steps.find_comment.outputs.comment-id != null) }}
+        if: ${{ github.event_name == 'pull_request' && github.ref != 'refs/heads/main' && (steps.diff-benchmark.outputs.markdown-table != null || steps.find_comment.outputs.comment-id != null) }}
         with:
           body: |
             Benchmark report:
@@ -190,46 +217,52 @@ jobs:
   size-report:
     name: 'Diffuse report'
     needs: [ test ]
-    if: github.ref != 'refs/heads/main'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+      contents: read
+      issues: write
+      actions: read
     steps:
-    - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      with:
-        fetch-depth: 0
-    - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
-      with:
-        java-version: ${{ env.JAVA_VERSION }}
-        distribution: adopt
-    - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
-      with:
-        cache-read-only: false
-    - name: 'Build'
-      run: |
-        ./gradlew clean build --stacktrace
-        cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
-    - name: 'Build main'
-      run: |
-        git checkout origin/main
-        ./gradlew clean build --stacktrace
-        cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
-    - id: diffuse
-      uses: usefulness/diffuse-action@41995fe8ff6be0a8847e63bdc5a4679c704b455c
-      with:
-        old-file-path: sdk-main.aar
-        new-file-path: sdk-pr.aar
-    - uses: hCaptcha/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e
-      id: find_comment
-      with:
-        issue-number: ${{ github.event.pull_request.number }}
-        body-includes: Diffuse report
-    - uses: hCaptcha/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
-      if: ${{ steps.diffuse.outputs.diff-raw != null || steps.find_comment.outputs.comment-id != null }}
-      with:
-        body: |
-          Diffuse report:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-java@3a4f6e1af504cf6a31855fa899c6aa5355ba6c12 # v4.7.0
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: adopt
+      - uses: gradle/actions/setup-gradle@94baf225fe0a508e581a564467443d0e2379123b
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+      - name: 'Build'
+        run: |
+          ./gradlew clean build --stacktrace
+          cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
+      - name: 'Build main'
+        run: |
+          git checkout origin/main
+          ./gradlew clean build --stacktrace
+          cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
+      - id: diffuse
+        uses: usefulness/diffuse-action@41995fe8ff6be0a8847e63bdc5a4679c704b455c
+        with:
+          old-file-path: sdk-main.aar
+          new-file-path: sdk-pr.aar
+      - uses: hCaptcha/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e
+        id: find_comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: Diffuse report
+      - uses: hCaptcha/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043
+        if: ${{ steps.diffuse.outputs.diff-raw != null || steps.find_comment.outputs.comment-id != null }}
+        with:
+          body: |
+            Diffuse report:
 
-          ${{ steps.diffuse.outputs.diff-gh-comment }}
-        edit-mode: replace
-        comment-id: ${{ steps.find_comment.outputs.comment-id }}
-        issue-number: ${{ github.event.pull_request.number }}
-        token: ${{ secrets.GITHUB_TOKEN }}
+            ${{ steps.diffuse.outputs.diff-gh-comment }}
+          edit-mode: replace
+          comment-id: ${{ steps.find_comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          token: ${{ secrets.GITHUB_TOKEN }}
