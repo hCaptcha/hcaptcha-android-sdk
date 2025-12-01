@@ -153,6 +153,7 @@ jobs:
     # macos-latest i.e. macos-14 https://github.com/ReactiveCircus/android-emulator-runner/issues/324
     runs-on: macos-13
     permissions:
+      pull-requests: write
       contents: read
       issues: write
       actions: read
@@ -219,6 +220,7 @@ jobs:
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     permissions:
+      pull-requests: write
       contents: read
       issues: write
       actions: read
