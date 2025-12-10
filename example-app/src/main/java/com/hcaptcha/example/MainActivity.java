@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox loading;
     private CheckBox disableHardwareAccel;
     private CheckBox themeDark;
+    private CheckBox userJourney;
     private TextView tokenTextView;
     private TextView errorTextView;
     private TextView phonePrefixInput;
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
         loading = findViewById(R.id.loading);
         disableHardwareAccel = findViewById(R.id.hwAccel);
         themeDark = findViewById(R.id.themeDark);
+        userJourney = findViewById(R.id.userJourney);
         phonePrefixInput = findViewById(R.id.phonePrefix);
         phoneModeSwitch = findViewById(R.id.phoneModeSwitch);
         rqdataInput = findViewById(R.id.rqdataInput);
@@ -88,6 +90,7 @@ public class MainActivity extends AppCompatActivity {
                 .hideDialog(hideDialog.isChecked())
                 .theme(isDark ? HCaptchaTheme.DARK : HCaptchaTheme.LIGHT)
                 .disableHardwareAcceleration(disableHardwareAccel.isChecked())
+                .userJourney(userJourney.isChecked())
                 .tokenExpiration(10)
                 .diagnosticLog(true)
                 .retryPredicate((config, exception) -> exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT)

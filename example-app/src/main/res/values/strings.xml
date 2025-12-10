@@ -11,4 +11,5 @@
     <string name="hide_dialog">Hide Dialog</string>
     <string name="hit_test">Hit test</string>
     <string name="theme_dark">Dark Theme</string>
+    <string name="user_journey">Journey</string>
 </resources>
