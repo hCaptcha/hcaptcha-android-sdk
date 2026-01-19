@@ -3,31 +3,35 @@ package com.hcaptcha.sdk.journeylitics;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class JLEvent {
-    private final long timestampMs;
+    private final long timestamp;
     private final EventKind kind;
     private final String view;
-    private final Map<String, Object> metadata;
+    private final Object metadata;
 
-    JLEvent(long timestampMs, EventKind kind, String view, Map<String, Object> metadata) {
-        this.timestampMs = timestampMs;
+    JLEvent(long timestamp, EventKind kind, String view, Object metadata) {
+        this.timestamp = timestamp;
         this.kind = kind;
         this.view = view;
         this.metadata = metadata;
     }
 
     JLEvent(EventKind kind, String view, Map<String, Object> metadata) {
-        this(System.currentTimeMillis(), kind, view, metadata);
+        this(TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis()), kind, view, metadata);
     }
 
     JLEvent(EventKind kind, String view) {
         this(kind, view, new java.util.HashMap<>());
     }
 
+    /**
+     * UNIX timestamp (seconds).
+     */
     @JsonProperty("ts")
-    long getTimestampMs() {
-        return timestampMs;
+    long getTimestamp() {
+        return timestamp;
     }
 
     @JsonProperty("k")
@@ -41,7 +45,7 @@ public class JLEvent {
     }
 
     @JsonProperty("m")
-    Map<String, Object> getMetadata() {
+    Object getMetadata() {
         return metadata;
     }
 }

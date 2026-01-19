@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk.journeylitics;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -32,7 +33,7 @@ public class JLConfig {
     }
 
     JLConfig() {
-        this(true, true, true, true, true, true, true, Arrays.asList(ConsoleSink.INSTANCE));
+        this(true, true, true, true, true, true, true, Collections.emptyList());
     }
 
     /**
