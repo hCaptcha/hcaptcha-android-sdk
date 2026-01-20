@@ -43,6 +43,16 @@ public class Journeylitics {
     private static final CopyOnWriteArrayList<JLSink> SINKS = new CopyOnWriteArrayList<>();
     private static final WeakHashMap<View, Boolean> INSTRUMENTED = new WeakHashMap<>();
 
+    private static final class ListenerLookup<T> {
+        private final T listener;
+        private final boolean success;
+
+        private ListenerLookup(T listener, boolean success) {
+            this.listener = listener;
+            this.success = success;
+        }
+    }
+
     private static final Application.ActivityLifecycleCallbacks LIFECYCLE_CALLBACKS =
             new Application.ActivityLifecycleCallbacks() {
                 @Override
@@ -264,7 +274,11 @@ public class Journeylitics {
     }
 
     private static void hookClick(View view) {
-        final View.OnClickListener original = getOnClickListener(view);
+        final ListenerLookup<View.OnClickListener> lookup = getOnClickListener(view);
+        if (!lookup.success) {
+            return;
+        }
+        final View.OnClickListener original = lookup.listener;
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View clickedView) {
@@ -284,7 +298,11 @@ public class Journeylitics {
     private static void hookCheckedTextView(CheckedTextView checkedTextView) {
         // CheckedTextView doesn't have an OnCheckedChangeListener like CompoundButton,
         // so we hook the click listener and track the checked state change
-        final View.OnClickListener original = getOnClickListener(checkedTextView);
+        final ListenerLookup<View.OnClickListener> lookup = getOnClickListener(checkedTextView);
+        if (!lookup.success) {
+            return;
+        }
+        final View.OnClickListener original = lookup.listener;
         checkedTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -312,7 +330,12 @@ public class Journeylitics {
     }
 
     private static void hookToggle(CompoundButton compoundButton) {
-        final CompoundButton.OnCheckedChangeListener original = getOnCheckedChangeListener(compoundButton);
+        final ListenerLookup<CompoundButton.OnCheckedChangeListener> lookup =
+                getOnCheckedChangeListener(compoundButton);
+        if (!lookup.success) {
+            return;
+        }
+        final CompoundButton.OnCheckedChangeListener original = lookup.listener;
         compoundButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton button, boolean isChecked) {
@@ -332,7 +355,12 @@ public class Journeylitics {
     }
 
     private static void hookSeek(SeekBar seekBar) {
-        final SeekBar.OnSeekBarChangeListener original = getOnSeekBarChangeListener(seekBar);
+        final ListenerLookup<SeekBar.OnSeekBarChangeListener> lookup =
+                getOnSeekBarChangeListener(seekBar);
+        if (!lookup.success) {
+            return;
+        }
+        final SeekBar.OnSeekBarChangeListener original = lookup.listener;
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar bar, int progress, boolean fromUser) {
@@ -366,7 +394,12 @@ public class Journeylitics {
     }
 
     private static void hookSearch(SearchView searchView) {
-        final SearchView.OnQueryTextListener original = getOnQueryTextListener(searchView);
+        final ListenerLookup<SearchView.OnQueryTextListener> lookup =
+                getOnQueryTextListener(searchView);
+        if (!lookup.success) {
+            return;
+        }
+        final SearchView.OnQueryTextListener original = lookup.listener;
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -438,51 +471,60 @@ public class Journeylitics {
         });
 
         // Track focus changes while preserving existing listener
-        final View.OnFocusChangeListener originalFocusListener = getOnFocusChangeListener(editText);
-        editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if (originalFocusListener != null) {
-                    originalFocusListener.onFocusChange(view, hasFocus);
-                }
-                final String action = hasFocus ? "focus" : "blur";
+        final ListenerLookup<View.OnFocusChangeListener> focusLookup =
+                getOnFocusChangeListener(editText);
+        if (focusLookup.success) {
+            final View.OnFocusChangeListener originalFocusListener = focusLookup.listener;
+            editText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean hasFocus) {
+                    if (originalFocusListener != null) {
+                        originalFocusListener.onFocusChange(view, hasFocus);
+                    }
+                    final String action = hasFocus ? "focus" : "blur";
 
-                // Use 'edit' event kind for text input focus changes
-                final Map<String, Object> meta = MetaMapHelper.createMetaMap(
-                    new AbstractMap.SimpleEntry<>(FieldKey.ID, viewIdName(editText)),
-                    new AbstractMap.SimpleEntry<>(FieldKey.ACTION, action)
-                );
-                emit(EventKind.edit, editText.getClass().getSimpleName(), meta);
-            }
-        });
-
-        // Track text input submission
-        final TextView.OnEditorActionListener originalEditorActionListener =
-                getOnEditorActionListener(editText);
-        editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView textView, int actionId,
-                                          android.view.KeyEvent event) {
-                final boolean handled = originalEditorActionListener != null
-                        && originalEditorActionListener.onEditorAction(textView, actionId, event);
-                if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE
-                        || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_GO
-                        || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
-                        || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND
-                        || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_NEXT) {
-
-                    // Use 'edit' event kind for text input submission
+                    // Use 'edit' event kind for text input focus changes
                     final Map<String, Object> meta = MetaMapHelper.createMetaMap(
                         new AbstractMap.SimpleEntry<>(FieldKey.ID, viewIdName(editText)),
-                        new AbstractMap.SimpleEntry<>(FieldKey.ACTION, "submit"),
-                        new AbstractMap.SimpleEntry<>(FieldKey.VALUE,
-                            editText.getText() != null ? editText.getText().length() : 0)
+                        new AbstractMap.SimpleEntry<>(FieldKey.ACTION, action)
                     );
                     emit(EventKind.edit, editText.getClass().getSimpleName(), meta);
                 }
-                return handled;
-            }
-        });
+            });
+        }
+
+        // Track text input submission
+        final ListenerLookup<TextView.OnEditorActionListener> editorLookup =
+                getOnEditorActionListener(editText);
+        if (editorLookup.success) {
+            final TextView.OnEditorActionListener originalEditorActionListener =
+                    editorLookup.listener;
+            editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+                @Override
+                public boolean onEditorAction(TextView textView, int actionId,
+                                              android.view.KeyEvent event) {
+                    final boolean handled = originalEditorActionListener != null
+                            && originalEditorActionListener.onEditorAction(
+                                    textView, actionId, event);
+                    if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE
+                            || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_GO
+                            || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH
+                            || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEND
+                            || actionId == android.view.inputmethod.EditorInfo.IME_ACTION_NEXT) {
+
+                        // Use 'edit' event kind for text input submission
+                        final Map<String, Object> meta = MetaMapHelper.createMetaMap(
+                            new AbstractMap.SimpleEntry<>(FieldKey.ID, viewIdName(editText)),
+                            new AbstractMap.SimpleEntry<>(FieldKey.ACTION, "submit"),
+                            new AbstractMap.SimpleEntry<>(FieldKey.VALUE,
+                                editText.getText() != null ? editText.getText().length() : 0)
+                        );
+                        emit(EventKind.edit, editText.getClass().getSimpleName(), meta);
+                    }
+                    return handled;
+                }
+            });
+        }
     }
 
     private static void hookScrollView(ScrollView scrollView) {
@@ -519,14 +561,14 @@ public class Journeylitics {
 
     // ------- Reflection helpers to preserve existing listeners -----------------------------
 
-    private static View.OnClickListener getOnClickListener(View view) {
+    private static ListenerLookup<View.OnClickListener> getOnClickListener(View view) {
         try {
             // Try to get the listener through reflection, but handle failures gracefully
             final java.lang.reflect.Field infoField = View.class.getDeclaredField("mListenerInfo");
             infoField.setAccessible(true);
             final Object info = infoField.get(view);
             if (info == null) {
-                return null;
+                return new ListenerLookup<>(null, true);
             }
 
             // Use a more robust approach to get the listener info class
@@ -541,68 +583,72 @@ public class Journeylitics {
             final java.lang.reflect.Field field =
                     listenerInfoClass.getDeclaredField("mOnClickListener");
             field.setAccessible(true);
-            return (View.OnClickListener) field.get(info);
+            return new ListenerLookup<>((View.OnClickListener) field.get(info), true);
         } catch (Throwable e) {
-            // If reflection fails, we can't preserve the original listener
-            // This is acceptable as the library will still work,
-            // just without preserving existing listeners
-            return null;
+            return new ListenerLookup<>(null, false);
         }
     }
 
-    private static CompoundButton.OnCheckedChangeListener getOnCheckedChangeListener(
-            CompoundButton view) {
+    private static ListenerLookup<CompoundButton.OnCheckedChangeListener>
+            getOnCheckedChangeListener(CompoundButton view) {
         try {
             final java.lang.reflect.Field field =
                     CompoundButton.class.getDeclaredField("mOnCheckedChangeListener");
             field.setAccessible(true);
-            return (CompoundButton.OnCheckedChangeListener) field.get(view);
+            return new ListenerLookup<>(
+                    (CompoundButton.OnCheckedChangeListener) field.get(view), true);
         } catch (Throwable e) {
-            return null;
+            return new ListenerLookup<>(null, false);
         }
     }
 
-    private static SeekBar.OnSeekBarChangeListener getOnSeekBarChangeListener(SeekBar view) {
+    private static ListenerLookup<SeekBar.OnSeekBarChangeListener>
+            getOnSeekBarChangeListener(SeekBar view) {
         try {
             final java.lang.reflect.Field field =
                     SeekBar.class.getDeclaredField("mOnSeekBarChangeListener");
             field.setAccessible(true);
-            return (SeekBar.OnSeekBarChangeListener) field.get(view);
+            return new ListenerLookup<>(
+                    (SeekBar.OnSeekBarChangeListener) field.get(view), true);
         } catch (Throwable e) {
-            return null;
+            return new ListenerLookup<>(null, false);
         }
     }
 
-    private static SearchView.OnQueryTextListener getOnQueryTextListener(SearchView view) {
+    private static ListenerLookup<SearchView.OnQueryTextListener>
+            getOnQueryTextListener(SearchView view) {
         try {
             final java.lang.reflect.Field field =
                     SearchView.class.getDeclaredField("mOnQueryChangeListener");
             field.setAccessible(true);
-            return (SearchView.OnQueryTextListener) field.get(view);
+            return new ListenerLookup<>(
+                    (SearchView.OnQueryTextListener) field.get(view), true);
         } catch (Throwable e) {
-            return null;
+            return new ListenerLookup<>(null, false);
         }
     }
 
-    private static View.OnFocusChangeListener getOnFocusChangeListener(View view) {
+    private static ListenerLookup<View.OnFocusChangeListener>
+            getOnFocusChangeListener(View view) {
         try {
             final java.lang.reflect.Field field =
                     View.class.getDeclaredField("mOnFocusChangeListener");
             field.setAccessible(true);
-            return (View.OnFocusChangeListener) field.get(view);
+            return new ListenerLookup<>((View.OnFocusChangeListener) field.get(view), true);
         } catch (Throwable e) {
-            return null;
+            return new ListenerLookup<>(null, false);
         }
     }
 
-    private static TextView.OnEditorActionListener getOnEditorActionListener(EditText view) {
+    private static ListenerLookup<TextView.OnEditorActionListener>
+            getOnEditorActionListener(EditText view) {
         try {
             final java.lang.reflect.Field field =
                     EditText.class.getDeclaredField("mEditorActionListener");
             field.setAccessible(true);
-            return (TextView.OnEditorActionListener) field.get(view);
+            return new ListenerLookup<>((TextView.OnEditorActionListener) field.get(view), true);
         } catch (Throwable e) {
-            return null;
+            return new ListenerLookup<>(null, false);
         }
     }
 }

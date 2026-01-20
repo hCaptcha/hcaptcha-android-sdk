@@ -21,6 +21,7 @@ import com.hcaptcha.sdk.HCaptchaConfig
 import com.hcaptcha.sdk.HCaptchaEvent
 import com.hcaptcha.sdk.HCaptchaResponse
 import com.hcaptcha.sdk.HCaptchaSize
+import com.hcaptcha.sdk.journeylitics.AnalyticsScreen
 
 class ComposeActivity : ComponentActivity() {
 
@@ -29,56 +30,58 @@ class ComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            var hideDialog by remember { mutableStateOf(false) }
-            var userJourney by remember { mutableStateOf(false) }
-            var captchaState by remember { mutableStateOf(CaptchaState.Idle) }
-            var text by remember { mutableStateOf("") }
+            AnalyticsScreen("ComposeActivity") {
+                var hideDialog by remember { mutableStateOf(false) }
+                var userJourney by remember { mutableStateOf(false) }
+                var captchaState by remember { mutableStateOf(CaptchaState.Idle) }
+                var text by remember { mutableStateOf("") }
 
-            val hCaptchaConfig = remember(hideDialog, userJourney) {
-                HCaptchaConfig.builder()
-                    .siteKey("10000000-ffff-ffff-ffff-000000000001")
-                    .size(if (hideDialog) HCaptchaSize.INVISIBLE else HCaptchaSize.NORMAL)
-                    .hideDialog(hideDialog)
-                    .userJourney(userJourney)
-                    .diagnosticLog(true)
-                    .build()
-            }
-
-            if (captchaState != CaptchaState.Idle) {
-                HCaptchaCompose(hCaptchaConfig) { result ->
-                    val message = when (result) {
-                        is HCaptchaResponse.Success -> {
-                            captchaState = CaptchaState.Idle
-                            "Success: ${result.token}"
-                        }
-                        is HCaptchaResponse.Failure -> {
-                            captchaState = CaptchaState.Idle
-                            "Failure: ${result.error.message}"
-                        }
-                        is HCaptchaResponse.Event -> {
-                            if (result.event == HCaptchaEvent.Opened) {
-                                captchaState = CaptchaState.Loaded
-                            }
-                            "Event: ${result.event}"
-                        }
-                    }
-                    text += "\n${message}"
-                    println(message)
+                val hCaptchaConfig = remember(hideDialog, userJourney) {
+                    HCaptchaConfig.builder()
+                        .siteKey("10000000-ffff-ffff-ffff-000000000001")
+                        .size(if (hideDialog) HCaptchaSize.INVISIBLE else HCaptchaSize.NORMAL)
+                        .hideDialog(hideDialog)
+                        .userJourney(userJourney)
+                        .diagnosticLog(true)
+                        .build()
                 }
-            }
 
-            CaptchaControlUI(
-                hideDialog = hideDialog,
-                onHideDialogChanged = { hideDialog = it },
-                userJourney = userJourney,
-                onUserJourneyChanged = { userJourney = it },
-                text = text,
-                onVerifyClick = {
-                    captchaState = CaptchaState.Started
-                    text = ""
-                },
-                showProgress = captchaState == CaptchaState.Started
-            )
+                if (captchaState != CaptchaState.Idle) {
+                    HCaptchaCompose(hCaptchaConfig) { result ->
+                        val message = when (result) {
+                            is HCaptchaResponse.Success -> {
+                                captchaState = CaptchaState.Idle
+                                "Success: ${result.token}"
+                            }
+                            is HCaptchaResponse.Failure -> {
+                                captchaState = CaptchaState.Idle
+                                "Failure: ${result.error.message}"
+                            }
+                            is HCaptchaResponse.Event -> {
+                                if (result.event == HCaptchaEvent.Opened) {
+                                    captchaState = CaptchaState.Loaded
+                                }
+                                "Event: ${result.event}"
+                            }
+                        }
+                        text += "\n${message}"
+                        println(message)
+                    }
+                }
+
+                CaptchaControlUI(
+                    hideDialog = hideDialog,
+                    onHideDialogChanged = { hideDialog = it },
+                    userJourney = userJourney,
+                    onUserJourneyChanged = { userJourney = it },
+                    text = text,
+                    onVerifyClick = {
+                        captchaState = CaptchaState.Started
+                        text = ""
+                    },
+                    showProgress = captchaState == CaptchaState.Started
+                )
+            }
         }
     }
 

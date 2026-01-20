@@ -78,15 +78,17 @@ fun AnalyticsScreen(
             .fillMaxSize()
             .pointerInput(Unit) {
                 awaitEachGesture {
-                    val down = awaitFirstDown()
+                    val down = awaitFirstDown(requireUnconsumed = false)
                     var lastPosition = down.position
                     var isDragging = false
                     var isScrolling = false
                     var totalDragDistance = 0f
+                    var pressed = true
 
                     do {
                         val event = awaitPointerEvent()
                         val change = event.changes.first()
+                        pressed = change.pressed
 
                         when {
                             change.pressed && change.previousPressed -> {
@@ -166,7 +168,7 @@ fun AnalyticsScreen(
                                 lastPosition = currentPosition
                             }
                         }
-                    } while (change.pressed)
+                    } while (pressed)
 
                     // Gesture ended
                     if (isDragging) {
@@ -228,15 +230,17 @@ fun Modifier.analytics(
     this.then(
         Modifier.pointerInput(Unit) {
             awaitEachGesture {
-                val down = awaitFirstDown()
+                val down = awaitFirstDown(requireUnconsumed = false)
                 var lastPosition = down.position
                 var isDragging = false
                 var isScrolling = false
                 var totalDragDistance = 0f
-                
+                var pressed = true
+
                 do {
                     val event = awaitPointerEvent()
                     val change = event.changes.first()
+                    pressed = change.pressed
                     
                     when {
                         change.pressed && change.previousPressed -> {
@@ -316,7 +320,7 @@ fun Modifier.analytics(
                             lastPosition = currentPosition
                         }
                     }
-                } while (change.pressed)
+                } while (pressed)
                 
                 // Gesture ended
                 if (isDragging) {
