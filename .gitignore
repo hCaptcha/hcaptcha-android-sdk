@@ -10,3 +10,10 @@ build
 .cxx
 node_modules
 example-app/local.properties
+
+# Eclipse
+.project
+.classpath
+.settings/
+
+AGENTS.md
