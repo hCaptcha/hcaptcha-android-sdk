@@ -149,9 +149,7 @@ jobs:
   test-benchmark:
     name: 'Test Benchmark'
     needs: test
-    # ubuntu-latest fails with JNI ERROR (app bug): weak global reference table overflow (max=51200)
-    # macos-latest i.e. macos-14 https://github.com/ReactiveCircus/android-emulator-runner/issues/324
-    runs-on: macos-13
+    runs-on: macos-15
     permissions:
       pull-requests: write
       contents: read
