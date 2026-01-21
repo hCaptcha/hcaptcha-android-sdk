@@ -11,4 +11,7 @@
     <string name="hide_dialog">Hide Dialog</string>
     <string name="hit_test">Hit test</string>
     <string name="theme_dark">Dark Theme</string>
+    <string name="copy_token">Copy</string>
+    <string name="token_copied">Token copied to clipboard</string>
+    <string name="no_token_to_copy">No token to copy</string>
 </resources>

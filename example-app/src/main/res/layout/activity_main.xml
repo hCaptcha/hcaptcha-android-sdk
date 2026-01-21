@@ -168,7 +168,8 @@
         android:padding="10dp"
         android:layout_marginTop="20dp"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical">
 
         <TextView
             android:text="Token: "
@@ -182,8 +183,21 @@
             android:textColor="@android:color/white"
             android:ellipsize="end"
             android:maxLines="10"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/copyTokenButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/copy_token"
+            android:onClick="onCopyToken"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="8dp"
+            android:layout_marginStart="8dp" />
     </LinearLayout>
 
     <LinearLayout

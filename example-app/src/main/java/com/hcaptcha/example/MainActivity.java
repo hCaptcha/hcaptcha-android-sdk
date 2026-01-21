@@ -1,5 +1,8 @@
 package com.hcaptcha.example;
 
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.text.InputType;
@@ -139,7 +142,7 @@ public class MainActivity extends AppCompatActivity {
     public void onClickVerify(final View v) {
         setTokenTextView("-");
         setErrorTextView("-");
-        
+
         // Always build verifyParams regardless of hCaptcha state
         final String input = phonePrefixInput.getText() != null ? phonePrefixInput.getText().toString().trim() : null;
         final String rqdata = rqdataInput.getText() != null ? rqdataInput.getText().toString().trim() : null;
@@ -160,7 +163,7 @@ public class MainActivity extends AppCompatActivity {
         } else {
             verifyParams = null;
         }
-        
+
         if (hCaptcha != null) {
             hCaptcha.verifyWithHCaptcha(verifyParams);
         } else {
@@ -178,6 +181,18 @@ public class MainActivity extends AppCompatActivity {
     public void onHitTest(final View v) {
         Toast.makeText(this, "Hit Test!", Toast.LENGTH_SHORT).show();
         Log.d(TAG, "onHitTest");
+    }
+
+    public void onCopyToken(final View v) {
+        String token = tokenTextView.getText().toString();
+        if (token.equals("-") || token.isEmpty()) {
+            Toast.makeText(this, R.string.no_token_to_copy, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+        ClipData clip = ClipData.newPlainText("hCaptcha Token", token);
+        clipboard.setPrimaryClip(clip);
+        Toast.makeText(this, R.string.token_copied, Toast.LENGTH_SHORT).show();
     }
 
     private void setupClient(final HCaptcha hCaptcha) {
