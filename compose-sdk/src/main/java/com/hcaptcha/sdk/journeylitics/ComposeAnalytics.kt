@@ -369,12 +369,16 @@ private class PressGestureScopeImpl(
 
     fun cancel() {
         isCanceled = true
-        mutex.unlock()
+        if (mutex.isLocked) {
+            mutex.unlock()
+        }
     }
 
     fun release() {
         isReleased = true
-        mutex.unlock()
+        if (mutex.isLocked) {
+            mutex.unlock()
+        }
     }
 
     suspend fun reset() {
