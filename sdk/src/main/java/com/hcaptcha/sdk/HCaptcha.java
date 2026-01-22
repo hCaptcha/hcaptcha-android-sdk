@@ -105,11 +105,22 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
         };
         try {
-            // Initialize user journey tracking if enabled
-            if (Boolean.TRUE.equals(inputConfig.getUserJourney()) && journeySink == null) {
-                journeySink = new InMemorySink();
-                final JLConfig jlConfig = new JLConfig(journeySink);
-                Journeylitics.start(activity, jlConfig);
+            // Initialize or disable user journey tracking if enabled/disabled
+            if (Boolean.TRUE.equals(inputConfig.getUserJourney())) {
+                if (journeySink == null) {
+                    journeySink = new InMemorySink();
+                }
+                if (Journeylitics.isStarted()) {
+                    Journeylitics.addSink(journeySink);
+                } else {
+                    final JLConfig jlConfig = new JLConfig(journeySink);
+                    Journeylitics.start(activity, jlConfig);
+                }
+            } else if (journeySink != null) {
+                if (Journeylitics.isStarted()) {
+                    Journeylitics.removeSink(journeySink);
+                }
+                journeySink = null;
             }
 
             if (Boolean.TRUE.equals(inputConfig.getHideDialog())) {

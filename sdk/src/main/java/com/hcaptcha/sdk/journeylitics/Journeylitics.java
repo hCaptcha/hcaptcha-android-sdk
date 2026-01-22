@@ -137,11 +137,18 @@ public class Journeylitics {
         sApp.registerActivityLifecycleCallbacks(LIFECYCLE_CALLBACKS);
     }
 
-    static void addSink(JLSink sink) {
+    public static boolean isStarted() {
+        return STARTED.get();
+    }
+
+    public static void addSink(JLSink sink) {
+        if (sink == null || SINKS.contains(sink)) {
+            return;
+        }
         SINKS.add(sink);
     }
 
-    static void removeSink(JLSink sink) {
+    public static void removeSink(JLSink sink) {
         SINKS.remove(sink);
     }
 
@@ -652,4 +659,3 @@ public class Journeylitics {
         }
     }
 }
-
