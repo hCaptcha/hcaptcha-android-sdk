@@ -10,8 +10,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.*
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
-//import androidx.compose.ui.util.fastAll
-//import androidx.compose.ui.util.fastAny
 import kotlin.math.abs
 import java.util.AbstractMap
 import kotlinx.coroutines.coroutineScope
@@ -48,13 +46,13 @@ fun AnalyticsScreen(
             AbstractMap.SimpleEntry(FieldKey.ACTION, "appear"),
             AbstractMap.SimpleEntry(FieldKey.COMPOSE, "true")
         )
-        
+
         Journeylitics.emit(
             EventKind.screen,
             "Screen",
             eventData
         )
-        
+
         onDispose {
             val disposeEventData = createFieldMapWithScreen(
                 screenName,
@@ -63,7 +61,7 @@ fun AnalyticsScreen(
                 AbstractMap.SimpleEntry(FieldKey.ACTION, "disappear"),
                 AbstractMap.SimpleEntry(FieldKey.COMPOSE, "true")
             )
-            
+
             Journeylitics.emit(
                 EventKind.screen,
                 "Screen",
@@ -71,7 +69,7 @@ fun AnalyticsScreen(
             )
         }
     }
-    
+
     // Top-level pointer interceptor that catches ALL interactions from children
     Box(
         modifier = Modifier
@@ -210,8 +208,6 @@ fun AnalyticsScreen(
     }
 }
 
-
-
 /**
  * Universal analytics modifier that detects all interactions without interfering with existing logic
  * Usage: Modifier.analytics("component_name", "ScreenName")
@@ -241,17 +237,17 @@ fun Modifier.analytics(
                     val event = awaitPointerEvent()
                     val change = event.changes.first()
                     pressed = change.pressed
-                    
+
                     when {
                         change.pressed && change.previousPressed -> {
                             // Movement detected
                             val currentPosition = change.position
                             val delta = currentPosition - lastPosition
                             val distance = kotlin.math.sqrt(delta.x * delta.x + delta.y * delta.y)
-                            
+
                             if (distance > 2f) { // Small threshold to avoid noise
                                 totalDragDistance += distance
-                                
+
                                 if (!isDragging) {
                                     isDragging = true
                                     // Determine if this is likely scrolling or dragging
@@ -259,7 +255,7 @@ fun Modifier.analytics(
                                         abs(delta.x) > abs(delta.y) * 2 || // Horizontal scroll
                                         abs(delta.y) > abs(delta.x) * 2    // Vertical scroll
                                     )
-                                    
+
                                     if (isLikelyScroll) {
                                         isScrolling = true
                                         val direction = if (abs(delta.x) > abs(delta.y)) "horizontal" else "vertical"
@@ -267,7 +263,7 @@ fun Modifier.analytics(
                                             abs(delta.x) > abs(delta.y) -> if (delta.x > 0) "right" else "left"
                                             else -> if (delta.y > 0) "down" else "up"
                                         }
-                                        
+
                                         val eventData = createFieldMapWithScreen(
                                             screenName,
                                             AbstractMap.SimpleEntry(FieldKey.ID, contentType),
@@ -316,12 +312,12 @@ fun Modifier.analytics(
                                     }
                                 }
                             }
-                            
+
                             lastPosition = currentPosition
                         }
                     }
                 } while (pressed)
-                
+
                 // Gesture ended
                 if (isDragging) {
                     if (isScrolling) {
@@ -401,4 +397,3 @@ private class PressGestureScopeImpl(
         return isReleased
     }
 }
-

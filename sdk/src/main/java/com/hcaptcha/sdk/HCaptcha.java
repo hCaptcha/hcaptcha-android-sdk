@@ -213,7 +213,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             setException(new HCaptchaException(HCaptchaError.ERROR));
         } else {
             HCaptchaVerifyParams finalParams = verifyParams;
-            if (journeySink != null && config != null && Boolean.TRUE.equals(config.getUserJourney())) {
+            if (journeySink != null) {
                 final List<JLEvent> events = journeySink.getAndClearEvents();
                 if (!events.isEmpty()) {
                     if (finalParams == null) {

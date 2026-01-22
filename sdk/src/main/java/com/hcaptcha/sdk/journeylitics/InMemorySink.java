@@ -41,30 +41,4 @@ public class InMemorySink implements JLSink {
         }
     }
 
-    /**
-     * Gets a snapshot of all current events without clearing
-     * @return List of events (may be empty, never null)
-     */
-    List<JLEvent> getEvents() {
-        lock.readLock().lock();
-        try {
-            return new ArrayList<>(events);
-        } finally {
-            lock.readLock().unlock();
-        }
-    }
-
-    /**
-     * Clears all events
-     */
-    void clear() {
-        lock.writeLock().lock();
-        try {
-            events.clear();
-        } finally {
-            lock.writeLock().unlock();
-        }
-    }
-
 }
-
