@@ -158,6 +158,7 @@ public class HCaptchaDialogFragmentTest {
     @Test
     public void loaderVisible() {
         launchInContainer();
+        onView(withId(R.id.loadingContainer)).perform(waitToBeDisplayed());
         onView(withId(R.id.loadingContainer)).check(matches(isDisplayed()));
         onView(withId(R.id.loadingContainer)).check(matches(withBackgroundColor(android.graphics.Color.WHITE)));
         onView(withId(R.id.webView)).perform(waitToBeDisplayed());
@@ -171,6 +172,7 @@ public class HCaptchaDialogFragmentTest {
                 .theme(HCaptchaTheme.DARK)
                 .build();
         launchInContainer(darkConfig, new HCaptchaStateTestAdapter());
+        onView(withId(R.id.loadingContainer)).perform(waitToBeDisplayed());
         onView(withId(R.id.loadingContainer)).check(matches(isDisplayed()));
         onView(withId(R.id.loadingContainer)).check(matches(withBackgroundColor(android.graphics.Color.BLACK)));
     }
