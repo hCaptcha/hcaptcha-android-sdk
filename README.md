@@ -307,6 +307,7 @@ The following list contains configuration properties to allows customization of 
 | `hideDialog`                  | Boolean                                              | No       | False                            | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
 | `tokenExpiration`             | long                                                 | No       | 120                              | hCaptcha token expiration timeout (seconds).                                                                                                                         |
 | `diagnosticLog`               | Boolean                                              | No       | False                            | Emit detailed console logs for debugging                                                                                                                             |
+| `userJourney`                 | Boolean                                              | No       | False                            | Enable user journey analytics; the SDK captures interaction events and attaches them to verification requests.                                                       |
 | `disableHardwareAcceleration` | Boolean                                              | No       | True                             | Disable WebView hardware acceleration                                                                                                                                |
 
 ## Verify Params
@@ -388,6 +389,45 @@ Failing to meet this requirement can result in runtime errors when attempting to
 The `retryPredicate` is part of `HCaptchaConfig` that may get persist during application lifecycle.
 So pay attention to this aspect and make sure that `retryPredicate` is serializable to avoid
 `android.os.BadParcelableException` in run-time.
+
+### User Journeys (Enterprise)
+
+You can optionally enable user journeys to send recent interaction events alongside your verification request.
+
+```java
+HCaptchaConfig config = HCaptchaConfig.builder()
+    .siteKey("10000000-ffff-ffff-ffff-000000000001")
+    .userJourney(true)
+    .build();
+
+HCaptcha.getClient(this)
+    .setup(config)
+    .verifyWithHCaptcha();
+```
+
+For Jetpack Compose, wrap your screen (and optionally specific components) to capture interactions:
+
+```kotlin
+import com.hcaptcha.sdk.journeylitics.AnalyticsScreen
+import com.hcaptcha.sdk.journeylitics.analytics
+
+AnalyticsScreen("Checkout") {
+    Button(
+        modifier = Modifier.analytics("submit_button", "Checkout")
+    ) {
+        Text("Submit")
+    }
+}
+```
+
+Notes:
+
+- Events start at `setup()` (including pre-warm) and continue until the same `HCaptcha` instance is reconfigured with `userJourney(false)`. `reset()` does not clear the event buffer.
+- Only the most recent 50 events are kept; they are cleared after `verifyWithHCaptcha` starts.
+- Events include component identifiers, coordinates, and text-length deltas (never full text). This should avoid collecting any personal or sensitive data, but ensure your component IDs do not include any PII.
+- If you set `HCaptchaVerifyParams.userJourney` manually while `userJourney` is enabled, the SDK may overwrite it with captured events.
+- Use `stopEvents()` if you need to unregister the user-journey sink, for example before reusing a client without analytics.
+
 
 ## Debugging Tips
 

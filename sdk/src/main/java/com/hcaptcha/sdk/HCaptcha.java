@@ -202,6 +202,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             captchaVerifier.reset();
             captchaVerifier = null;
         }
+        stopEvents();
     }
 
     @Override
@@ -209,6 +210,17 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier != null) {
             captchaVerifier.destroy();
             captchaVerifier = null;
+        }
+        stopEvents();
+    }
+
+    @Override
+    public void stopEvents() {
+        if (journeySink != null) {
+            if (Journeylitics.isStarted()) {
+                Journeylitics.removeSink(journeySink);
+            }
+            journeySink = null;
         }
     }
 
