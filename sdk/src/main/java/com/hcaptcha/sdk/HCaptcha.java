@@ -17,6 +17,7 @@ import com.hcaptcha.sdk.tasks.Task;
 
 import java.util.List;
 
+@SuppressWarnings("PMD.GodClass")
 public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
 

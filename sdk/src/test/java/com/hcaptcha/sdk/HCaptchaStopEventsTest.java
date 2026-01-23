@@ -63,12 +63,13 @@ public class HCaptchaStopEventsTest {
 
         final HCaptcha hCaptcha = HCaptcha.getClient(activity);
         try (MockedStatic<HCaptchaDialogFragment> dialogFragmentMock = mockStatic(HCaptchaDialogFragment.class)) {
-            dialogFragmentMock.when(() -> HCaptchaDialogFragment.newInstance(
-                    any(Context.class),
-                    any(HCaptchaConfig.class),
-                    any(HCaptchaInternalConfig.class),
-                    any(HCaptchaStateListener.class)))
-                .thenReturn(mock(HCaptchaDialogFragment.class));
+            dialogFragmentMock
+                    .when(() -> HCaptchaDialogFragment.newInstance(
+                            any(Context.class),
+                            any(HCaptchaConfig.class),
+                            any(HCaptchaInternalConfig.class),
+                            any(HCaptchaStateListener.class)))
+                    .thenReturn(mock(HCaptchaDialogFragment.class));
 
             hCaptcha.setup(config);
         }
