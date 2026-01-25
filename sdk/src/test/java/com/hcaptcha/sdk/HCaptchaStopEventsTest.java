@@ -45,6 +45,10 @@ public class HCaptchaStopEventsTest {
         final Field instrumentedField = Journeylitics.class.getDeclaredField("INSTRUMENTED");
         instrumentedField.setAccessible(true);
         ((Map<?, ?>) instrumentedField.get(null)).clear();
+
+        final Field scrollEventField = Journeylitics.class.getDeclaredField("LAST_SCROLL_EVENT_AT");
+        scrollEventField.setAccessible(true);
+        ((Map<?, ?>) scrollEventField.get(null)).clear();
     }
 
     @Test
@@ -55,6 +59,7 @@ public class HCaptchaStopEventsTest {
         final Application app = mock(Application.class);
         when(app.getApplicationContext()).thenReturn(app);
         when(activity.getApplicationContext()).thenReturn(app);
+        when(activity.getApplication()).thenReturn(app);
 
         final HCaptchaConfig config = HCaptchaConfig.builder()
                 .siteKey(HCaptchaConfigTest.MOCK_SITE_KEY)

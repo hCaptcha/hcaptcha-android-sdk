@@ -1,5 +1,6 @@
 package com.hcaptcha.sdk.journeylitics;
 
+import android.app.Activity;
 import android.app.Application;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -40,6 +41,10 @@ public class JourneyliticsTest {
         final Field instrumentedField = Journeylitics.class.getDeclaredField("INSTRUMENTED");
         instrumentedField.setAccessible(true);
         ((Map<?, ?>) instrumentedField.get(null)).clear();
+
+        final Field scrollEventField = Journeylitics.class.getDeclaredField("LAST_SCROLL_EVENT_AT");
+        scrollEventField.setAccessible(true);
+        ((Map<?, ?>) scrollEventField.get(null)).clear();
     }
 
     @Test
@@ -81,8 +86,9 @@ public class JourneyliticsTest {
     public void addSink_afterStart_receivesEvents() throws Exception {
         resetJourneyliticsState();
         final Application app = Mockito.mock(Application.class);
-        Mockito.when(app.getApplicationContext()).thenReturn(app);
-        Journeylitics.start(app, new JLConfig());
+        final Activity activity = Mockito.mock(Activity.class);
+        Mockito.when(activity.getApplication()).thenReturn(app);
+        Journeylitics.start(activity, new JLConfig());
 
         final List<JLEvent> events = new ArrayList<>();
         final JLSink sink = events::add;
@@ -99,8 +105,9 @@ public class JourneyliticsTest {
     public void removeSink_stopsEvents() throws Exception {
         resetJourneyliticsState();
         final Application app = Mockito.mock(Application.class);
-        Mockito.when(app.getApplicationContext()).thenReturn(app);
-        Journeylitics.start(app, new JLConfig());
+        final Activity activity = Mockito.mock(Activity.class);
+        Mockito.when(activity.getApplication()).thenReturn(app);
+        Journeylitics.start(activity, new JLConfig());
 
         final List<JLEvent> events = new ArrayList<>();
         final JLSink sink = events::add;
