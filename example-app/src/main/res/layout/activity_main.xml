@@ -11,69 +11,78 @@
     android:paddingTop="60dp"
     tools:context=".MainActivity">
 
-    <com.google.android.flexbox.FlexboxLayout
+    <HorizontalScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:flexDirection="row"
-        app:flexWrap="wrap"
-        app:alignItems="center">
-        <Spinner
-            android:id="@+id/sizes"
-            android:theme="@style/ThemeOverlay.AppCompat.Light"
-            android:spinnerMode="dropdown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="12dp" />
-        <CheckBox
-            android:id="@+id/loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="true"
-            android:text="@string/loading"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/hide_dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/hide_dialog"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/webViewDebug"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/web_view_debug"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/hwAccel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="true"
-            android:text="@string/hw_accel"
-            style="@style/CheckBoxText" />
+        android:layout_height="50dp"
+        android:fillViewport="false"
+        android:fadingEdgeLength="64dp"
+        android:requiresFadingEdge="horizontal">
 
-        <CheckBox
-            android:id="@+id/themeDark"
+        <LinearLayout
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/theme_dark"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/userJourney"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/user_journey"
-            style="@style/CheckBoxText" />
-    </com.google.android.flexbox.FlexboxLayout>
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <Spinner
+                android:id="@+id/sizes"
+                android:theme="@style/ThemeOverlay.AppCompat.Light"
+                android:spinnerMode="dropdown"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+            <CheckBox
+                android:id="@+id/loading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:minHeight="48dp"
+                android:checked="true"
+                android:text="@string/loading"
+                style="@style/CheckBoxText" />
+            <CheckBox
+                android:id="@+id/hide_dialog"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:checked="false"
+                android:text="@string/hide_dialog"
+                style="@style/CheckBoxText" />
+            <CheckBox
+                android:id="@+id/webViewDebug"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:checked="false"
+                android:text="@string/web_view_debug"
+                style="@style/CheckBoxText" />
+            <CheckBox
+                android:id="@+id/hwAccel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:checked="true"
+                android:text="@string/hw_accel"
+                style="@style/CheckBoxText" />
+
+            <CheckBox
+                android:id="@+id/themeDark"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:checked="false"
+                android:text="@string/theme_dark"
+                style="@style/CheckBoxText" />
+            <CheckBox
+                android:id="@+id/userJourney"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minHeight="48dp"
+                android:checked="false"
+                android:text="@string/user_journey"
+                style="@style/CheckBoxText" />
+        </LinearLayout>
+
+    </HorizontalScrollView>
 
     <!-- Phone input row -->
     <LinearLayout

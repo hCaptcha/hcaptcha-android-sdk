@@ -2,8 +2,8 @@ package com.hcaptcha.sdk.journeylitics;
 
 import android.app.Activity;
 import android.app.Application;
-import android.content.Context;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -42,6 +42,8 @@ public class Journeylitics {
     private static JLConfig sConfig = JLConfig.DEFAULT;
     private static final CopyOnWriteArrayList<JLSink> SINKS = new CopyOnWriteArrayList<>();
     private static final WeakHashMap<View, Boolean> INSTRUMENTED = new WeakHashMap<>();
+    private static final WeakHashMap<View, Long> LAST_SCROLL_EVENT_AT = new WeakHashMap<>();
+    private static final long SCROLL_EVENT_MIN_INTERVAL_MS = 250;
 
     private static final class ListenerLookup<T> {
         private final T listener;
@@ -117,24 +119,21 @@ public class Journeylitics {
             };
 
     @MainThread
-    public static void start(Context context) {
-        start(context, JLConfig.DEFAULT);
+    public static void start(Activity activity) {
+        start(activity, JLConfig.DEFAULT);
     }
 
     @MainThread
-    public static void start(Context context, JLConfig configuration) {
+    public static void start(Activity activity, JLConfig configuration) {
         if (!STARTED.compareAndSet(false, true)) {
             return;
         }
-        final Context appCtx = context.getApplicationContext();
-        if (!(appCtx instanceof Application)) {
-            throw new IllegalArgumentException("context must be Application or provide applicationContext");
-        }
-        sApp = (Application) appCtx;
+        sApp = activity.getApplication();
         sConfig = configuration;
         SINKS.clear();
         SINKS.addAll(configuration.getSinks());
         sApp.registerActivityLifecycleCallbacks(LIFECYCLE_CALLBACKS);
+        instrumentViews(activity);
     }
 
     public static boolean isStarted() {
@@ -207,9 +206,9 @@ public class Journeylitics {
         } else if (view instanceof SearchView) {
             hookSearch((SearchView) view);
         } else if (view instanceof ScrollView) {
-            hookScrollView((ScrollView) view);
+            hookScrollView(view);
         } else if (view instanceof HorizontalScrollView) {
-            hookHScrollView((HorizontalScrollView) view);
+            hookScrollView(view);
         }
 
         if (view instanceof ViewGroup) {
@@ -534,28 +533,19 @@ public class Journeylitics {
         }
     }
 
-    private static void hookScrollView(ScrollView scrollView) {
+    private static void hookScrollView(View scrollView) {
         scrollView.getViewTreeObserver().addOnScrollChangedListener(
             new ViewTreeObserver.OnScrollChangedListener() {
                 @Override
                 public void onScrollChanged() {
                     if (sConfig.isEnableScrolls()) {
-                        final Map<String, Object> meta = MetaMapHelper.createMetaMap(
-                            new AbstractMap.SimpleEntry<>(FieldKey.ID, viewIdName(scrollView)),
-                            new AbstractMap.SimpleEntry<>(FieldKey.ACTION, "scroll")
-                        );
-                        emit(EventKind.drag, scrollView.getClass().getSimpleName(), meta);
-                    }
-                }
-            });
-    }
-
-    private static void hookHScrollView(HorizontalScrollView scrollView) {
-        scrollView.getViewTreeObserver().addOnScrollChangedListener(
-            new ViewTreeObserver.OnScrollChangedListener() {
-                @Override
-                public void onScrollChanged() {
-                    if (sConfig.isEnableScrolls()) {
+                        final long now = SystemClock.uptimeMillis();
+                        final Long lastEventAt = LAST_SCROLL_EVENT_AT.get(scrollView);
+                        if (lastEventAt != null
+                                && now - lastEventAt < SCROLL_EVENT_MIN_INTERVAL_MS) {
+                            return;
+                        }
+                        LAST_SCROLL_EVENT_AT.put(scrollView, now);
                         final Map<String, Object> meta = MetaMapHelper.createMetaMap(
                             new AbstractMap.SimpleEntry<>(FieldKey.ID, viewIdName(scrollView)),
                             new AbstractMap.SimpleEntry<>(FieldKey.ACTION, "scroll")

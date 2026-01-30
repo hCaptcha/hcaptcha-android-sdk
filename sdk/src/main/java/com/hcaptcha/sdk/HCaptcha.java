@@ -17,6 +17,7 @@ import com.hcaptcha.sdk.tasks.Task;
 
 import java.util.List;
 
+@SuppressWarnings("PMD.GodClass")
 public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
 
@@ -202,6 +203,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             captchaVerifier.reset();
             captchaVerifier = null;
         }
+        stopEvents();
     }
 
     @Override
@@ -209,6 +211,17 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier != null) {
             captchaVerifier.destroy();
             captchaVerifier = null;
+        }
+        stopEvents();
+    }
+
+    @Override
+    public void stopEvents() {
+        if (journeySink != null) {
+            if (Journeylitics.isStarted()) {
+                Journeylitics.removeSink(journeySink);
+            }
+            journeySink = null;
         }
     }
 
