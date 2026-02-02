@@ -95,6 +95,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             @Override
             void onSuccess(final String token) {
                 HCaptchaLog.d("HCaptcha.onSuccess");
+                if (journeySink != null) {
+                    journeySink.clearEvents();
+                }
                 scheduleCaptchaExpired(inputConfig.getTokenExpiration());
                 setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));
             }
@@ -221,6 +224,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             if (Journeylitics.isStarted()) {
                 Journeylitics.removeSink(journeySink);
             }
+            journeySink.clearEvents();
             journeySink = null;
         }
     }
@@ -238,7 +242,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         } else {
             HCaptchaVerifyParams finalParams = verifyParams;
             if (journeySink != null) {
-                final List<JLEvent> events = journeySink.getAndClearEvents();
+                final List<JLEvent> events = journeySink.getEvents();
                 if (!events.isEmpty()) {
                     if (finalParams == null) {
                         finalParams = HCaptchaVerifyParams.builder()

@@ -422,7 +422,7 @@ AnalyticsScreen("Checkout") {
 
 Notes:
 
-- Events start at `setup()` (including pre-warm) and continue until the same `HCaptcha` instance is reconfigured with `userJourney(false)`. `reset()` does not clear the event buffer.
+- Events start at `setup()` (including pre-warm) and continue until the same `HCaptcha` instance is reconfigured with `userJourney(false)`. `reset()` and `destroy()` stop tracking and clear the event buffer.
 - Only the most recent 50 events are kept; they are cleared after `verifyWithHCaptcha` starts.
 - Events include component identifiers, coordinates, and text-length deltas (never full text). This should avoid collecting any personal or sensitive data, but ensure your component IDs do not include any PII.
 - If you set `HCaptchaVerifyParams.userJourney` manually while `userJourney` is enabled, the SDK may overwrite it with captured events.
