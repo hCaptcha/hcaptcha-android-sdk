@@ -25,6 +25,8 @@ android {
         minSdkVersion 16
         targetSdkVersion 35
 
+        vectorDrawables.useSupportLibrary = true
+
         // See https://developer.android.com/studio/publish/versioning
         // versionCode must be integer and be incremented by one for every new update
         // android system uses this to prevent downgrades
