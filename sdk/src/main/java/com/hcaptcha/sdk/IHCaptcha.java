@@ -1,5 +1,8 @@
 package com.hcaptcha.sdk;
 
+import android.view.ViewGroup;
+import androidx.annotation.Nullable;
+
 import lombok.NonNull;
 
 /**
@@ -59,6 +62,15 @@ public interface IHCaptcha {
      * @return new {@link HCaptcha} object
      */
     IHCaptcha setup(@NonNull HCaptchaConfig config);
+
+    /**
+     * Set optional host container for visual challenge rendering when render mode is embedded.
+     * If null and render mode is embedded, SDK fails fast with an IllegalStateException.
+     *
+     * @param embeddedContainer Target container for embedded challenge WebView.
+     * @return {@link IHCaptcha}
+     */
+    IHCaptcha setEmbeddedContainer(@Nullable ViewGroup embeddedContainer);
 
     /**
      * Shows a captcha challenge dialog to be completed by the user

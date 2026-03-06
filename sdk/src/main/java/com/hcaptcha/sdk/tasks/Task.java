@@ -35,6 +35,7 @@ public abstract class Task<R> {
     private final CopyOnWriteArrayList<OnFailureListener> onFailureListeners;
 
     private final CopyOnWriteArrayList<OnOpenListener> onOpenListeners;
+    private final CopyOnWriteArrayList<OnLoadedListener> onLoadedListeners;
 
     protected final Handler handler = new Handler(Looper.getMainLooper());
 
@@ -45,6 +46,7 @@ public abstract class Task<R> {
         this.onSuccessListeners = new CopyOnWriteArrayList<>();
         this.onFailureListeners = new CopyOnWriteArrayList<>();
         this.onOpenListeners = new CopyOnWriteArrayList<>();
+        this.onLoadedListeners = new CopyOnWriteArrayList<>();
         this.reset();
     }
 
@@ -101,6 +103,15 @@ public abstract class Task<R> {
     protected void captchaOpened() {
         for (OnOpenListener listener : onOpenListeners) {
             listener.onOpen();
+        }
+    }
+
+    /**
+     * Internal callback which called once 'loaded-callback' fired in js SDK
+     */
+    protected void captchaLoaded() {
+        for (OnLoadedListener listener : onLoadedListeners) {
+            listener.onLoaded();
         }
     }
 
@@ -177,6 +188,18 @@ public abstract class Task<R> {
     }
 
     /**
+     * Add a hCaptcha loaded listener triggered when the hCaptcha content is loaded
+     *
+     * @param onLoadedListener the loaded listener to be triggered
+     * @return current object
+     */
+    public Task<R> addOnLoadedListener(@NonNull final OnLoadedListener onLoadedListener) {
+        this.onLoadedListeners.add(onLoadedListener);
+        tryCb();
+        return this;
+    }
+
+    /**
      * Remove a open listener
      * @param onOpenListener to be removed
      * @return current object
@@ -189,6 +212,18 @@ public abstract class Task<R> {
     }
 
     /**
+     * Remove a loaded listener
+     * @param onLoadedListener to be removed
+     * @return current object
+     */
+    public Task<R> removeOnLoadedListener(@NonNull final OnLoadedListener onLoadedListener) {
+        if (!onLoadedListeners.remove(onLoadedListener)) {
+            HCaptchaLog.d("removeOnLoadedListener: %1 not found and cannot be removed", onLoadedListener);
+        }
+        return this;
+    }
+
+    /**
      * Remove all listeners: success, failure and open listeners
      * @return current object
      */
@@ -196,6 +231,7 @@ public abstract class Task<R> {
         onSuccessListeners.clear();
         onFailureListeners.clear();
         onOpenListeners.clear();
+        onLoadedListeners.clear();
         return this;
     }
 

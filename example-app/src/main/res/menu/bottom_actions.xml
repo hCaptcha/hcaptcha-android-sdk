@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/action_reset"
+        android:icon="@android:drawable/ic_menu_revert"
+        android:title="@string/reset" />
+    <item
+        android:id="@+id/action_setup"
+        android:icon="@android:drawable/ic_menu_manage"
+        android:title="@string/setup" />
+    <item
+        android:id="@+id/action_verify"
+        android:icon="@android:drawable/ic_media_play"
+        android:title="@string/verify" />
+    <item
+        android:id="@+id/action_destroy"
+        android:icon="@android:drawable/ic_menu_close_clear_cancel"
+        android:title="@string/destroy" />
+    <item
+        android:id="@+id/action_hit_test"
+        android:icon="@android:drawable/ic_menu_compass"
+        android:title="@string/hit_test" />
+</menu>

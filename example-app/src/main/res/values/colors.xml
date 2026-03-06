@@ -1,6 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
-    <color name="colorAccent">#03DAC5</color>
+    <color name="colorPrimary">#1364FF</color>
+    <color name="colorPrimaryDark">#0A3FAF</color>
+    <color name="colorAccent">#1E88FF</color>
+
+    <color name="hc_bg_app">#0B1E4A</color>
+    <color name="hc_surface">#FFFFFF</color>
+    <color name="hc_surface_alt">#E8F0FF</color>
+    <color name="hc_border">#B7CCF8</color>
+    <color name="hc_text_primary">#0B2455</color>
+    <color name="hc_text_secondary">#355A9C</color>
+    <color name="hc_status_success">#1B5E20</color>
+    <color name="hc_status_error">#8E1B1B</color>
+    <color name="hc_result_ok_bg">#EAF2FF</color>
+    <color name="hc_result_error_bg">#DDE9FF</color>
+    <color name="hc_audit_bg">#E6EEFF</color>
+    <color name="hc_bottom_bar_bg">#0A3FAF</color>
+    <color name="hc_bottom_bar_text">#FFFFFF</color>
+    <color name="hc_host_scrim">#0A3FAF</color>
 </resources>

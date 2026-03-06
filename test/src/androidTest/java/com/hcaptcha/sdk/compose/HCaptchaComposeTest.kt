@@ -18,6 +18,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hcaptcha.sdk.HCaptchaCompose
 import com.hcaptcha.sdk.HCaptchaConfig
 import com.hcaptcha.sdk.HCaptchaError
+import com.hcaptcha.sdk.HCaptchaRenderMode
 import com.hcaptcha.sdk.HCaptchaResponse
 import com.hcaptcha.sdk.HCaptchaSize
 import androidx.test.espresso.Espresso.pressBack
@@ -44,7 +45,8 @@ class HCaptchaComposeTest {
 
     private fun setContent(siteKey: String = PASSIVE_SITE_KEY,
                            passiveSiteKey: Boolean = false,
-                           size: State<HCaptchaSize> = mutableStateOf(HCaptchaSize.INVISIBLE)) {
+                           size: State<HCaptchaSize> = mutableStateOf(HCaptchaSize.INVISIBLE),
+                           renderMode: HCaptchaRenderMode = HCaptchaRenderMode.DIALOG) {
 
         composeTestRule.setContent {
             var text by remember { mutableStateOf("<init>") }
@@ -57,7 +59,7 @@ class HCaptchaComposeTest {
                         .siteKey(siteKey)
                         .diagnosticLog(true)
                         .size(size.value)
-                        .hideDialog(passiveSiteKey)
+                        .renderMode(if (passiveSiteKey) HCaptchaRenderMode.HEADLESS else renderMode)
                         .build()
                 ) { result ->
                     when (result) {
@@ -175,5 +177,16 @@ class HCaptchaComposeTest {
 
         composeTestRule.onNodeWithContentDescription(resultContentDescription)
             .assertTextContains("<init>")
+    }
+
+    @Test
+    fun renderCustomHost() {
+        setContent(renderMode = HCaptchaRenderMode.EMBEDDED)
+
+        runBlocking { delay(timeout) }
+
+        composeTestRule.onNodeWithTag("dialogRoot").assertDoesNotExist()
+        composeTestRule.onNodeWithContentDescription(resultContentDescription)
+            .assertTextEquals(TEST_TOKEN)
     }
 }

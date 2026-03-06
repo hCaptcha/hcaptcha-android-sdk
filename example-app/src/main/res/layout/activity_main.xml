@@ -1,243 +1,499 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/root"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/hc_bg_app"
     android:fitsSystemWindows="true"
-    android:theme="@style/Theme.AppCompat"
-    android:paddingTop="60dp"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.google.android.flexbox.FlexboxLayout
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/topTabs"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:flexDirection="row"
-        app:flexWrap="wrap"
-        app:alignItems="center">
-        <Spinner
-            android:id="@+id/sizes"
-            android:theme="@style/ThemeOverlay.AppCompat.Light"
-            android:spinnerMode="dropdown"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginVertical="12dp" />
-        <CheckBox
-            android:id="@+id/loading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="true"
-            android:text="@string/loading"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/hide_dialog"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/hide_dialog"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/webViewDebug"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/web_view_debug"
-            style="@style/CheckBoxText" />
-        <CheckBox
-            android:id="@+id/hwAccel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="true"
-            android:text="@string/hw_accel"
-            style="@style/CheckBoxText" />
+        android:background="@color/hc_surface"
+        app:tabIndicatorColor="@color/colorPrimary"
+        app:tabSelectedTextColor="@color/hc_text_primary"
+        app:tabTextColor="@color/hc_text_secondary" />
 
-        <CheckBox
-            android:id="@+id/themeDark"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minHeight="48dp"
-            android:checked="false"
-            android:text="@string/theme_dark"
-            style="@style/CheckBoxText" />
-    </com.google.android.flexbox.FlexboxLayout>
-
-    <!-- Phone input row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp"
-        android:paddingHorizontal="4dp">
-
-        <EditText
-            android:id="@+id/phonePrefix"
-            android:layout_width="0dp"
-            android:layout_height="40dp"
-            android:layout_weight="1"
-            android:inputType="phone"
-            android:gravity="center_vertical|start"
-            android:textColor="@android:color/black"
-            android:textColorHint="@android:color/darker_gray"
-            android:hint="Phone prefix" />
-
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/phoneModeSwitch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:text="Full number"
-            android:textColor="@android:color/black"
-            app:switchPadding="12dp" />
-    </LinearLayout>
-
-    <!-- Rqdata input row -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:layout_marginTop="8dp"
-        android:paddingHorizontal="4dp">
-
-        <EditText
-            android:id="@+id/rqdataInput"
-            android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:inputType="text"
-            android:gravity="center_vertical|start"
-            android:textColor="@android:color/black"
-            android:textColorHint="@android:color/darker_gray"
-            android:hint="Request data (rqdata)" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal">
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/reset"
-            android:onClick="onClickReset" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/setup"
-            android:onClick="onClickSetup" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/verify"
-            android:onClick="onClickVerify" />
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/mark_used"
-            android:onClick="onMarkUsed" />
-
-    </LinearLayout>
-
-    <!-- Second row for actions that shouldn't wrap awkwardly -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="8dp">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/destroy"
-            android:onClick="onClickDestroy" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:background="@android:color/holo_green_light"
-        android:orientation="horizontal"
-        android:padding="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center_vertical">
-
-        <TextView
-            android:text="Token: "
-            android:textColor="@android:color/white"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/tokenTextView"
-            android:text="-"
-            android:textColor="@android:color/white"
-            android:ellipsize="end"
-            android:maxLines="10"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content" />
-
-        <Button
-            android:id="@+id/copyTokenButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/copy_token"
-            android:onClick="onCopyToken"
-            android:minWidth="0dp"
-            android:minHeight="0dp"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="8dp"
-            android:layout_marginStart="8dp" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:background="@android:color/holo_red_light"
-        android:padding="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:text="Error:   "
-            android:textColor="@android:color/white"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
-        <TextView
-            android:id="@+id/errorTextView"
-            android:text="-"
-            android:textColor="@android:color/white"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <RelativeLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingLeft="@dimen/hcaptcha_safe_padding"
-        android:paddingRight="@dimen/hcaptcha_safe_padding"
-        android:paddingTop="@dimen/hcaptcha_safe_padding"
-        android:paddingBottom="@dimen/hcaptcha_safe_padding">
+        android:layout_weight="1">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/hit_test"
-            android:layout_centerInParent="true"
-            android:onClick="onHitTest"/>
+        <ScrollView
+            android:id="@+id/tabConfiguration"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    </RelativeLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/hc_surface"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/configuration"
+                        android:textColor="@color/hc_text_primary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:text="@string/render_mode"
+                        android:textColor="@color/hc_text_primary" />
+
+                    <RadioGroup
+                        android:id="@+id/challenge_mode_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/mode_dialog"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:text="@string/render_mode_dialog" />
+
+                        <RadioButton
+                            android:id="@+id/mode_embedded"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/render_mode_embedded" />
+
+                        <RadioButton
+                            android:id="@+id/mode_headless"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/render_mode_headless" />
+
+                    </RadioGroup>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/challenge_size"
+                        android:textColor="@color/hc_text_primary" />
+
+                    <RadioGroup
+                        android:id="@+id/challenge_size_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/size_normal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:text="@string/challenge_size_normal" />
+
+                        <RadioButton
+                            android:id="@+id/size_invisible"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/challenge_size_invisible" />
+
+                        <RadioButton
+                            android:id="@+id/size_compact"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/challenge_size_compact" />
+                    </RadioGroup>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/loading"
+                            android:textColor="@color/hc_text_primary" />
+
+                        <CheckBox
+                            android:id="@+id/loading"
+                            style="@style/CheckBoxText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:minHeight="48dp"
+                            android:text="" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/web_view_debug"
+                            android:textColor="@color/hc_text_primary" />
+
+                        <CheckBox
+                            android:id="@+id/webViewDebug"
+                            style="@style/CheckBoxText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:minHeight="48dp"
+                            android:text="" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/hw_accel"
+                            android:textColor="@color/hc_text_primary" />
+
+                        <CheckBox
+                            android:id="@+id/hwAccel"
+                            style="@style/CheckBoxText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="true"
+                            android:minHeight="48dp"
+                            android:text="" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/theme_dark"
+                            android:textColor="@color/hc_text_primary" />
+
+                        <CheckBox
+                            android:id="@+id/themeDark"
+                            style="@style/CheckBoxText"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:checked="false"
+                            android:minHeight="48dp"
+                            android:text="" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/phone_mode"
+                            android:textColor="@color/hc_text_primary" />
+
+                        <androidx.appcompat.widget.SwitchCompat
+                            android:id="@+id/phoneModeSwitch"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/phone_mode_prefix" />
+                    </LinearLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/phoneInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:hint="@string/phone_input"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/hc_text_secondary"
+                        app:placeholderText="@string/phone_prefix_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/phonePrefix"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="phone"
+                            android:textColor="@color/hc_text_primary" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/rqdataInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:hint="@string/rqdata_label"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/hc_text_secondary"
+                        app:placeholderText="@string/rqdata_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/rqdataInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:textColor="@color/hc_text_primary" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:id="@+id/tabEmbedded"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/hc_surface"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/embedded_showcase"
+                        android:textColor="@color/hc_text_primary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/embeddedHostStateTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="@string/embedded_host_closed"
+                        android:textColor="@color/hc_text_secondary" />
+
+                    <FrameLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:background="@color/hc_surface_alt"
+                        android:minHeight="120dp">
+
+                        <FrameLayout
+                            android:id="@+id/embedded_challenge_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content" />
+
+                        <LinearLayout
+                            android:id="@+id/embeddedLoadingOverlay"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp"
+                            android:visibility="gone">
+
+                            <ProgressBar
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:text="@string/embedded_loading"
+                                android:textColor="@color/hc_text_secondary" />
+                        </LinearLayout>
+                    </FrameLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:id="@+id/tabResult"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:id="@+id/resultCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/hc_result_ok_bg"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/result"
+                        android:textColor="@color/hc_text_primary"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/resultStatusTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="@string/result_idle"
+                        android:textColor="@color/hc_text_primary" />
+
+                    <TextView
+                        android:id="@+id/resultMessageTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:ellipsize="end"
+                        android:maxLines="1"
+                        android:singleLine="true"
+                        android:text="-"
+                        android:textColor="@color/hc_text_secondary" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/copyTokenButton"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:onClick="onCopyToken"
+                            android:text="@string/copy_token"
+                            android:textAllCaps="false" />
+
+                        <Button
+                            android:id="@+id/markUsedButton"
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="8dp"
+                            android:layout_weight="1"
+                            android:onClick="onMarkUsed"
+                            android:text="@string/mark_used"
+                            android:textAllCaps="false" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:id="@+id/tabAudit"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@color/hc_audit_bg"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/audit_log"
+                            android:textColor="@color/hc_text_primary"
+                            android:textStyle="bold" />
+
+                        <Button
+                            style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:onClick="onClearAuditLog"
+                            android:text="@string/clear_log"
+                            android:textAllCaps="false" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/auditLogTextView"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:fontFamily="monospace"
+                        android:minLines="6"
+                        android:text="-"
+                        android:textColor="@color/hc_text_secondary" />
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomActions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/hc_bottom_bar_bg"
+        app:itemIconTint="@color/bottom_nav_item_tint"
+        app:itemTextColor="@color/bottom_nav_item_tint"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/bottom_actions" />
 
 </LinearLayout>
