@@ -1,5 +1,9 @@
 # Changelog
 
+# 4.5.1
+
+- Fix: compose-sdk `loading(false)` now suppresses dialog dim, matching core sdk behavior
+
 # 4.5.0
 
 - Feat: add shared `HCaptchaConfig.renderMode` (`DIALOG`, `EMBEDDED`, `HEADLESS`) for sdk + compose-sdk.
