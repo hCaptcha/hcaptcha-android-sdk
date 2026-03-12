@@ -77,7 +77,7 @@ jobs:
         run: |
           ./gradlew :sdk:compileReleaseJavaWithJavac --stacktrace
           java -cp sdk/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes com.hcaptcha.sdk.HCaptchaHtml > sdk/build/hcaptcha-form.html
-          npx jshint --extract=always sdk/build/hcaptcha-form.html
+          npx -y jshint --extract=always sdk/build/hcaptcha-form.html
       - name: 'JitPack Test'
         run: ./gradlew publishReleasePublicationToMavenLocal --stacktrace
 
