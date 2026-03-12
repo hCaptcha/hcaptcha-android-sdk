@@ -8,7 +8,8 @@ import androidx.compose.runtime.State
 internal class HCaptchaComposeVerifier(
     private val config: HCaptchaConfig,
     private val onResult: (HCaptchaResponse) -> Unit,
-    private val helperState: State<HCaptchaWebViewHelper?>
+    private val helperState: State<HCaptchaWebViewHelper?>,
+    private val onReadyForInteraction: () -> Unit = {}
 ) : IHCaptchaVerifier {
 
     private var verifyParams: HCaptchaVerifyParams? = null
@@ -16,7 +17,12 @@ internal class HCaptchaComposeVerifier(
     override fun onLoaded() {
         onResult(HCaptchaResponse.Event(HCaptchaEvent.Loaded))
 
-        if (config.isHeadlessMode() || config.size == HCaptchaSize.INVISIBLE) {
+        val isInvisible = config.size == HCaptchaSize.INVISIBLE
+        if (!isInvisible) {
+            onReadyForInteraction()
+        }
+
+        if (config.isHeadlessMode() || isInvisible) {
             helperState.value?.let { helper ->
                 if (verifyParams != null) {
                     helper.resetAndExecute(verifyParams)
@@ -31,6 +37,9 @@ internal class HCaptchaComposeVerifier(
     }
 
     override fun onOpen() {
+        if (config.size == HCaptchaSize.INVISIBLE) {
+            onReadyForInteraction()
+        }
         onResult(HCaptchaResponse.Event(HCaptchaEvent.Opened))
     }
 

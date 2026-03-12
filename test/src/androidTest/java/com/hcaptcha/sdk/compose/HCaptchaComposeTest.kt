@@ -1,5 +1,7 @@
 package com.hcaptcha.sdk.compose
 
+import android.view.View
+import android.view.WindowManager
 import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.foundation.layout.*
@@ -14,6 +16,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.Espresso.pressBack
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.matcher.RootMatchers.isDialog
+import androidx.test.espresso.matcher.ViewMatchers.isRoot
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hcaptcha.sdk.HCaptchaCompose
 import com.hcaptcha.sdk.HCaptchaConfig
@@ -21,9 +29,11 @@ import com.hcaptcha.sdk.HCaptchaError
 import com.hcaptcha.sdk.HCaptchaRenderMode
 import com.hcaptcha.sdk.HCaptchaResponse
 import com.hcaptcha.sdk.HCaptchaSize
-import androidx.test.espresso.Espresso.pressBack
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.hamcrest.Matcher
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,6 +56,7 @@ class HCaptchaComposeTest {
     private fun setContent(siteKey: String = PASSIVE_SITE_KEY,
                            passiveSiteKey: Boolean = false,
                            size: State<HCaptchaSize> = mutableStateOf(HCaptchaSize.INVISIBLE),
+                           loading: Boolean = true,
                            renderMode: HCaptchaRenderMode = HCaptchaRenderMode.DIALOG) {
 
         composeTestRule.setContent {
@@ -59,6 +70,7 @@ class HCaptchaComposeTest {
                         .siteKey(siteKey)
                         .diagnosticLog(true)
                         .size(size.value)
+                        .loading(loading)
                         .renderMode(if (passiveSiteKey) HCaptchaRenderMode.HEADLESS else renderMode)
                         .build()
                 ) { result ->
@@ -188,5 +200,39 @@ class HCaptchaComposeTest {
         composeTestRule.onNodeWithTag("dialogRoot").assertDoesNotExist()
         composeTestRule.onNodeWithContentDescription(resultContentDescription)
             .assertTextEquals(TEST_TOKEN)
+    }
+
+    @Test
+    fun loadingFalseSuppressesDimBehind() {
+        setContent(CHALLENGE_SITE_KEY, loading = false)
+
+        composeTestRule.waitForIdle()
+        composeTestRule.onNodeWithTag("dialogRoot").assertIsDisplayed()
+
+        var dialogWindowParams: WindowManager.LayoutParams? = null
+        onView(isRoot())
+            .inRoot(isDialog())
+            .perform(object : ViewAction {
+                override fun getConstraints(): Matcher<View> = isRoot()
+                override fun getDescription() = "extract dialog window params"
+                override fun perform(uiController: UiController, view: View) {
+                    var root = view
+                    while (root.parent is View) {
+                        root = root.parent as View
+                    }
+                    dialogWindowParams = root.layoutParams as? WindowManager.LayoutParams
+                }
+            })
+
+        val params = dialogWindowParams!!
+        assertFalse(
+            "FLAG_DIM_BEHIND should be cleared when loading=false",
+            params.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND != 0
+        )
+        assertEquals(
+            "dimAmount should be 0 when loading=false",
+            0f,
+            params.dimAmount
+        )
     }
 }

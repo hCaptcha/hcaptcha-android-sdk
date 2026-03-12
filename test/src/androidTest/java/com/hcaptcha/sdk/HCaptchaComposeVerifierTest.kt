@@ -2,7 +2,6 @@ package com.hcaptcha.sdk
 
 import android.os.Handler
 import android.os.Looper
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.annotation.UiThreadTest
@@ -29,10 +28,11 @@ class HCaptchaComposeVerifierTest {
         val helper = mutableStateOf<HCaptchaWebViewHelper?>(null)
 
         val clazz = Class.forName("com.hcaptcha.sdk.HCaptchaComposeVerifier")
-        val constructor = clazz.constructors.first()
+        val constructor = clazz.constructors
+            .first { it.parameterTypes.size > 3 && it.parameterTypes.last() != Int::class.javaPrimitiveType }
         constructor.isAccessible = true
 
-        val result = constructor.newInstance(config, onResult, helper) as IHCaptchaVerifier
+        val result = constructor.newInstance(config, onResult, helper, {}) as IHCaptchaVerifier
         helper.value = HCaptchaWebViewHelper(handler, context, config, internalConfig, result, HCaptchaWebView(context))
         return result
     }

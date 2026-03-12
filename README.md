@@ -357,7 +357,7 @@ The following list contains configuration properties to allows customization of 
 | `imghost`                     | String (URL)                                         | No       | -                                | See Enterprise docs.                                                                                                                                                 |
 | `customTheme`                 | Stringified JSON                                     | No       | -                                | See Enterprise docs.                                                                                                                                                 |
 | `host`                        | String (hostname)                                    | No       | -                                | See Enterprise docs. Do not include scheme; remove `http(s)://`.                                                                                                     |
-| `loading`                     | Boolean                                              | No       | True                             | Show or hide the loading dialog.                                                                                                                                     |
+| `loading`                     | Boolean                                              | No       | True                             | Show or hide the loading dialog. See [99.9% Passive mode](#999-passive-mode).                                                                                        |
 | `renderMode`                  | Enum (`DIALOG`, `EMBEDDED`, `HEADLESS`)               | No       | `DIALOG`                         | Controls where/how captcha renders. Use `HEADLESS` for passive sitekeys.                                                                                             |
 | `hideDialog`                  | Boolean                                              | No       | False                            | **DEPRECATED**. Use `renderMode=HEADLESS` instead.                                                                                                                    |
 | `tokenExpiration`             | long                                                 | No       | 120                              | hCaptcha token expiration timeout (seconds).                                                                                                                         |
@@ -443,6 +443,20 @@ Failing to meet this requirement can result in runtime errors when attempting to
 The `retryPredicate` is part of `HCaptchaConfig` that may get persist during application lifecycle.
 So pay attention to this aspect and make sure that `retryPredicate` is serializable to avoid
 `android.os.BadParcelableException` in run-time.
+
+### 99.9% Passive mode
+
+When using [99.9% Passive](https://docs.hcaptcha.com/invisible#999-passive-mode) the captcha usually resolves without showing a visual challenge. In this case the default background dim can cause an unwanted flash before the dialog auto-dismisses. Set `loading(false)` to suppress both the loading indicator and the background dim until a challenge is actually presented:
+
+```java
+final HCaptchaConfig config = HCaptchaConfig.builder()
+        .siteKey("YOUR_API_SITE_KEY")
+        .size(HCaptchaSize.INVISIBLE)
+        .loading(false)
+        .build();
+```
+
+This works in both the Android View SDK and the Compose SDK (`compose-sdk`). If a visual challenge is required, the dim is automatically restored when the challenge appears.
 
 ## Debugging Tips
 
