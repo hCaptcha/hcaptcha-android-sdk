@@ -5,6 +5,7 @@ import android.os.Handler
 import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,16 +43,13 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
 
     val helper = remember { mutableStateOf<HCaptchaWebViewHelper?>(null) }
     var verificationFinished by remember { mutableStateOf(false) }
-    var readyForInteraction by remember { mutableStateOf(false) }
     val verifier = remember {
         HCaptchaComposeVerifier(config, { result ->
             if (result is HCaptchaResponse.Success || result is HCaptchaResponse.Failure) {
                 verificationFinished = true
             }
             onResultState.value(result)
-        }, helper, onReadyForInteraction = {
-            readyForInteraction = true
-        })
+        }, helper)
     }
     val preloadedWebView = remember {
         HCaptchaWebView(context).apply {
@@ -98,7 +95,7 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
             Dialog(
                 onDismissRequest = onDismissRequest
             ) {
-                DialogDimEffect(suppressDim = suppressDim, readyForInteraction = readyForInteraction)
+                DialogWindowSetup(suppressDim = suppressDim)
 
                 Column(
                     modifier = Modifier
@@ -121,21 +118,24 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
     }
 }
 
-private const val DEFAULT_DIM_AMOUNT = 0.6f
-
 @Composable
-private fun DialogDimEffect(suppressDim: Boolean, readyForInteraction: Boolean) {
+private fun DialogWindowSetup(suppressDim: Boolean) {
     if (!suppressDim) return
 
-    val window = (LocalView.current.parent as? DialogWindowProvider)?.window ?: return
+    val view = LocalView.current
+    val window = (view.parent as? DialogWindowProvider)?.window ?: return
 
-    SideEffect {
-        if (readyForInteraction) {
-            window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            window.setDimAmount(DEFAULT_DIM_AMOUNT)
-        } else {
-            window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            window.setDimAmount(0f)
+    DisposableEffect(Unit) {
+        val listener = ViewTreeObserver.OnGlobalLayoutListener {
+            val lp = window.attributes
+            if (lp.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND != 0) {
+                lp.flags = lp.flags and WindowManager.LayoutParams.FLAG_DIM_BEHIND.inv()
+                lp.dimAmount = 0f
+                window.attributes = lp
+            }
         }
+        view.viewTreeObserver.addOnGlobalLayoutListener(listener)
+        view.post { listener.onGlobalLayout() }
+        onDispose { view.viewTreeObserver.removeOnGlobalLayoutListener(listener) }
     }
 }

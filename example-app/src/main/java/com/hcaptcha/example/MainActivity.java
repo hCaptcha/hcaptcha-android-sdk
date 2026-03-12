@@ -45,7 +45,7 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String SITEKEY = "10000000-ffff-ffff-ffff-000000000001";
+    private static final String SITEKEY = "00000000-0000-0000-0000-000000000000";
     private static final int MAX_AUDIT_LOG_LINES = 100;
     private static final int TAB_CONFIGURATION = 0;
     private static final int TAB_CUSTOM = 1;

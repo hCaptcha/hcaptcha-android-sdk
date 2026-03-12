@@ -209,6 +209,8 @@ class HCaptchaComposeTest {
         composeTestRule.waitForIdle()
         composeTestRule.onNodeWithTag("dialogRoot").assertIsDisplayed()
 
+        runBlocking { delay(timeout) }
+
         var dialogWindowParams: WindowManager.LayoutParams? = null
         onView(isRoot())
             .inRoot(isDialog())

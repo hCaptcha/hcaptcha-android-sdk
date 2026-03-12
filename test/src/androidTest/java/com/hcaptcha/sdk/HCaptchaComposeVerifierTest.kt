@@ -28,11 +28,11 @@ class HCaptchaComposeVerifierTest {
         val helper = mutableStateOf<HCaptchaWebViewHelper?>(null)
 
         val clazz = Class.forName("com.hcaptcha.sdk.HCaptchaComposeVerifier")
-        val constructor = clazz.constructors
-            .first { it.parameterTypes.size > 3 && it.parameterTypes.last() != Int::class.javaPrimitiveType }
+        val constructor = clazz.declaredConstructors
+            .first { it.parameterTypes.size == 3 }
         constructor.isAccessible = true
 
-        val result = constructor.newInstance(config, onResult, helper, {}) as IHCaptchaVerifier
+        val result = constructor.newInstance(config, onResult, helper) as IHCaptchaVerifier
         helper.value = HCaptchaWebViewHelper(handler, context, config, internalConfig, result, HCaptchaWebView(context))
         return result
     }
