@@ -1,3 +1,9 @@
 <resources>
-    <string name="app_name">hCaptcha Compose</string>
+    <string name="app_name">hCaptcha</string>
+    <string name="render_mode">Mode</string>
+    <string name="render_mode_dialog">Dialog</string>
+    <string name="render_mode_embedded">Embedded</string>
+    <string name="render_mode_headless">Headless</string>
+    <string name="verify_with_hcaptcha">Verify with HCaptcha</string>
+    <string name="verification_result_placeholder">Verification result will be here...</string>
 </resources>

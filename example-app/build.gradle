@@ -25,7 +25,6 @@ android {
     }
 
     compileOptions {
-        // Sets Java compatibility to Java 8
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
@@ -45,8 +44,8 @@ android {
 dependencies {
     implementation project(path: ':sdk')
 
-    //noinspection GradleDependency
     implementation "androidx.appcompat:appcompat:${prop('exampleAppcompatVersion', '1.3.1')}"
+    implementation "com.google.android.material:material:${prop('exampleMaterialVersion', '1.12.0')}"
     implementation "com.google.android.flexbox:flexbox:3.0.0"
 
     if (!prop('disableLeakCanary', 'false').toBoolean()) {

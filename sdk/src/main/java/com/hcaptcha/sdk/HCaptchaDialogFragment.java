@@ -254,6 +254,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             HCaptchaLog.w("DialogFragment.onLoaded webViewHelper == null, likely about to destroy");
             return;
         }
+        if (listener != null) {
+            listener.onLoaded();
+        }
 
         final HCaptchaConfig config = webViewHelper.getConfig();
         final boolean isInvisible = config.getSize() == HCaptchaSize.INVISIBLE;
@@ -265,9 +268,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         }
 
         if (webViewHelper != null) {
-            if (isInvisible && !config.getHideDialog()) {
+            if (isInvisible && !config.isHeadlessMode()) {
                 // We want to auto-execute in case of `invisible` checkbox.
-                // But not in the case of `hideDialog` since the verification process
+                // But not in headless mode since the verification process
                 // might be desired to happen at a later time.
                 webViewHelper.resetAndExecute(verifyParams);
             } else {

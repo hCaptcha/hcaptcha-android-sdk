@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,13 +29,23 @@ import androidx.compose.ui.window.Dialog
 @Composable
 public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) -> Unit) {
     HCaptchaLog.sDiagnosticsLogEnabled = config.diagnosticLog
+    val headlessMode = config.isHeadlessMode()
 
     val context = LocalContext.current
     val handler = Handler(Looper.getMainLooper())
     val internalConfig = HCaptchaInternalConfig(com.hcaptcha.sdk.HCaptchaHtml())
+    val onResultState = rememberUpdatedState(onResult)
 
     val helper = remember { mutableStateOf<HCaptchaWebViewHelper?>(null) }
-    val verifier = remember { HCaptchaComposeVerifier(config, onResult, helper) }
+    var verificationFinished by remember { mutableStateOf(false) }
+    val verifier = remember {
+        HCaptchaComposeVerifier(config, { result ->
+            if (result is HCaptchaResponse.Success || result is HCaptchaResponse.Failure) {
+                verificationFinished = true
+            }
+            onResultState.value(result)
+        }, helper)
+    }
     val preloadedWebView = remember {
         HCaptchaWebView(context).apply {
             helper.value = HCaptchaWebViewHelper(
@@ -45,7 +57,7 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
 
     val onDismissRequest: () -> Unit = {
         dismissed = true
-        verifier.onFailure(HCaptchaException(HCaptchaError.CHALLENGE_CLOSED));
+        verifier.onFailure(HCaptchaException(HCaptchaError.CHALLENGE_CLOSED))
         helper.value?.destroy()
     }
 
@@ -57,29 +69,44 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
 
     HCaptchaLog.d("HCaptchaCompose($config)")
 
-    if (config.hideDialog) {
+    DisposableEffect(Unit) {
+        onDispose {
+            if (!dismissed && !verificationFinished && !headlessMode) {
+                verifier.onFailure(HCaptchaException(HCaptchaError.CHALLENGE_CLOSED))
+            }
+            if (!dismissed) {
+                helper.value?.destroy()
+            }
+        }
+    }
+
+    if (headlessMode) {
         AndroidView(
             modifier = Modifier.size(0.dp),
             factory = webViewFactory
         )
     } else if (!dismissed) {
-        Dialog(
-            onDismissRequest = onDismissRequest
-        ) {
-            Column(
-                modifier = Modifier
-                    .testTag("dialogRoot")
-                    .fillMaxSize()
-                    .clickable(
-                        interactionSource = MutableInteractionSource(),
-                        indication = null,
-                        onClick = onDismissRequest
-                    ),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
+        if (config.renderMode == HCaptchaRenderMode.DIALOG) {
+            Dialog(
+                onDismissRequest = onDismissRequest
             ) {
-                AndroidView(factory = webViewFactory)
+                Column(
+                    modifier = Modifier
+                        .testTag("dialogRoot")
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = MutableInteractionSource(),
+                            indication = null,
+                            onClick = onDismissRequest
+                        ),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    AndroidView(factory = webViewFactory)
+                }
             }
+        } else {
+            AndroidView(factory = webViewFactory)
         }
     }
 }

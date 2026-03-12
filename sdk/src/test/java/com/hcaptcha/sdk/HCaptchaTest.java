@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
 import static org.mockito.Mockito.mockStatic;
@@ -15,11 +17,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.AndroidRuntimeException;
+import android.view.ViewGroup;
 import androidx.fragment.app.FragmentActivity;
 
 import com.hcaptcha.sdk.tasks.OnFailureListener;
@@ -293,6 +297,68 @@ public class HCaptchaTest {
                 .verifyWithHCaptcha();
 
         verify(fragment).startVerification(fragmentActivity, null);
+    }
+
+    @Test
+    public void test_custom_render_mode_uses_embedded_verifier() {
+        final Activity plainActivity = mock(Activity.class);
+        final ViewGroup challengeContainer = mock(ViewGroup.class);
+        final HCaptchaConfig embeddedConfig = config.toBuilder()
+                .renderMode(HCaptchaRenderMode.EMBEDDED)
+                .build();
+
+        try (MockedConstruction<HCaptchaEmbeddedView> embeddedVerifierMock =
+                     mockConstruction(HCaptchaEmbeddedView.class)) {
+            HCaptcha.getClient(plainActivity)
+                    .setEmbeddedContainer(challengeContainer)
+                    .setup(embeddedConfig)
+                    .verifyWithHCaptcha();
+
+            assertEquals(1, embeddedVerifierMock.constructed().size());
+            verify(embeddedVerifierMock.constructed().get(0)).startVerification(eq(plainActivity), isNull());
+            dialogFragmentMock.verify(() ->
+                    HCaptchaDialogFragment.newInstance(
+                            any(Context.class),
+                            any(HCaptchaConfig.class),
+                            any(HCaptchaInternalConfig.class),
+                            any(HCaptchaStateListener.class)), never());
+        }
+    }
+
+    @Test
+    public void test_embedded_render_mode_without_container_fails_fast() {
+        final Activity plainActivity = mock(Activity.class);
+        final HCaptchaConfig embeddedConfig = config.toBuilder()
+                .renderMode(HCaptchaRenderMode.EMBEDDED)
+                .build();
+
+        try {
+            HCaptcha.getClient(plainActivity)
+                    .setup(embeddedConfig)
+                    .verifyWithHCaptcha();
+        } catch (IllegalStateException exception) {
+            assertEquals(
+                    "renderMode=EMBEDDED requires an embedded container. Call setEmbeddedContainer(...) first.",
+                    exception.getMessage());
+            dialogFragmentMock.verify(() ->
+                    HCaptchaDialogFragment.newInstance(
+                            any(Context.class),
+                            any(HCaptchaConfig.class),
+                            any(HCaptchaInternalConfig.class),
+                            any(HCaptchaStateListener.class)), never());
+            return;
+        }
+        throw new AssertionError("Expected IllegalStateException for renderMode=EMBEDDED without embedded container");
+    }
+
+    @Test
+    public void test_set_render_container_resets_existing_verifier() {
+        final HCaptcha subject = HCaptcha.getClient(fragmentActivity)
+                .setup(config);
+
+        subject.setEmbeddedContainer(mock(ViewGroup.class));
+
+        verify(fragment).reset();
     }
 
     @Test

@@ -1,5 +1,12 @@
 # Changelog
 
+# 4.5.0
+
+- Feat: add shared `HCaptchaConfig.renderMode` (`DIALOG`, `EMBEDDED`, `HEADLESS`) for sdk + compose-sdk.
+- Feat: add `HCaptcha.setEmbeddedContainer(...)` for embedded render mode in core sdk.
+- Feat: add `addOnLoadedListener(...)` callback support in core sdk task listeners.
+- Deprecation: `HCaptchaConfig.hideDialog` is deprecated in favor of `renderMode=HEADLESS`.
+
 # 4.4.0
 
 - Feat: add explicit `HCaptcha.destroy()` API to fully tear down WebView and related resources.
@@ -207,4 +214,3 @@
 
 ## 2.0.0
 - Add more error codes (see readme for full list)
-
