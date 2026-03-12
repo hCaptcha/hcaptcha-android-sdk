@@ -24,7 +24,7 @@ inputs:
   boot-options:
     description: Emulator boot options
     required: true
-    default: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+    default: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -no-metrics
   fresh-avd:
     description: Force AVD creation and skip cache
     required: false
