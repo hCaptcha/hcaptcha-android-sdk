@@ -14,7 +14,7 @@ This SDK provides a wrapper for [hCaptcha](https://www.hcaptcha.com). It is a dr
 <pre>
 // Register JitPack Repository inside the root build.gradle file
 repositories {
-    <b>maven { url 'https://jitpack.io' }</b> 
+    <b>maven { url 'https://jitpack.io' }</b>
 }
 // Add hCaptcha sdk dependency inside the app's build.gradle file
 dependencies {
@@ -32,7 +32,7 @@ dependencies {
 <pre>
 // Register JitPack Repository inside the root build.gradle file
 repositories {
-    <b>maven { url 'https://jitpack.io' }</b> 
+    <b>maven { url 'https://jitpack.io' }</b>
 }
 // Add hCaptcha sdk dependency inside the app's build.gradle file
 dependencies {
@@ -49,7 +49,7 @@ dependencies {
 
 ## Example App
 
-The current repository comes with an example Android application demonstrating 3 different hCaptcha usage patterns. 
+The current repository comes with an example Android application demonstrating 3 different hCaptcha usage patterns.
 
 See the code example below along with the possible customization to enable human verification in your Android application.
 
@@ -94,7 +94,7 @@ hCaptcha
   });
 
 // =================================================
-// 3. Trigger the verification process which may or may not require user input. 
+// 3. Trigger the verification process which may or may not require user input.
 //    It depends on the sitekey difficulty setting and the hCaptcha client configuration.
 // 3.1 Optionaly, setup the client to pre-warm the assets.
 //     It helps speeding up the actual verification process by having the assets locally already.
@@ -107,8 +107,8 @@ hCaptcha.verifyWithHCaptcha(/* args */).
 // 1. The sitekey string.
 final String SITE_KEY = "10000000-ffff-ffff-ffff-000000000001";
 hCaptcha.setup(SITE_KEY).verifyWithHCaptcha()
-// 2. An "HCaptchaConfig" object which allows customization 
-//    of the look and feel, the language and more. 
+// 2. An "HCaptchaConfig" object which allows customization
+//    of the look and feel, the language and more.
 //    See section "Config Params" below.
 final HCaptchaConfig hCaptchaConfig = HCaptchaConfig.builder()
         .siteKey("10000000-ffff-ffff-ffff-000000000001")
@@ -127,13 +127,15 @@ hCaptcha.setup().verifyWithHCaptcha()
 </manifest>
 ```
 
-To remove a specific listener you may use `HCaptcha.removeOn[Success|Failure|Open]Listener(listener)`.
+To remove a specific listener you may use `HCaptcha.removeOn[Success|Failure|Loaded|Open]Listener(listener)`.
 
-To remove all listeners you may use `HCaptcha.removeAllListener()`.
+To remove all listeners you may use `HCaptcha.removeAllListeners()`.
 
-Note ⚠️: For any sitekey that can show visual challenges, `HCaptcha.getClient(Activity)` must be called with `FragmentActivity` instance.
+Note ⚠️: For visual challenges, `FragmentActivity` is required only when using SDK dialog mode.
 
-`Activity` is allowed only when `hideDialog=true` and sitekey setting is Passive (Enterprise feature).
+If you use an embedded container via `setEmbeddedContainer(...)` with `renderMode=EMBEDDED`, a plain `Activity` can be used.
+
+`Activity` is also allowed in headless mode (`renderMode=HEADLESS`) with a Passive sitekey (Enterprise feature).
 
 
 ```java
@@ -156,6 +158,23 @@ hCaptcha.removeOnSuccessListener(firstListener)
     .addOnSuccessListener(secondListener)
     .verifyWithHCaptcha();
 ```
+
+To render visual challenges inside your own view hierarchy instead of SDK dialog:
+
+```java
+final FrameLayout captchaContainer = findViewById(R.id.captchaContainer);
+
+HCaptcha.getClient(this)
+    .setEmbeddedContainer(captchaContainer)
+    .setup(HCaptchaConfig.builder()
+        .siteKey("YOUR_API_SITE_KEY")
+        .renderMode(HCaptchaRenderMode.EMBEDDED)
+        .size(HCaptchaSize.INVISIBLE)
+        .build())
+    .verifyWithHCaptcha();
+```
+
+When your custom modal/container is dismissed, call `hCaptcha.reset()` (or `destroy()` on teardown).
 
 ### MFA Phone Support
 
@@ -213,14 +232,17 @@ class HCaptchaActivity : AppCompatActivity() {
             Log.d("hCaptcha", "hCaptcha failed: " + e.getMessage() + "(" + e.getStatusCode() + ")")
             setResult(RESULT_CANCELED)
             finish()
-        }.addOnOpenListener { 
+        }.addOnOpenListener {
             // Analytics event
             Log.d("hCaptcha", "hCaptcha is now visible.")
+        }.addOnLoadedListener {
+            // Fired when hCaptcha assets/content finish loading.
+            Log.d("hCaptcha", "hCaptcha loaded.")
         }
     }
 }
 ```
-To fetch token data from activity in @Composable Class: 
+To fetch token data from activity in @Composable Class:
 
 ```kotlin
 val intent = Intent(context, HCaptchaActivity::class.java)
@@ -231,7 +253,7 @@ val intent = Intent(context, HCaptchaActivity::class.java)
                             Activity.RESULT_OK -> {
                                 data?.let {
                                     captcha.value = data.extras?.getString("captcha")?: ""
-                                }                        
+                                }
                             }
                             Activity.RESULT_CANCELED -> {
                                 Log.d("hCaptcha", "hCaptcha failed")
@@ -242,6 +264,38 @@ val intent = Intent(context, HCaptchaActivity::class.java)
                     launcher.launch(intent)
                 }
 ```
+
+If you use `compose-sdk`, you can render hCaptcha in three host modes:
+
+```kotlin
+val config = HCaptchaConfig(
+    siteKey = "YOUR_SITE_KEY",
+    renderMode = HCaptchaRenderMode.DIALOG // use EMBEDDED for embedded hosting
+)
+
+HCaptchaCompose(
+    config = config
+) { result ->
+    when (result) {
+        is HCaptchaResponse.Success -> {
+            // Send token to your backend for siteverify
+            Log.d("hCaptcha", "Token: ${result.token}")
+        }
+        is HCaptchaResponse.Failure -> {
+            // Decide whether to retry or show an error UI
+            Log.e("hCaptcha", "Error: ${result.error}")
+        }
+        is HCaptchaResponse.Event -> {
+            // Optional lifecycle hooks: Loaded, Opened
+            Log.d("hCaptcha", "Event: ${result.event}")
+        }
+    }
+}
+```
+
+- `renderMode=DIALOG` (default): SDK opens its own Compose dialog.
+- `renderMode=EMBEDDED`: SDK renders the challenge `WebView` embedded, so you can place it inside your own Compose modal/container.
+- `renderMode=HEADLESS`: SDK runs headless (no visual UI), intended for passive sitekeys.
 
 ### Memory usage (fragment lifecycle)
 
@@ -264,10 +318,10 @@ protected void onDestroy() {
 
 Note: If you reuse the same `HCaptcha` instance across multiple verifications, prefer `reset()` between runs to keep preload benefits, and use `destroy()` only for final teardown.
 
- 
+
 
 ### Good to know
-1. The listeners (`onSuccess`, `onFailure`, `onOpen`) can be called multiple times in the following cases:
+1. The listeners (`onSuccess`, `onFailure`, `onLoaded`, `onOpen`) can be called multiple times in the following cases:
    1. the same client is used to invoke multiple verifications
    2. the config option `resetOnTimeout(true)` is used which will automatically trigger a new verification when the current token expired. This will result in a new success or error callback.
       * deprecated, please use [`HCaptchaConfig.retryPredicate`](#retry-failed-verification)
@@ -304,7 +358,8 @@ The following list contains configuration properties to allows customization of 
 | `customTheme`                 | Stringified JSON                                     | No       | -                                | See Enterprise docs.                                                                                                                                                 |
 | `host`                        | String (hostname)                                    | No       | -                                | See Enterprise docs. Do not include scheme; remove `http(s)://`.                                                                                                     |
 | `loading`                     | Boolean                                              | No       | True                             | Show or hide the loading dialog.                                                                                                                                     |
-| `hideDialog`                  | Boolean                                              | No       | False                            | To be used in combination with a passive sitekey when no user interaction is required. See Enterprise docs.                                                          |
+| `renderMode`                  | Enum (`DIALOG`, `EMBEDDED`, `HEADLESS`)               | No       | `DIALOG`                         | Controls where/how captcha renders. Use `HEADLESS` for passive sitekeys.                                                                                             |
+| `hideDialog`                  | Boolean                                              | No       | False                            | **DEPRECATED**. Use `renderMode=HEADLESS` instead.                                                                                                                    |
 | `tokenExpiration`             | long                                                 | No       | 120                              | hCaptcha token expiration timeout (seconds).                                                                                                                         |
 | `diagnosticLog`               | Boolean                                              | No       | False                            | Emit detailed console logs for debugging                                                                                                                             |
 | `userJourney`                 | Boolean                                              | No       | False                            |Enable user journeys; SDK captures interaction events (Enterprise).                                                                                                   |
@@ -344,8 +399,8 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
 
 ## Error handling
 
-In some scenarios in which the human verification process cannot be completed. 
-You can add logic to gracefully handle the errors. 
+In some scenarios in which the human verification process cannot be completed.
+You can add logic to gracefully handle the errors.
 
 The following is a list of possible error codes:
 
@@ -447,7 +502,7 @@ After retrieving a `token`, you should pass it to your backend in order to verif
 
 No: the SDK depends on WebView, which is a UI component and cannot be instantiated in a non-UI thread.
 
-However, the SDK provides a completely silent (invisible to the end-user) mechanism with `hideDialog=true` config + "passive" site key (this is an Enterprise feature). But note that the token request still has to be called from the UI thread.
+However, the SDK provides a completely silent (invisible to the end-user) mechanism with `renderMode=HEADLESS` + "passive" site key (this is an Enterprise feature). But note that the token request still has to be called from the UI thread.
 
 > How can I prevent the hCaptcha verification from being canceled when the back button is pressed?
 
@@ -466,7 +521,7 @@ final HCaptchaConfig config = HCaptchaConfig.builder()
 
 SDK expect to be initialized with `FragmentActivity` instance in regular scenario.
 
-In case if you use passive `siteKey` make sure that you called `hideDialog(true)` on `HCaptchaCconfig.builder()`
+In case if you use passive `siteKey`, configure `renderMode(HEADLESS)` on `HCaptchaConfig.builder()`.
 
 > I'm getting build conflicts with `android:usesCleartextTraffic` attribute. What should I do?
 
@@ -492,7 +547,9 @@ Some resources are cached to speed up subsequent calls. Once you call `HCaptcha.
 
 ### FragmentActivity requirement
 
-Visual challenges throw if you pass a non-FragmentActivity. A plain Activity is only supported for headless mode (hideDialog=true) with a Passive sitekey.
+Visual challenges require `FragmentActivity` in default dialog mode.
+If you set `setEmbeddedContainer(...)` and configure `renderMode=EMBEDDED`, visual challenges can run in a regular `Activity` as embedded WebView.
+A plain `Activity` is also supported for headless mode (`renderMode=HEADLESS`) with a Passive sitekey.
 
 ### Listener management
 

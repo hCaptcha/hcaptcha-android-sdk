@@ -5,6 +5,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.AndroidRuntimeException;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
@@ -29,6 +30,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @Nullable
     private HCaptchaConfig config;
+
+    @Nullable
+    private ViewGroup embeddedContainer;
 
     @NonNull
     private final HCaptchaInternalConfig internalConfig;
@@ -88,6 +92,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
+            void onLoaded() {
+                captchaLoaded();
+            }
+
+            @Override
             void onOpen() {
                 captchaOpened();
             }
@@ -109,7 +118,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
         };
         try {
-            // Initialize or disable user journey tracking if enabled/disabled
+            // Initialize or disable user journey tracking if enabled/disabled.
             if (Boolean.TRUE.equals(inputConfig.getUserJourney())) {
                 if (journeySink == null) {
                     journeySink = new InMemorySink();
@@ -127,13 +136,28 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                 journeySink = null;
             }
 
+            final boolean headlessMode = inputConfig.isHeadlessMode();
             if (Boolean.TRUE.equals(inputConfig.getHideDialog())) {
-                // Overwrite certain config values in case the dialog is hidden to avoid behavior collision
+                HCaptchaLog.w("Config.hideDialog is deprecated. Use renderMode=HEADLESS instead.");
+            }
+
+            if (headlessMode) {
+                // Overwrite certain config values in case the flow is headless to avoid behavior collision
                 this.config = inputConfig.toBuilder()
+                        .renderMode(HCaptchaRenderMode.HEADLESS)
                         .size(HCaptchaSize.INVISIBLE)
                         .loading(false)
                         .build();
                 captchaVerifier = new HCaptchaHeadlessWebView(activity, this.config, internalConfig, listener);
+            } else if (inputConfig.getRenderMode() == HCaptchaRenderMode.EMBEDDED) {
+                if (embeddedContainer == null) {
+                    throw new IllegalStateException(
+                            "renderMode=EMBEDDED requires an embedded container. "
+                                    + "Call setEmbeddedContainer(...) first.");
+                }
+                captchaVerifier = new HCaptchaEmbeddedView(
+                        activity, inputConfig, internalConfig, listener, embeddedContainer);
+                this.config = inputConfig;
             } else if (this.activity instanceof FragmentActivity) {
                 captchaVerifier = HCaptchaDialogFragment.newInstance(activity, inputConfig, internalConfig, listener);
                 this.config = inputConfig;
@@ -143,6 +167,16 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         } catch (AndroidRuntimeException e) {
             listener.onFailure(new HCaptchaException(HCaptchaError.ERROR));
         }
+        return this;
+    }
+
+    @Override
+    public HCaptcha setEmbeddedContainer(@Nullable ViewGroup container) {
+        if (this.embeddedContainer != container && captchaVerifier != null) {
+            captchaVerifier.reset();
+            captchaVerifier = null;
+        }
+        this.embeddedContainer = container;
         return this;
     }
 

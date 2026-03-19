@@ -1,5 +1,18 @@
 <resources>
     <string name="app_name">hCaptcha Example</string>
+    <string name="configuration">Configuration</string>
+    <string name="tab_configuration">Configuration</string>
+    <string name="tab_embedded_host">Render Host</string>
+    <string name="tab_result">Result</string>
+    <string name="tab_audit_log">Audit Log</string>
+    <string name="render_mode">Render mode</string>
+    <string name="challenge_size">Checkbox size</string>
+    <string name="challenge_size_normal">Normal</string>
+    <string name="challenge_size_invisible">Invisible</string>
+    <string name="challenge_size_compact">Compact</string>
+    <string name="render_mode_dialog">Dialog</string>
+    <string name="render_mode_headless">Headless</string>
+    <string name="render_mode_embedded">Embedded</string>
     <string name="reset">Reset</string>
     <string name="setup">Setup</string>
     <string name="verify">Verify</string>
@@ -12,7 +25,27 @@
     <string name="hit_test">Hit test</string>
     <string name="theme_dark">Dark Theme</string>
     <string name="user_journey">Journey</string>
-    <string name="copy_token">Copy</string>
+    <string name="phone_mode">Phone mode</string>
+    <string name="phone_mode_prefix">Use phone prefix</string>
+    <string name="phone_mode_number">Use full phone number</string>
+    <string name="phone_input">Phone input</string>
+    <string name="phone_prefix_hint">Country prefix (e.g. 44)</string>
+    <string name="phone_number_hint">Full phone number (e.g. +44123456789)</string>
+    <string name="rqdata_label">Request data (rqdata)</string>
+    <string name="rqdata_hint">Optional rqdata value</string>
+    <string name="embedded_showcase">Custom render host showcase</string>
+    <string name="embedded_host_open">Custom host: open</string>
+    <string name="embedded_host_closed">Custom host: closed</string>
+    <string name="embedded_host_loading">Custom host: loading...</string>
+    <string name="embedded_loading">Loading captcha...</string>
+    <string name="embedded_host_result_success">Status: Success. See Result tab for details.</string>
+    <string name="embedded_host_result_error">Status: Error. See Result tab for details.</string>
+    <string name="close">Close</string>
+    <string name="result">Result</string>
+    <string name="result_idle">Status: Idle</string>
+    <string name="audit_log">Audit log</string>
+    <string name="clear_log">Clear</string>
+    <string name="copy_token">Copy token</string>
     <string name="token_copied">Token copied to clipboard</string>
     <string name="no_token_to_copy">No token to copy</string>
 </resources>

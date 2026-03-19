@@ -22,6 +22,37 @@ env:
   JAVA_VERSION: '17'
 
 jobs:
+  changes:
+    name: 'Detect Changes'
+    runs-on: ubuntu-latest
+    outputs:
+      sdk_related: ${{ steps.filter.outputs.sdk_related }}
+      benchmark_related: ${{ steps.filter.outputs.benchmark_related }}
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            sdk_related:
+              - 'sdk/**'
+              - 'compose-sdk/**'
+              - 'gradle/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+              - 'gradle.properties'
+            benchmark_related:
+              - 'benchmark/**'
+              - 'sdk/**'
+              - 'test/**'
+              - 'gradle/**'
+              - 'build.gradle'
+              - 'settings.gradle'
+              - 'gradle.properties'
+
   test:
     name: 'Test Unit'
     runs-on: ubuntu-latest
@@ -38,18 +69,20 @@ jobs:
         with:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: 'Build'
-        run: ./gradlew build --stacktrace
+        run: ./gradlew :sdk:check :compose-sdk:check --stacktrace
+      - uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0
+        with:
+          node-version: 20
       - name: 'HTML ES5 test'
         run: |
-          npm install -g jshint
+          ./gradlew :sdk:compileReleaseJavaWithJavac --stacktrace
           java -cp sdk/build/intermediates/javac/release/compileReleaseJavaWithJavac/classes com.hcaptcha.sdk.HCaptchaHtml > sdk/build/hcaptcha-form.html
-          jshint --extract=always sdk/build/hcaptcha-form.html
+          npx -y jshint --extract=always sdk/build/hcaptcha-form.html
       - name: 'JitPack Test'
-        run: ./gradlew publishReleasePublicationToMavenLocal
+        run: ./gradlew publishReleasePublicationToMavenLocal --stacktrace
 
   build-matrix:
     name: 'Build (target:${{ matrix.target }} compile:${{ matrix.compile }} appcompat: ${{ matrix.appcompat }})'
-    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 15
     strategy:
@@ -86,9 +119,10 @@ jobs:
         with:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
       - run: |
-          ./gradlew build -PexampleCompileSdkVersion=${{ matrix.compile }} \
-                          -PexampleTargetSdkVersion=${{ matrix.target }} \
-                          -PexampleAppcompatVersion=${{ matrix.appcompat }}
+          ./gradlew :sdk:assemble :compose-sdk:assemble :example-app:assembleDebug :example-compose-app:assembleDebug \
+            -PexampleCompileSdkVersion=${{ matrix.compile }} \
+            -PexampleTargetSdkVersion=${{ matrix.target }} \
+            -PexampleAppcompatVersion=${{ matrix.appcompat }}
 
   test-ui:
     name: 'Test UI'
@@ -150,7 +184,9 @@ jobs:
 
   test-benchmark:
     name: 'Test Benchmark'
-    needs: test
+    needs: changes
+    if: ${{ needs.changes.outputs.benchmark_related == 'true' }}
+    continue-on-error: true
     runs-on: macos-15-intel
     timeout-minutes: 30
     permissions:
@@ -173,7 +209,7 @@ jobs:
         uses: ./.github/actions/android-emulator-run
         with:
           api-level: 29
-          fresh-avd: true
+          fresh-avd: false
           script: |
             adb uninstall com.hcaptcha.sdk.bench.test || true
             ./gradlew benchmark:connectedReleaseAndroidTest
@@ -216,8 +252,8 @@ jobs:
 
   size-report:
     name: 'Diffuse report'
-    needs: [ test ]
-    if: github.event_name == 'pull_request'
+    needs: [ changes ]
+    if: ${{ github.event_name == 'pull_request' && needs.changes.outputs.sdk_related == 'true' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
@@ -239,12 +275,12 @@ jobs:
           cache-read-only: ${{ github.event_name == 'pull_request' }}
       - name: 'Build'
         run: |
-          ./gradlew clean build --stacktrace
+          ./gradlew :sdk:assembleRelease --stacktrace
           cp sdk/build/outputs/aar/sdk-release.aar sdk-pr.aar
       - name: 'Build main'
         run: |
           git checkout origin/main
-          ./gradlew clean build --stacktrace
+          ./gradlew :sdk:assembleRelease --stacktrace --rerun-tasks
           cp sdk/build/outputs/aar/sdk-release.aar sdk-main.aar
       - id: diffuse
         uses: usefulness/diffuse-action@41995fe8ff6be0a8847e63bdc5a4679c704b455c
