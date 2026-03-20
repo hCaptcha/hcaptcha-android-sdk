@@ -78,6 +78,7 @@ public class HCaptchaJSInterfaceTest {
                 .tokenExpiration(timeout)
                 .diagnosticLog(true)
                 .disableHardwareAcceleration(false)
+                .userJourney(true)
                 .build();
         final HCaptchaJSInterface jsInterface = new HCaptchaJSInterface(handler, config, captchaVerifier);
 
@@ -102,6 +103,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("tokenExpiration", timeout);
         expected.put("diagnosticLog", true);
         expected.put("disableHardwareAcceleration", false);
+        expected.put("userJourney", true);
 
         JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
     }
@@ -145,6 +147,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("tokenExpiration", defaultTimeout);
         expected.put("diagnosticLog", false);
         expected.put("disableHardwareAcceleration", true);
+        expected.put("userJourney", false);
 
         JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
     }

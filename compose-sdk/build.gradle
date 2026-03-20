@@ -64,6 +64,7 @@ android {
 dependencies {
     api project(':sdk')
     implementation "androidx.compose.foundation:foundation:$compose_version"
+    testImplementation 'junit:junit:4.13.2'
 }
 
 project.afterEvaluate {
