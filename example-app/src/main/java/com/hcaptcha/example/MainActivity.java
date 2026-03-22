@@ -45,7 +45,8 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = MainActivity.class.getSimpleName();
-    private static final String SITEKEY = "10000000-ffff-ffff-ffff-000000000001";
+    private static final String SITEKEY_VISUAL = "00000000-0000-0000-0000-000000000000";
+    private static final String SITEKEY_PASSIVE = "10000000-ffff-ffff-ffff-000000000001";
     private static final int MAX_AUDIT_LOG_LINES = 100;
     private static final int TAB_CONFIGURATION = 0;
     private static final int TAB_CUSTOM = 1;
@@ -54,6 +55,9 @@ public class MainActivity extends AppCompatActivity {
 
     private RadioGroup modeGroup;
     private RadioGroup sizeGroup;
+    private RadioGroup sitekeyGroup;
+    private TextInputLayout sitekeyInputLayout;
+    private TextInputEditText sitekeyInput;
     private CheckBox loading;
     private CheckBox disableHardwareAccel;
     private CheckBox themeDark;
@@ -99,6 +103,9 @@ public class MainActivity extends AppCompatActivity {
 
         modeGroup = findViewById(R.id.challenge_mode_group);
         sizeGroup = findViewById(R.id.challenge_size_group);
+        sitekeyGroup = findViewById(R.id.sitekey_group);
+        sitekeyInputLayout = findViewById(R.id.sitekeyInputLayout);
+        sitekeyInput = findViewById(R.id.sitekeyInput);
         loading = findViewById(R.id.loading);
         disableHardwareAccel = findViewById(R.id.hwAccel);
         themeDark = findViewById(R.id.themeDark);
@@ -138,6 +145,11 @@ public class MainActivity extends AppCompatActivity {
             }
             updateLoadingControlForMode();
             updateCustomHostUiState();
+        });
+
+        sitekeyGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            sitekeyInputLayout.setVisibility(checkedId == R.id.sitekey_custom ? View.VISIBLE : View.GONE);
+            addAuditLog("Sitekey switched to " + sitekeyLabel(checkedId));
         });
 
         setPhoneModeUi(phoneModeSwitch.isChecked());
@@ -316,6 +328,28 @@ public class MainActivity extends AppCompatActivity {
         return HCaptchaSize.NORMAL;
     }
 
+    private String getSelectedSitekey() {
+        final int checkedId = sitekeyGroup.getCheckedRadioButtonId();
+        if (checkedId == R.id.sitekey_passive) {
+            return SITEKEY_PASSIVE;
+        }
+        if (checkedId == R.id.sitekey_custom) {
+            final String custom = sitekeyInput.getText() != null ? sitekeyInput.getText().toString().trim() : "";
+            return custom.isEmpty() ? SITEKEY_VISUAL : custom;
+        }
+        return SITEKEY_VISUAL;
+    }
+
+    private String sitekeyLabel(final int checkedId) {
+        if (checkedId == R.id.sitekey_passive) {
+            return "Passive";
+        }
+        if (checkedId == R.id.sitekey_custom) {
+            return "Custom";
+        }
+        return "Challenge";
+    }
+
     private HCaptcha getConfiguredClient() {
         final HCaptcha client = HCaptcha.getClient(this);
         client.setEmbeddedContainer(selectedMode == HCaptchaRenderMode.EMBEDDED ? embeddedChallengeContainer : null);
@@ -328,7 +362,7 @@ public class MainActivity extends AppCompatActivity {
                 : getSelectedSize();
         final boolean isDark = themeDark.isChecked();
         return HCaptchaConfig.builder()
-                .siteKey(SITEKEY)
+                .siteKey(getSelectedSitekey())
                 .size(size)
                 .renderMode(selectedMode)
                 .loading(selectedMode != HCaptchaRenderMode.EMBEDDED && loading.isChecked())

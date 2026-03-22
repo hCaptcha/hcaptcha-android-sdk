@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
@@ -36,6 +37,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
@@ -55,6 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,6 +76,12 @@ import java.util.Locale
 class ComposeActivity : ComponentActivity() {
     private enum class ResultState { Idle, Verifying, Success, Error, Setup, Reset, Destroyed }
     private enum class TopTab { Configuration, CustomHost, Result, AuditLog }
+    private enum class SitekeyOption { Visual, Passive, Custom }
+
+    companion object {
+        private const val SITEKEY_VISUAL = "00000000-0000-0000-0000-000000000000"
+        private const val SITEKEY_PASSIVE = "10000000-ffff-ffff-ffff-000000000001"
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -102,6 +111,8 @@ class ComposeActivity : ComponentActivity() {
                 var selectedTab by remember { mutableStateOf(TopTab.Configuration) }
                 var selectedMode by remember { mutableStateOf(HCaptchaRenderMode.DIALOG) }
                 var selectedSize by remember { mutableStateOf(HCaptchaSize.NORMAL) }
+                var selectedSitekeyOption by remember { mutableStateOf(SitekeyOption.Passive) }
+                var customSitekey by remember { mutableStateOf("") }
 
                 var loadingEnabled by remember { mutableStateOf(true) }
                 var webDebugEnabled by remember { mutableStateOf(false) }
@@ -150,6 +161,11 @@ class ComposeActivity : ComponentActivity() {
 
                 val loadingForConfig = if (selectedMode == HCaptchaRenderMode.EMBEDDED) false else loadingEnabled
                 val sizeForConfig = if (selectedMode == HCaptchaRenderMode.HEADLESS) HCaptchaSize.INVISIBLE else selectedSize
+                val activeSitekey = when (selectedSitekeyOption) {
+                    SitekeyOption.Visual -> SITEKEY_VISUAL
+                    SitekeyOption.Passive -> SITEKEY_PASSIVE
+                    SitekeyOption.Custom -> customSitekey.ifBlank { SITEKEY_VISUAL }
+                }
 
                 val config = remember(
                     selectedMode,
@@ -157,10 +173,11 @@ class ComposeActivity : ComponentActivity() {
                     loadingForConfig,
                     disableHwAccel,
                     darkTheme,
+                    activeSitekey,
                     captchaRenderKey
                 ) {
                     HCaptchaConfig.builder()
-                        .siteKey("10000000-ffff-ffff-ffff-000000000001")
+                        .siteKey(activeSitekey)
                         .size(sizeForConfig)
                         .renderMode(selectedMode)
                         .loading(loadingForConfig)
@@ -310,6 +327,39 @@ class ComposeActivity : ComponentActivity() {
                                             verticalArrangement = Arrangement.spacedBy(10.dp)
                                         ) {
                                             Text("Configuration", style = MaterialTheme.typography.titleMedium, color = hcTextPrimary)
+                                            Text("Sitekey", color = hcTextPrimary)
+                                            InlineRadioRow(
+                                                labels = listOf("Passive", "Challenge", "Custom"),
+                                                selectedIndex = when (selectedSitekeyOption) {
+                                                    SitekeyOption.Passive -> 0
+                                                    SitekeyOption.Visual -> 1
+                                                    SitekeyOption.Custom -> 2
+                                                },
+                                                onSelected = {
+                                                    selectedSitekeyOption = when (it) {
+                                                        1 -> SitekeyOption.Visual
+                                                        2 -> SitekeyOption.Custom
+                                                        else -> SitekeyOption.Passive
+                                                    }
+                                                    val label = when (selectedSitekeyOption) {
+                                                        SitekeyOption.Visual -> "Challenge"
+                                                        SitekeyOption.Passive -> "Passive"
+                                                        SitekeyOption.Custom -> "Custom"
+                                                    }
+                                                    addAudit("Sitekey switched to $label")
+                                                }
+                                            )
+                                            if (selectedSitekeyOption == SitekeyOption.Custom) {
+                                                OutlinedTextField(
+                                                    value = customSitekey,
+                                                    onValueChange = { customSitekey = it },
+                                                    label = { Text("Custom sitekey") },
+                                                    placeholder = { Text("xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx") },
+                                                    singleLine = true,
+                                                    modifier = Modifier.fillMaxWidth(),
+                                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Ascii)
+                                                )
+                                            }
                                             Text("Render mode", color = hcTextPrimary)
                                             InlineRadioRow(
                                                 labels = listOf("Dialog", "Headless", "Embedded"),

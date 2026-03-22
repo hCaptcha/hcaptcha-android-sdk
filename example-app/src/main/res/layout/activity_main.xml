@@ -53,6 +53,62 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
+                        android:text="@string/sitekey"
+                        android:textColor="@color/hc_text_primary" />
+
+                    <RadioGroup
+                        android:id="@+id/sitekey_group"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:orientation="horizontal">
+
+                        <RadioButton
+                            android:id="@+id/sitekey_passive"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:checked="true"
+                            android:text="@string/sitekey_passive" />
+
+                        <RadioButton
+                            android:id="@+id/sitekey_visual"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/sitekey_visual" />
+
+                        <RadioButton
+                            android:id="@+id/sitekey_custom"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="@string/sitekey_custom" />
+                    </RadioGroup>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/sitekeyInputLayout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:visibility="gone"
+                        app:boxBackgroundMode="outline"
+                        app:boxStrokeColor="@color/colorPrimary"
+                        app:hintTextColor="@color/hc_text_secondary"
+                        app:placeholderText="@string/sitekey_custom_hint">
+
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/sitekeyInput"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="text"
+                            android:textColor="@color/hc_text_primary" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
                         android:text="@string/render_mode"
                         android:textColor="@color/hc_text_primary" />
 
