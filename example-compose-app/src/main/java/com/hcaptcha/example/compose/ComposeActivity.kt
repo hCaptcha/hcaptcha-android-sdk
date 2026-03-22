@@ -21,7 +21,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Bolt
-import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Refresh
@@ -74,7 +73,7 @@ import java.util.Date
 import java.util.Locale
 
 class ComposeActivity : ComponentActivity() {
-    private enum class ResultState { Idle, Verifying, Success, Error, Setup, Reset, Destroyed }
+    private enum class ResultState { Idle, Verifying, Success, Error, Reset, Destroyed }
     private enum class TopTab { Configuration, CustomHost, Result, AuditLog }
     private enum class SitekeyOption { Visual, Passive, Custom }
 
@@ -125,7 +124,6 @@ class ComposeActivity : ComponentActivity() {
                 val auditLog = remember { mutableStateListOf<String>() }
 
                 var captchaVisible by remember { mutableStateOf(false) }
-                var setupArmed by remember { mutableStateOf(false) }
                 var captchaRenderKey by remember { mutableIntStateOf(0) }
                 var customWaitingForOpen by remember { mutableStateOf(false) }
                 var customStatusMessage by remember { mutableStateOf<String?>(null) }
@@ -153,7 +151,6 @@ class ComposeActivity : ComponentActivity() {
                 fun resetCaptcha() {
                     captchaVisible = false
                     captchaRenderKey += 1
-                    setupArmed = false
                     customWaitingForOpen = false
                     customStatusMessage = null
                     customStatusIsError = false
@@ -221,18 +218,6 @@ class ComposeActivity : ComponentActivity() {
                             NavigationBarItem(
                                 selected = false,
                                 onClick = {
-                                    setupArmed = true
-                                    resultState = ResultState.Setup
-                                    resultMessage = "setup armed"
-                                    addAudit("Setup armed")
-                                },
-                                icon = { Icon(Icons.Default.Build, contentDescription = null) },
-                                label = { Text("Setup") },
-                                colors = navItemColors
-                            )
-                            NavigationBarItem(
-                                selected = false,
-                                onClick = {
                                     resultState = ResultState.Verifying
                                     resultMessage = "verification started"
                                     lastToken = null
@@ -243,7 +228,7 @@ class ComposeActivity : ComponentActivity() {
                                         customStatusMessage = null
                                         customStatusIsError = false
                                     }
-                                    if (!setupArmed) addAudit("Verify without setup") else addAudit("Verify")
+                                    addAudit("Verify")
                                 },
                                 icon = { Icon(Icons.Default.CheckCircle, contentDescription = null) },
                                 label = { Text("Verify") },
@@ -429,7 +414,6 @@ class ComposeActivity : ComponentActivity() {
                                                     HCaptchaCompose(config = config) { response ->
                                                         when (response) {
                                                             is HCaptchaResponse.Success -> {
-                                                                setupArmed = false
                                                                 captchaVisible = false
                                                                 customWaitingForOpen = false
                                                                 customStatusMessage = "Success. See Result tab for details."
@@ -441,7 +425,6 @@ class ComposeActivity : ComponentActivity() {
                                                             }
 
                                                             is HCaptchaResponse.Failure -> {
-                                                                setupArmed = false
                                                                 captchaVisible = false
                                                                 customWaitingForOpen = false
                                                                 customStatusMessage = "Error. See Result tab for details."
@@ -584,7 +567,6 @@ class ComposeActivity : ComponentActivity() {
                     HCaptchaCompose(config = config) { response ->
                         when (response) {
                             is HCaptchaResponse.Success -> {
-                                setupArmed = false
                                 captchaVisible = false
                                 resultState = ResultState.Success
                                 lastToken = response.token
@@ -593,7 +575,6 @@ class ComposeActivity : ComponentActivity() {
                             }
 
                             is HCaptchaResponse.Failure -> {
-                                setupArmed = false
                                 captchaVisible = false
                                 resultState = ResultState.Error
                                 lastToken = null
