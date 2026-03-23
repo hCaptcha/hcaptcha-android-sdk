@@ -1,5 +1,11 @@
 # Changelog
 
+# 5.0.0
+
+- Feat: add opt-in User Journeys support via `HCaptchaConfig.userJourney` and `HCaptchaVerifyParams.userJourney` for sdk + compose-sdk.
+- Fix: preserve the hCaptcha logo when vector drawable support is enabled.
+- Fix: preserve the Compose dialog dimming behavior without regressing invisible/headless flows.
+
 # 4.5.0
 
 - Feat: add shared `HCaptchaConfig.renderMode` (`DIALOG`, `EMBEDDED`, `HEADLESS`) for sdk + compose-sdk.

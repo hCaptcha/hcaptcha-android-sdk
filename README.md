@@ -25,7 +25,7 @@ dependencies {
 }
 </pre>
 
-*Note: replace `x.y.z` with one from [Release](https://github.com/hCaptcha/hcaptcha-android-sdk/releases) (e.g. `1.0.0`).*
+*Note: replace `x.y.z` with one from [Release](https://github.com/hCaptcha/hcaptcha-android-sdk/releases) (e.g. `5.0.0`).*
 
 ### Legacy (versions < 5.0)
 
@@ -39,6 +39,29 @@ dependencies {
     <b>implementation 'com.github.hcaptcha:hcaptcha-android-sdk:x.y.z'</b>
 }
 </pre>
+
+### 5.0 Migration
+
+Most apps do not need code changes to adopt `5.0.0`.
+
+1. Update your dependency to the `5.x` coordinate shown above.
+2. If your app only uses `HCaptcha.getClient(...)`, no API migration is required.
+3. If your app implements `IHCaptcha` directly, you must add the new `stopEvents()` method.
+
+Example for custom `IHCaptcha` implementations:
+
+```java
+public final class CustomCaptchaClient implements IHCaptcha {
+    @Override
+    public void stopEvents() {
+        // Stop any user-journey/event collection owned by this client.
+    }
+
+    // ...existing IHCaptcha methods...
+}
+```
+
+The rest of the `5.0.0` surface is additive: `userJourney` support was added to `HCaptchaConfig` and `HCaptchaVerifyParams`, and Compose gained optional analytics helpers.
 
 ## Requirements
 
@@ -477,8 +500,8 @@ AnalyticsScreen("Checkout") {
 
 Notes:
 
-- Events start at `setup()` (including pre-warm) and continue until the same `HCaptcha` instance is reconfigured with `userJourney(false)`. `reset()` and `destroy()` stop tracking and clear the event buffer.
-- Only the most recent 50 events are kept; they are cleared after `verifyWithHCaptcha` starts.
+- Events start at `setup()` (including pre-warm) and continue until the same `HCaptcha` instance is reconfigured with `userJourney(false)` or you call `stopEvents()`. `reset()` and `destroy()` also stop tracking and clear the event buffer.
+- Only the most recent 50 events are kept. Buffered events are attached to verification requests and cleared after successful verification, `reset()`, `destroy()`, or `stopEvents()`.
 - Events include component identifiers, coordinates, and text-length deltas (never full text). This should avoid collecting any personal or sensitive data, but ensure your component IDs do not include any PII.
 - If you set `HCaptchaVerifyParams.userJourney` manually while `userJourney` is enabled, the SDK may overwrite it with captured events.
 - Use `stopEvents()` if you need to unregister the user-journey sink, for example before reusing a client without analytics.
