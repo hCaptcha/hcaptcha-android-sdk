@@ -122,4 +122,9 @@ public interface IHCaptcha {
      * Use this in Activity/Fragment teardown to prevent retaining the host context.
      */
     void destroy();
+
+    /**
+     * Stop user journey event tracking for this client instance.
+     */
+    void stopEvents();
 }

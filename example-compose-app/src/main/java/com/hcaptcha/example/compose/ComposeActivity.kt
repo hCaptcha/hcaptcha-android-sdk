@@ -67,6 +67,7 @@ import com.hcaptcha.sdk.HCaptchaEvent
 import com.hcaptcha.sdk.HCaptchaRenderMode
 import com.hcaptcha.sdk.HCaptchaResponse
 import com.hcaptcha.sdk.HCaptchaSize
+import com.hcaptcha.sdk.journeylitics.AnalyticsScreen
 import com.hcaptcha.sdk.HCaptchaTheme
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -86,15 +87,16 @@ class ComposeActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
         setContent {
-            val compactTypography = Typography(
-                bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp),
-                bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
-                titleMedium = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp),
-                labelMedium = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp)
-            )
-            MaterialTheme(typography = compactTypography) {
-                val context = LocalContext.current
-                val formatter = remember { SimpleDateFormat("HH:mm:ss", Locale.US) }
+            AnalyticsScreen("ComposeActivity") {
+                val compactTypography = Typography(
+                    bodyLarge = MaterialTheme.typography.bodyLarge.copy(fontSize = 13.sp),
+                    bodyMedium = MaterialTheme.typography.bodyMedium.copy(fontSize = 12.sp),
+                    titleMedium = MaterialTheme.typography.titleMedium.copy(fontSize = 15.sp),
+                    labelMedium = MaterialTheme.typography.labelMedium.copy(fontSize = 11.sp)
+                )
+                MaterialTheme(typography = compactTypography) {
+                    val context = LocalContext.current
+                    val formatter = remember { SimpleDateFormat("HH:mm:ss", Locale.US) }
 
                 val hcBgApp = Color(0xFF211238)
                 val hcSurface = Color(0xFFFFFFFF)
@@ -117,6 +119,7 @@ class ComposeActivity : ComponentActivity() {
                 var webDebugEnabled by remember { mutableStateOf(false) }
                 var disableHwAccel by remember { mutableStateOf(true) }
                 var darkTheme by remember { mutableStateOf(false) }
+                var userJourney by remember { mutableStateOf(false) }
 
                 var resultState by remember { mutableStateOf(ResultState.Idle) }
                 var resultMessage by remember { mutableStateOf("-") }
@@ -171,6 +174,7 @@ class ComposeActivity : ComponentActivity() {
                     disableHwAccel,
                     darkTheme,
                     activeSitekey,
+                    userJourney,
                     captchaRenderKey
                 ) {
                     HCaptchaConfig.builder()
@@ -180,6 +184,7 @@ class ComposeActivity : ComponentActivity() {
                         .loading(loadingForConfig)
                         .disableHardwareAcceleration(disableHwAccel)
                         .theme(if (darkTheme) HCaptchaTheme.DARK else HCaptchaTheme.LIGHT)
+                        .userJourney(userJourney)
                         .tokenExpiration(120)
                         .diagnosticLog(true)
                         .build()
@@ -388,6 +393,7 @@ class ComposeActivity : ComponentActivity() {
                                             LabeledCheckbox("Web Debug", webDebugEnabled) { webDebugEnabled = it }
                                             LabeledCheckbox("Disable HW Accel", disableHwAccel) { disableHwAccel = it }
                                             LabeledCheckbox("Dark Theme", darkTheme) { darkTheme = it }
+                                            LabeledCheckbox("User Journey", userJourney) { userJourney = it }
                                         }
                                     }
                                 }
@@ -562,7 +568,6 @@ class ComposeActivity : ComponentActivity() {
                         }
                     }
                 }
-
                 if (captchaVisible && selectedMode != HCaptchaRenderMode.EMBEDDED) {
                     HCaptchaCompose(config = config) { response ->
                         when (response) {
@@ -589,6 +594,7 @@ class ComposeActivity : ComponentActivity() {
                             }
                         }
                     }
+                }
                 }
             }
         }

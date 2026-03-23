@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private CheckBox loading;
     private CheckBox disableHardwareAccel;
     private CheckBox themeDark;
+    private CheckBox userJourney;
     private CheckBox webViewDebug;
     private TextInputLayout phoneInputLayout;
     private TextInputEditText phonePrefixInput;
@@ -84,7 +85,6 @@ public class MainActivity extends AppCompatActivity {
     private TabLayout topTabs;
     private int selectedTab = TAB_CONFIGURATION;
     private final List<Integer> visibleTopTabs = new ArrayList<>();
-
     private HCaptcha hCaptcha;
     private HCaptchaTokenResponse tokenResponse;
     private String lastToken;
@@ -109,6 +109,7 @@ public class MainActivity extends AppCompatActivity {
         loading = findViewById(R.id.loading);
         disableHardwareAccel = findViewById(R.id.hwAccel);
         themeDark = findViewById(R.id.themeDark);
+        userJourney = findViewById(R.id.userJourney);
         webViewDebug = findViewById(R.id.webViewDebug);
         phoneInputLayout = findViewById(R.id.phoneInputLayout);
         phonePrefixInput = findViewById(R.id.phonePrefix);
@@ -369,6 +370,7 @@ public class MainActivity extends AppCompatActivity {
                 .disableHardwareAcceleration(disableHardwareAccel.isChecked())
                 .theme(isDark ? HCaptchaTheme.DARK : HCaptchaTheme.LIGHT)
                 .tokenExpiration(120)
+                .userJourney(userJourney.isChecked())
                 .diagnosticLog(true)
                 .retryPredicate((config, exception) -> exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT)
                 .build();

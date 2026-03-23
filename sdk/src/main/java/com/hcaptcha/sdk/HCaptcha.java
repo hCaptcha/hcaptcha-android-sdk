@@ -10,8 +10,15 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.FragmentActivity;
 
+import com.hcaptcha.sdk.journeylitics.InMemorySink;
+import com.hcaptcha.sdk.journeylitics.JLConfig;
+import com.hcaptcha.sdk.journeylitics.JLEvent;
+import com.hcaptcha.sdk.journeylitics.Journeylitics;
 import com.hcaptcha.sdk.tasks.Task;
 
+import java.util.List;
+
+@SuppressWarnings("PMD.GodClass")
 public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCaptcha {
     public static final String META_SITE_KEY = "com.hcaptcha.sdk.site-key";
 
@@ -29,6 +36,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @NonNull
     private final HCaptchaInternalConfig internalConfig;
+
+    @Nullable
+    private InMemorySink journeySink;
 
     private HCaptcha(@NonNull final Activity activity, @NonNull final HCaptchaInternalConfig internalConfig) {
         this.activity = activity;
@@ -94,6 +104,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             @Override
             void onSuccess(final String token) {
                 HCaptchaLog.d("HCaptcha.onSuccess");
+                if (journeySink != null) {
+                    journeySink.clearEvents();
+                }
                 scheduleCaptchaExpired(inputConfig.getTokenExpiration());
                 setResult(new HCaptchaTokenResponse(token, HCaptcha.this.handler));
             }
@@ -105,6 +118,24 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
         };
         try {
+            // Initialize or disable user journey tracking if enabled/disabled.
+            if (Boolean.TRUE.equals(inputConfig.getUserJourney())) {
+                if (journeySink == null) {
+                    journeySink = new InMemorySink();
+                }
+                if (Journeylitics.isStarted()) {
+                    Journeylitics.addSink(journeySink);
+                } else {
+                    final JLConfig jlConfig = new JLConfig(journeySink);
+                    Journeylitics.start(activity, jlConfig);
+                }
+            } else if (journeySink != null) {
+                if (Journeylitics.isStarted()) {
+                    Journeylitics.removeSink(journeySink);
+                }
+                journeySink = null;
+            }
+
             final boolean headlessMode = inputConfig.isHeadlessMode();
             if (Boolean.TRUE.equals(inputConfig.getHideDialog())) {
                 HCaptchaLog.w("Config.hideDialog is deprecated. Use renderMode=HEADLESS instead.");
@@ -209,6 +240,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             captchaVerifier.reset();
             captchaVerifier = null;
         }
+        stopEvents();
     }
 
     @Override
@@ -216,6 +248,18 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier != null) {
             captchaVerifier.destroy();
             captchaVerifier = null;
+        }
+        stopEvents();
+    }
+
+    @Override
+    public void stopEvents() {
+        if (journeySink != null) {
+            if (Journeylitics.isStarted()) {
+                Journeylitics.removeSink(journeySink);
+            }
+            journeySink.clearEvents();
+            journeySink = null;
         }
     }
 
@@ -230,7 +274,22 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         if (captchaVerifier == null) {
             setException(new HCaptchaException(HCaptchaError.ERROR));
         } else {
-            captchaVerifier.startVerification(activity, verifyParams);
+            HCaptchaVerifyParams finalParams = verifyParams;
+            if (journeySink != null) {
+                final List<JLEvent> events = journeySink.getEvents();
+                if (!events.isEmpty()) {
+                    if (finalParams == null) {
+                        finalParams = HCaptchaVerifyParams.builder()
+                                .userJourney(events)
+                                .build();
+                    } else {
+                        finalParams = finalParams.toBuilder()
+                                .userJourney(events)
+                                .build();
+                    }
+                }
+            }
+            captchaVerifier.startVerification(activity, finalParams);
         }
         return this;
     }
