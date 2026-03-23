@@ -30,6 +30,11 @@
     <string name="phone_input">Phone input</string>
     <string name="phone_prefix_hint">Country prefix (e.g. 44)</string>
     <string name="phone_number_hint">Full phone number (e.g. +44123456789)</string>
+    <string name="sitekey">Sitekey</string>
+    <string name="sitekey_visual">Challenge</string>
+    <string name="sitekey_passive">Passive</string>
+    <string name="sitekey_custom">Custom</string>
+    <string name="sitekey_custom_hint">xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx</string>
     <string name="rqdata_label">Request data (rqdata)</string>
     <string name="rqdata_hint">Optional rqdata value</string>
     <string name="embedded_showcase">Custom render host showcase</string>

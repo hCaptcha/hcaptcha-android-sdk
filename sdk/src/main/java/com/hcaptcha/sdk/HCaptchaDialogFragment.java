@@ -196,6 +196,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void onDestroy() {
         HCaptchaLog.d("DialogFragment.onDestroy");
         super.onDestroy();
+        readyForInteraction = false;
         if (webViewHelper != null) {
             webViewHelper.reset();
         }
@@ -210,11 +211,14 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             final Window window = dialog.getWindow();
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
             defaultDimAmount = window.getAttributes().dimAmount;
-            if (Boolean.FALSE.equals(webViewHelper.getConfig().getLoading())) {
-                // Remove dialog shadow to appear completely invisible
+            if (!readyForInteraction && Boolean.FALSE.equals(webViewHelper.getConfig().getLoading())) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
                 window.setDimAmount(0);
             }
+        }
+        if (!readyForInteraction && webViewHelper != null) {
+            HCaptchaLog.d("DialogFragment.onStart: re-triggering onLoaded after reset");
+            onLoaded();
         }
     }
 
