@@ -1,5 +1,9 @@
 # Changelog
 
+# 5.0.1
+
+- Fix: skip the verify-params bridge call when no verification parameters are provided.
+
 # 5.0.0
 
 - Feat: add opt-in User Journeys support via `HCaptchaConfig.userJourney` and `HCaptchaVerifyParams.userJourney` for sdk + compose-sdk.
