@@ -2,6 +2,7 @@ package com.hcaptcha.sdk;
 
 import static com.hcaptcha.sdk.AssertUtil.failAsNonReachable;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
@@ -135,11 +136,8 @@ public class HCaptchaWebViewHelperTest {
             helper.setVerifyParams(null);
         });
 
-        // Wait for and get the parsed JSON
-        HCaptchaVerifyParams receivedParams = testObject.waitForSetData();
-
-        // Verify null case is handled correctly
-        assertEquals("Should return empty verify params for null parameters", new HCaptchaVerifyParams(), receivedParams);
+        // Verify null case does not call hcaptcha.setData with an empty object.
+        testObject.assertSetDataNotCalled();
     }
 
     @Test
@@ -286,6 +284,11 @@ public class HCaptchaWebViewHelperTest {
             assertTrue("setData should be called within timeout",
                 setDataLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
             return receivedParams;
+        }
+
+        public void assertSetDataNotCalled() throws InterruptedException {
+            assertFalse("setData should not be called for empty verify params",
+                    setDataLatch.await(500, TimeUnit.MILLISECONDS));
         }
     }
 }

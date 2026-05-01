@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -105,5 +106,50 @@ public class HCaptchaWebViewHelperTest {
         when(config.getBaseUrl()).thenReturn(host);
         new HCaptchaWebViewHelper(handler, context, config, internalConfig, captchaVerifier, webView);
         verify(webView).loadDataWithBaseURL(host, MOCK_HTML, "text/html", "UTF-8", null);
+    }
+
+    @Test
+    public void test_set_verify_params_with_null_does_not_call_set_data() {
+        final HCaptchaWebViewHelper webViewHelper = new HCaptchaWebViewHelper(handler, context, config,
+                internalConfig, captchaVerifier, webView);
+
+        webViewHelper.setVerifyParams(null);
+
+        verify(webView, never()).loadUrl(anyString());
+    }
+
+    @Test
+    public void test_set_verify_params_with_empty_params_does_not_call_set_data() {
+        final HCaptchaWebViewHelper webViewHelper = new HCaptchaWebViewHelper(handler, context, config,
+                internalConfig, captchaVerifier, webView);
+
+        webViewHelper.setVerifyParams(HCaptchaVerifyParams.builder().build());
+
+        verify(webView, never()).loadUrl(anyString());
+    }
+
+    @Test
+    public void test_set_verify_params_with_null_uses_config_rqdata() {
+        final String rqdata = "test-rqdata-from-config";
+        when(config.getRqdata()).thenReturn(rqdata);
+        final HCaptchaWebViewHelper webViewHelper = new HCaptchaWebViewHelper(handler, context, config,
+                internalConfig, captchaVerifier, webView);
+
+        webViewHelper.setVerifyParams(null);
+
+        verify(webView).loadUrl("javascript:setData({\"rqdata\":\"" + rqdata + "\"});");
+    }
+
+    @Test
+    public void test_set_verify_params_with_user_journey_calls_set_data() {
+        final HCaptchaVerifyParams params = HCaptchaVerifyParams.builder()
+                .userJourney("test-user-journey")
+                .build();
+        final HCaptchaWebViewHelper webViewHelper = new HCaptchaWebViewHelper(handler, context, config,
+                internalConfig, captchaVerifier, webView);
+
+        webViewHelper.setVerifyParams(params);
+
+        verify(webView).loadUrl("javascript:setData({\"userjourney\":\"test-user-journey\"});");
     }
 }
