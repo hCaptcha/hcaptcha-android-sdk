@@ -119,6 +119,10 @@ final class HCaptchaWebViewHelper {
             }
         }
 
+        if (verifyParams.equals(new HCaptchaVerifyParams())) {
+            return;
+        }
+
         try {
             final ObjectMapper objectMapper = new ObjectMapper();
             final String data = objectMapper.writeValueAsString(verifyParams);
