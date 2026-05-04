@@ -3,6 +3,7 @@ package com.hcaptcha.sdk;
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
@@ -14,8 +15,8 @@ import static androidx.test.espresso.web.sugar.Web.onWebView;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.clearElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.findElement;
 import static androidx.test.espresso.web.webdriver.DriverAtoms.webClick;
-import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
+import static com.hcaptcha.sdk.AssertUtil.evaluateJavascript;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewErrorByInput;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static com.hcaptcha.sdk.AssertUtil.waitToBeDisplayed;
@@ -157,11 +158,17 @@ public class HCaptchaDialogFragmentTest {
 
     @Test
     public void loaderVisible() {
-        launchInContainer();
+        launchInContainer(
+                config,
+                internalConfig.toBuilder()
+                        .htmlProvider(new HCaptchaTestHtml(false))
+                        .build(),
+                new HCaptchaStateTestAdapter());
         onView(withId(R.id.loadingContainer)).perform(waitToBeDisplayed());
         onView(withId(R.id.loadingContainer)).check(matches(isDisplayed()));
         onView(withId(R.id.loadingContainer)).check(matches(withBackgroundColor(android.graphics.Color.WHITE)));
         onView(withId(R.id.webView)).perform(waitToBeDisplayed());
+        onView(withId(R.id.webView)).perform(evaluateJavascript("onHcaptchaLoaded()"));
         final long waitToDisappearMs = 10000;
         onView(withId(R.id.loadingContainer)).perform(waitToDisappear(waitToDisappearMs));
     }
@@ -470,6 +477,39 @@ public class HCaptchaDialogFragmentTest {
                         0 /* NO_META */);
                 assertTrue(dialog.dispatchTouchEvent(keyEvent));
             });
+        }
+    }
+
+    @Test
+    public void testInvisibleDialogDoesNotExecuteBeforeBridgeLoaded() throws InterruptedException {
+        final CountDownLatch loadedLatch = new CountDownLatch(1);
+        final CountDownLatch failureLatch = new CountDownLatch(1);
+        final HCaptchaStateListener listener = new HCaptchaStateTestAdapter() {
+            @Override
+            void onLoaded() {
+                loadedLatch.countDown();
+            }
+
+            @Override
+            void onFailure(HCaptchaException exception) {
+                failureLatch.countDown();
+            }
+        };
+
+        try (FragmentScenario<HCaptchaDialogFragment> scenario = launch(
+                config.toBuilder()
+                        .size(HCaptchaSize.INVISIBLE)
+                        .hideDialog(false)
+                        .build(),
+                internalConfig.toBuilder()
+                        .htmlProvider(new HCaptchaTestHtml(false, true))
+                        .build(),
+                listener)) {
+            assertFalse(loadedLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+            assertFalse(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+            onView(withId(R.id.webView)).perform(evaluateJavascript("onHcaptchaLoaded()"));
+            assertTrue(loadedLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+            assertTrue(failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
         }
     }
 

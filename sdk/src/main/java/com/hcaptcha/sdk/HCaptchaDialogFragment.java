@@ -67,6 +67,10 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     private boolean readyForInteraction = false;
 
+    private boolean webViewLoaded = false;
+
+    private boolean replayLoadedOnStart = false;
+
     @Nullable
     private static HCaptchaWebView sPreloadWebView;
 
@@ -197,6 +201,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         HCaptchaLog.d("DialogFragment.onDestroy");
         super.onDestroy();
         readyForInteraction = false;
+        replayLoadedOnStart = webViewLoaded;
         if (webViewHelper != null) {
             webViewHelper.reset();
         }
@@ -216,7 +221,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
                 window.setDimAmount(0);
             }
         }
-        if (!readyForInteraction && webViewHelper != null) {
+        if (!readyForInteraction && webViewHelper != null && replayLoadedOnStart) {
+            replayLoadedOnStart = false;
             HCaptchaLog.d("DialogFragment.onStart: re-triggering onLoaded after reset");
             onLoaded();
         }
@@ -258,6 +264,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             HCaptchaLog.w("DialogFragment.onLoaded webViewHelper == null, likely about to destroy");
             return;
         }
+        webViewLoaded = true;
         if (listener != null) {
             listener.onLoaded();
         }
@@ -371,6 +378,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (webViewHelper != null) {
             webViewHelper.reset();
         }
+        webViewLoaded = false;
+        replayLoadedOnStart = false;
         if (isAdded()) {
             dismissAllowingStateLoss();
         }

@@ -1,5 +1,6 @@
 package com.hcaptcha.sdk;
 
+import static androidx.test.platform.app.InstrumentationRegistry.getInstrumentation;
 import static com.hcaptcha.sdk.AssertUtil.waitHCaptchaWebViewToken;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -20,6 +21,7 @@ import org.junit.Test;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HCaptchaTest {
     private static final long AWAIT_CALLBACK_MS = 5000;
@@ -124,6 +126,41 @@ public class HCaptchaTest {
                 .addOnFailureListener(exception -> fail("No errors expected")));
 
         assertTrue(latch.await(E2E_AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+    }
+
+    @Test
+    public void dialogVerifierReplaysLoadedAfterReset() throws Exception {
+        final CountDownLatch firstSuccessLatch = new CountDownLatch(1);
+        final CountDownLatch secondFailureLatch = new CountDownLatch(1);
+        final AtomicReference<HCaptcha> hCaptchaRef = new AtomicReference<>();
+
+        final HCaptchaInternalConfig resetAwareInternalConfig = internalConfig.toBuilder()
+                .htmlProvider(new HCaptchaTestHtml(true, false, true))
+                .build();
+        final HCaptchaConfig dialogConfig = config.toBuilder().hideDialog(false).build();
+
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            final HCaptcha hCaptcha = HCaptcha.getClient(activity, resetAwareInternalConfig);
+            hCaptchaRef.set(hCaptcha);
+            hCaptcha.verifyWithHCaptcha(dialogConfig)
+                    .addOnSuccessListener(response -> firstSuccessLatch.countDown())
+                    .addOnFailureListener(exception -> {
+                        if (firstSuccessLatch.getCount() == 0
+                                && exception.getHCaptchaError() == HCaptchaError.ERROR) {
+                            secondFailureLatch.countDown();
+                        } else {
+                            fail("Unexpected failure: " + exception.getHCaptchaError());
+                        }
+                    });
+        });
+
+        waitHCaptchaWebViewToken(firstSuccessLatch, AWAIT_CALLBACK_MS);
+        getInstrumentation().waitForIdleSync();
+
+        scenario.onActivity(activity -> hCaptchaRef.get().verifyWithHCaptcha(dialogConfig));
+
+        assertTrue(secondFailureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
     }
 
     @Test(expected = IllegalStateException.class)

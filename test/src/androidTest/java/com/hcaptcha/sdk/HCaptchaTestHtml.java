@@ -5,13 +5,25 @@ import androidx.annotation.NonNull;
 class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
 
     private final boolean callBridgeOnLoaded;
+    private final boolean failOnExecute;
+    private final boolean failOnExecuteAfterReset;
 
     HCaptchaTestHtml() {
         this(true);
     }
 
     HCaptchaTestHtml(boolean callBridgeOnLoaded) {
+        this(callBridgeOnLoaded, false);
+    }
+
+    HCaptchaTestHtml(boolean callBridgeOnLoaded, boolean failOnExecute) {
+        this(callBridgeOnLoaded, failOnExecute, false);
+    }
+
+    HCaptchaTestHtml(boolean callBridgeOnLoaded, boolean failOnExecute, boolean failOnExecuteAfterReset) {
         this.callBridgeOnLoaded = callBridgeOnLoaded;
+        this.failOnExecute = failOnExecute;
+        this.failOnExecuteAfterReset = failOnExecuteAfterReset;
     }
 
     @Override
@@ -40,6 +52,7 @@ class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
                 + "        console.assert(typeof window.JSDI.getSysDebug() === 'object');\n"
                 + "        var BridgeObject = window.JSInterface;\n"
                 + "        var bridgeConfig = JSON.parse(BridgeObject.getConfig());\n"
+                + "        var resetCount = 0;\n"
                 + "        function onHcaptchaLoaded() {\n"
                 + "            try {\n"
                 + "                BridgeObject.onLoaded();\n"
@@ -64,9 +77,13 @@ class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
                 + "            TestObject.setData(JSON.stringify(arg));\n"
                 + "        }\n"
                 + "        function reset() {\n"
+                + "            resetCount += 1;\n"
                 + "            document.getElementById(\"input-text\").value = \"reset\";\n"
                 + "        }\n"
                 + "        function execute() {\n"
+                + (failOnExecute ? "            BridgeObject.onError(29);\n" : "")
+                + (failOnExecuteAfterReset
+                        ? "            if (resetCount > 1) { BridgeObject.onError(29); }\n" : "")
                 + "        }\n"
                 + (callBridgeOnLoaded ? "onHcaptchaLoaded();\n" : "")
                 + "    </script>\n"
