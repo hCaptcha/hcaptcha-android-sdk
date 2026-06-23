@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.ConsoleMessage;
+import android.webkit.PermissionRequest;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -79,6 +80,10 @@ final class HCaptchaWebViewHelper {
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
         settings.setSupportMultipleWindows(true);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            // Allow media playback to start without a user gesture.
+            settings.setMediaPlaybackRequiresUserGesture(false);
+        }
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             webView.setWebViewClient(new HCaptchaWebClient(handler));
         }
@@ -259,6 +264,30 @@ final class HCaptchaWebViewHelper {
         @Override
         public void onProgressChanged(WebView view, int newProgress) {
             HCaptchaLog.d("[webview] onProgressChanged %d%%", newProgress);
+        }
+
+        @Override
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
+        public void onPermissionRequest(final PermissionRequest request) {
+            // Grant only the requested capture resource; audio is never requested, which
+            // avoids forcing host apps to declare RECORD_AUDIO.
+            boolean wantsCapture = false;
+            for (final String resource : request.getResources()) {
+                if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
+                    wantsCapture = true;
+                    break;
+                }
+            }
+            if (wantsCapture) {
+                // The requested surface only composites on a hardware layer; the default
+                // software layer (disableHardwareAcceleration) would render it blank.
+                webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+                request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+                HCaptchaLog.d("[webview] onPermissionRequest granted");
+            } else {
+                request.deny();
+                HCaptchaLog.d("[webview] onPermissionRequest denied");
+            }
         }
     }
 }

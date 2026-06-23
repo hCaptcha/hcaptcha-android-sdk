@@ -1,5 +1,7 @@
 package com.hcaptcha.example.compose
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.webkit.WebView
 import android.widget.Toast
@@ -60,6 +62,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.hcaptcha.sdk.HCaptchaCompose
 import com.hcaptcha.sdk.HCaptchaConfig
 import com.hcaptcha.sdk.HCaptchaError
@@ -86,6 +90,12 @@ class ComposeActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         actionBar?.hide()
+
+        // Ensure the WebView's required runtime permission is granted.
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.CAMERA), 0)
+        }
         setContent {
             AnalyticsScreen("ComposeActivity") {
                 val compactTypography = Typography(

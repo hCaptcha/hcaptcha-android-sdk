@@ -468,6 +468,16 @@ The `retryPredicate` is part of `HCaptchaConfig` that may get persist during app
 So pay attention to this aspect and make sure that `retryPredicate` is serializable to avoid
 `android.os.BadParcelableException` in run-time.
 
+### Camera Permission
+
+Challenges that use the camera require the host app to declare and request the `CAMERA` permission at runtime (Android 6.0+):
+
+```xml
+<uses-permission android:name="android.permission.CAMERA" />
+```
+
+Requires Android 5.0+ (API 21).
+
 ### User Journeys (Enterprise)
 
 You can optionally enable user journeys to send recent interaction events alongside your verification request.
