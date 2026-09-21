@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -28,6 +29,9 @@ import lombok.Getter;
 import lombok.NonNull;
 
 final class HCaptchaWebViewHelper {
+    private static final String SMSTO_SCHEME = "smsto:";
+    private static final String SMS_BODY_EXTRA = "sms_body";
+
     @NonNull
     private final Context context;
 
@@ -163,6 +167,79 @@ final class HCaptchaWebViewHelper {
         return config.getRetryPredicate().shouldRetry(config, exception);
     }
 
+    /**
+     * Hands an {@code sms:} link from the MFA "inbound SMS" challenge over to the user's
+     * messaging app, pre-filled with the hCaptcha number and the one-time code.
+     *
+     * <p>Android has no in-app composer that reports back whether the message was sent
+     * ({@code SmsManager} needs {@code SEND_SMS}, which Google Play restricts to default SMS
+     * handlers), so the hand-off is unavoidable. What it can do is keep the challenge reachable:
+     * the messaging app is started inside the host app's task, so {@code back} returns straight
+     * to the still-open challenge and its Confirm button.
+     *
+     * @param url the URL the WebView tried to navigate to, or opened in a new window
+     * @return true when the link was an SMS link and the navigation should be cancelled
+     */
+    private boolean openSmsComposer(@Nullable final String url) {
+        final HCaptchaSmsLink link = HCaptchaSmsLink.parse(url);
+        if (link == null) {
+            return false;
+        }
+
+        final String recipient = link.getRecipient();
+        final String body = link.getBody();
+        // The recipient and the body are kept out of the log on purpose: the body carries the
+        // one-time verification code.
+        HCaptchaLog.d("[webview] sms link intercepted, recipient: %b body: %b",
+                recipient != null, body != null);
+
+        if (recipient != null && startActivitySafely(smsComposerIntent(recipient, body))) {
+            return true;
+        }
+
+        // Messaging apps that only understand the raw link with its `?body=` query.
+        if (startActivitySafely(new Intent(Intent.ACTION_VIEW, Uri.parse(url)))) {
+            return true;
+        }
+
+        captchaVerifier.onFailure(new HCaptchaException(
+                HCaptchaError.INTERNAL_ERROR, "Messaging app cannot be launched"));
+        return true;
+    }
+
+    /**
+     * Builds the documented pre-filled compose intent: {@code ACTION_SENDTO} on a {@code smsto:}
+     * URI, with the message in the {@code sms_body} extra. The body is passed through byte-exact
+     * because the backend matches the code against the message it receives.
+     */
+    private Intent smsComposerIntent(@NonNull final String recipient, @Nullable final String body) {
+        final Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse(SMSTO_SCHEME + recipient));
+        if (body != null) {
+            intent.putExtra(SMS_BODY_EXTRA, body);
+            // AOSP Messaging and several OEM clients read EXTRA_TEXT instead.
+            intent.putExtra(Intent.EXTRA_TEXT, body);
+        }
+        return intent;
+    }
+
+    private boolean startActivitySafely(@NonNull final Intent intent) {
+        // FLAG_ACTIVITY_NEW_TASK puts the messaging app in a task of its own, so `back` from it
+        // lands on the launcher rather than on the challenge. It is only needed when there is no
+        // Activity to start from; every SDK render mode passes one.
+        if (!(context instanceof Activity)) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        }
+
+        try {
+            context.startActivity(intent);
+            HCaptchaLog.d("[webview] messaging app launched via %s", intent.getAction());
+            return true;
+        } catch (Exception e) {
+            HCaptchaLog.w("[webview] messaging app launch failed: " + e.getMessage());
+            return false;
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private class HCaptchaWebClient extends WebViewClient {
 
@@ -179,22 +256,7 @@ final class HCaptchaWebViewHelper {
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
-            final String url = request.getUrl().toString();
-
-            if (url.startsWith("sms:")) {
-                try {
-                    final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    context.startActivity(intent);
-                    HCaptchaLog.d("[webview] messaging app launched");
-                } catch (Exception e) {
-                    HCaptchaLog.w("[webview] messaging app launch failed: " + e.getMessage());
-                    captchaVerifier.onFailure(new HCaptchaException(
-                            HCaptchaError.INTERNAL_ERROR, "Messaging app cannot be launched"));
-                }
-                return true;
-            }
-            return false;
+            return openSmsComposer(request.getUrl().toString());
         }
 
         @Override
@@ -241,6 +303,11 @@ final class HCaptchaWebViewHelper {
                 try {
                     final WebView.HitTestResult result = view.getHitTestResult();
                     if (result.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE) {
+                        // The MFA challenge opens its `sms:` link in a new window, so this is
+                        // the path the live flow takes - not shouldOverrideUrlLoading.
+                        if (openSmsComposer(result.getExtra())) {
+                            return true;
+                        }
                         final Uri url = Uri.parse(result.getExtra());
                         final Intent intent = new Intent(Intent.ACTION_VIEW, url);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

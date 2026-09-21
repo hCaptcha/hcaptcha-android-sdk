@@ -1,5 +1,9 @@
 # Changelog
 
+# 5.2.0
+
+- Improvement: in the MFA "inbound SMS" challenge the `sms:` link is now parsed (RFC 5724) and handed to the messaging app as a pre-filled `ACTION_SENDTO` compose intent on a `smsto:` URI, including the links the challenge opens with `target="_blank"`. This removes the app chooser, since `smsto:` is not claimed by non-SMS apps, and keeps the one-time code out of logcat. `FLAG_ACTIVITY_NEW_TASK` is no longer set when an Activity context is available, though messaging apps whose compose activity is `singleTask` (Google Messages among them) still open in a task of their own.
+
 # 5.0.1
 
 - Fix: skip the verify-params bridge call when no verification parameters are provided.

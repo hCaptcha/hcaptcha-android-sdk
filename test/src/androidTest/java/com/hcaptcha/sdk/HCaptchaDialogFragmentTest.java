@@ -7,6 +7,8 @@ import static androidx.test.espresso.intent.Intents.intended;
 import static androidx.test.espresso.intent.Intents.intending;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasAction;
 import static androidx.test.espresso.intent.matcher.IntentMatchers.hasData;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasExtra;
+import static androidx.test.espresso.intent.matcher.IntentMatchers.hasFlag;
 import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static androidx.test.espresso.web.assertion.WebViewAssertions.webMatches;
@@ -78,6 +80,11 @@ import java.util.concurrent.TimeUnit;
 public class HCaptchaDialogFragmentTest {
     private static final long AWAIT_CALLBACK_MS = 1000;
     private static final String TEST_TOKEN = "test-token";
+    private static final String SMS_BODY_EXTRA = "sms_body";
+    private static final String SMS_BODY = "Return to the app and press Confirm after sending "
+            + "this message. Do not edit or share the code: gsuc-djcd-wd6z";
+    private static final String LIVE_SMS_BODY = "Return to the app and press Confirm after "
+            + "sending this message. Do not edit or share the code: mcsp-u3oz-s4du";
 
     final HCaptchaConfig config = HCaptchaConfig.builder()
             .siteKey("10000000-ffff-ffff-ffff-000000000001")
@@ -558,6 +565,9 @@ public class HCaptchaDialogFragmentTest {
     public void testSmsHandled() {
         try {
             Intents.init();
+            // Espresso stubs the intent out so the messaging app is never really started.
+            intending(hasAction(Intent.ACTION_SENDTO))
+                    .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
 
             launchInContainer();
 
@@ -565,9 +575,43 @@ public class HCaptchaDialogFragmentTest {
             onWebView().withElement(DriverAtoms.findElement(Locator.ID, "on-sms"))
                     .perform(DriverAtoms.webClick());
 
+            // The `sms:` link is turned into the documented pre-filled compose intent, and the
+            // body reaches the messaging app byte-exact: the backend matches the one-time code
+            // against the message it receives.
             intended(allOf(
-                    hasAction(Intent.ACTION_VIEW),
-                    hasData(Uri.parse("sms:+123-456-789?body=Hello%20World"))
+                    hasAction(Intent.ACTION_SENDTO),
+                    hasData(Uri.parse("smsto:+46769439873")),
+                    hasExtra(SMS_BODY_EXTRA, SMS_BODY),
+                    not(hasFlag(Intent.FLAG_ACTIVITY_NEW_TASK))
+            ));
+        } finally {
+            Intents.release();
+        }
+    }
+
+    /**
+     * The live MFA challenge opens its `sms:` link with target="_blank", so it arrives through
+     * onCreateWindow instead of shouldOverrideUrlLoading. Verified against a live sitekey: this
+     * is the path that actually matters, and it must not fall through to the browser hand-off.
+     */
+    @Test
+    public void testSmsHandledFromNewWindow() {
+        try {
+            Intents.init();
+            intending(hasAction(Intent.ACTION_SENDTO))
+                    .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
+
+            launchInContainer();
+
+            onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
+            onWebView().withElement(DriverAtoms.findElement(Locator.ID, "on-sms-blank"))
+                    .perform(DriverAtoms.webClick());
+
+            intended(allOf(
+                    hasAction(Intent.ACTION_SENDTO),
+                    hasData(Uri.parse("smsto:+46769432675")),
+                    hasExtra(SMS_BODY_EXTRA, LIVE_SMS_BODY),
+                    not(hasFlag(Intent.FLAG_ACTIVITY_NEW_TASK))
             ));
         } finally {
             Intents.release();
