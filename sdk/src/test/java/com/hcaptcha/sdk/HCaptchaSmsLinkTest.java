@@ -18,6 +18,14 @@ public class HCaptchaSmsLinkTest {
             + "%20press%20Confirm%20after%20sending%20this%20message.%20Do%20not%20edit%20or%20"
             + "share%20the%20code%3A%20gsuc-djcd-wd6z";
 
+    /**
+     * Captured from a live MFA sitekey on a device. Note the empty first query parameter: the
+     * challenge emits `?&body=`, not `?body=`.
+     */
+    private static final String LIVE_LINK = "sms:+46769432675?&body=Return%20to%20the%20app%20and"
+            + "%20press%20Confirm%20after%20sending%20this%20message.%20Do%20not%20edit%20or%20"
+            + "share%20the%20code%3A%20mcsp-u3oz-s4du";
+
     private static final String NUMBER = "+15551234567";
     private static final String CODE = "code";
     private static final String CODE_QUERY = "?body=code";
@@ -40,6 +48,21 @@ public class HCaptchaSmsLinkTest {
         final HCaptchaSmsLink link = parseUrl(REAL_LINK);
         assertEquals(REAL_NUMBER, link.getRecipient());
         assertEquals(REAL_BODY, link.getBody());
+    }
+
+    @Test
+    public void parsesLiveLinkWithEmptyLeadingQueryParameter() {
+        final HCaptchaSmsLink link = parseUrl(LIVE_LINK);
+        assertEquals("+46769432675", link.getRecipient());
+        assertEquals("Return to the app and press Confirm after sending this message. "
+                + "Do not edit or share the code: mcsp-u3oz-s4du", link.getBody());
+    }
+
+    @Test
+    public void skipsEmptyQueryParameters() {
+        assertEquals(CODE, parseSuffix("?&body=code").getBody());
+        assertEquals(CODE, parseSuffix("?&&body=code").getBody());
+        assertEquals(CODE, parseSuffix("?x=1&body=code&").getBody());
     }
 
     @Test

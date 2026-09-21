@@ -177,10 +177,10 @@ final class HCaptchaWebViewHelper {
      * the messaging app is started inside the host app's task, so {@code back} returns straight
      * to the still-open challenge and its Confirm button.
      *
-     * @param url the URL the WebView tried to navigate to
+     * @param url the URL the WebView tried to navigate to, or opened in a new window
      * @return true when the link was an SMS link and the navigation should be cancelled
      */
-    private boolean openSmsComposer(@NonNull final String url) {
+    private boolean openSmsComposer(@Nullable final String url) {
         final HCaptchaSmsLink link = HCaptchaSmsLink.parse(url);
         if (link == null) {
             return false;
@@ -303,6 +303,11 @@ final class HCaptchaWebViewHelper {
                 try {
                     final WebView.HitTestResult result = view.getHitTestResult();
                     if (result.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE) {
+                        // The MFA challenge opens its `sms:` link in a new window, so this is
+                        // the path the live flow takes - not shouldOverrideUrlLoading.
+                        if (openSmsComposer(result.getExtra())) {
+                            return true;
+                        }
                         final Uri url = Uri.parse(result.getExtra());
                         final Intent intent = new Intent(Intent.ACTION_VIEW, url);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
