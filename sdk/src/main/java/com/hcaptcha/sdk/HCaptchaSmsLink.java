@@ -75,7 +75,10 @@ final class HCaptchaSmsLink {
         while (start < url.length() && url.charAt(start) == '/') {
             start++;
         }
-        final String payload = url.substring(start);
+
+        // A literal `#` starts a fragment (RFC 3986); an encoded `%23` stays in the body.
+        final int fragment = url.indexOf('#', start);
+        final String payload = fragment < 0 ? url.substring(start) : url.substring(start, fragment);
 
         // The query and the `;` subscriber parameters are separate grammars, so `?` has to be
         // split off first. Folding them together loses the body of a link such as

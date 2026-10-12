@@ -138,6 +138,27 @@ public class HCaptchaSmsLinkTest {
     }
 
     @Test
+    public void ignoresLiteralFragmentsWithoutRemovingEncodedHashes() {
+        // `sms:+15551234567#123?body=code` must not become recipient `+15551234567123`.
+        final HCaptchaSmsLink fragmentBeforeQuery = parseSuffix("#123" + CODE_QUERY);
+        assertEquals(NUMBER, fragmentBeforeQuery.getRecipient());
+        assertNull(fragmentBeforeQuery.getBody());
+
+        assertEquals(CODE, parseSuffix(CODE_QUERY + "#123").getBody());
+        assertEquals(CODE, parseSuffix(";body=code#123?body=other").getBody());
+
+        // An encoded `%23` is payload, decoded only after the split, so a body keeps its hash.
+        assertEquals("code#suffix", parseSuffix("?body=code%23suffix").getBody());
+        assertEquals("code#suffix", parseSuffix("?body=code%23suffix#ignored").getBody());
+        assertEquals("code#suffix", parseSuffix(";body=code%23suffix#ignored").getBody());
+        assertEquals("%23", parseSuffix("?body=%2523#ignored").getBody());
+
+        final HCaptchaSmsLink fragmentOnly = parseUrl("sms:#123" + CODE_QUERY);
+        assertNull(fragmentOnly.getRecipient());
+        assertNull(fragmentOnly.getBody());
+    }
+
+    @Test
     public void rejectsNonSmsUrls() {
         assertNull(HCaptchaSmsLink.parse(null));
         assertNull(HCaptchaSmsLink.parse("https://example.com" + CODE_QUERY));
