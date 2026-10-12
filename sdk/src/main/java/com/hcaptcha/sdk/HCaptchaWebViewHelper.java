@@ -3,6 +3,7 @@ package com.hcaptcha.sdk;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -226,7 +227,7 @@ final class HCaptchaWebViewHelper {
         // FLAG_ACTIVITY_NEW_TASK puts the messaging app in a task of its own, so `back` from it
         // lands on the launcher rather than on the challenge. It is only needed when there is no
         // Activity to start from; every SDK render mode passes one.
-        if (!(context instanceof Activity)) {
+        if (!isBackedByActivity(context)) {
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         }
 
@@ -238,6 +239,18 @@ final class HCaptchaWebViewHelper {
             HCaptchaLog.w("[webview] messaging app launch failed: " + e.getMessage());
             return false;
         }
+    }
+
+    // Hosts often pass a ContextWrapper (themed, Compose, Hilt) around their Activity.
+    private static boolean isBackedByActivity(@NonNull final Context context) {
+        Context current = context;
+        while (current instanceof ContextWrapper) {
+            if (current instanceof Activity) {
+                return true;
+            }
+            current = ((ContextWrapper) current).getBaseContext();
+        }
+        return false;
     }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -297,29 +310,31 @@ final class HCaptchaWebViewHelper {
     }
 
     private class HCaptchaWebChromeClient extends WebChromeClient {
+        // Always false: no child WebView is created, the link is handed off or dropped.
         @Override
         public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
+            HCaptchaLog.d("[webview] onCreateWindow userGesture=%b", isUserGesture);
             if (isUserGesture) {
                 try {
                     final WebView.HitTestResult result = view.getHitTestResult();
+                    HCaptchaLog.d("[webview] onCreateWindow hitType=%d", result.getType());
                     if (result.getType() == WebView.HitTestResult.SRC_ANCHOR_TYPE) {
                         // The MFA challenge opens its `sms:` link in a new window, so this is
                         // the path the live flow takes - not shouldOverrideUrlLoading.
                         if (openSmsComposer(result.getExtra())) {
-                            return true;
+                            return false;
                         }
                         final Uri url = Uri.parse(result.getExtra());
                         final Intent intent = new Intent(Intent.ACTION_VIEW, url);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                         context.startActivity(intent);
                         HCaptchaLog.d("[webview] opened target=_blank link in browser: " + url);
-                        return true;
                     }
                 } catch (Exception e) {
                     HCaptchaLog.w("[webview] failed to open target=_blank link in browser: " + e.getMessage());
                 }
             }
-            return super.onCreateWindow(view, isDialog, isUserGesture, resultMsg);
+            return false;
         }
 
         @Override
@@ -336,8 +351,7 @@ final class HCaptchaWebViewHelper {
         @Override
         @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         public void onPermissionRequest(final PermissionRequest request) {
-            // Grant only the requested capture resource; audio is never requested, which
-            // avoids forcing host apps to declare RECORD_AUDIO.
+            // Camera only: audio is never requested, so hosts need not declare RECORD_AUDIO.
             boolean wantsCapture = false;
             for (final String resource : request.getResources()) {
                 if (PermissionRequest.RESOURCE_VIDEO_CAPTURE.equals(resource)) {
@@ -346,8 +360,7 @@ final class HCaptchaWebViewHelper {
                 }
             }
             if (wantsCapture) {
-                // The requested surface only composites on a hardware layer; the default
-                // software layer (disableHardwareAcceleration) would render it blank.
+                // A camera texture renders blank on the default software layer.
                 webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
                 request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
                 HCaptchaLog.d("[webview] onPermissionRequest granted");
