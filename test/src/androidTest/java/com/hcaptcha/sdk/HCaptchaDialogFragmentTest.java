@@ -601,11 +601,24 @@ public class HCaptchaDialogFragmentTest {
             intending(hasAction(Intent.ACTION_SENDTO))
                     .respondWith(new Instrumentation.ActivityResult(Activity.RESULT_OK, null));
 
+            // Diagnostic logging on, so a failure on CI shows what onCreateWindow saw.
+            HCaptchaLog.sDiagnosticsLogEnabled = true;
             launchInContainer();
 
             onWebView().check(webMatches(getCurrentUrl(), startsWith("about:blank")));
-            onWebView().withElement(DriverAtoms.findElement(Locator.ID, "on-sms-blank"))
-                    .perform(DriverAtoms.webClick());
+
+            // Before API 30 a WebDriver click is not a user gesture, so a native tap is needed.
+            // API 28 offsets touches and snaps to the nearest link, so the anchor fills the viewport.
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                onWebView().withElement(DriverAtoms.findElement(Locator.ID, "on-sms-blank"))
+                        .perform(DriverAtoms.webClick());
+            } else {
+                onView(withId(R.id.webView)).perform(evaluateJavascript(
+                        "document.getElementById('on-sms-blank').style.cssText = "
+                        + "'position:fixed;left:0;top:0;right:0;bottom:0;z-index:2147483647;"
+                        + "display:block;'"));
+                onView(withId(R.id.webView)).perform(AssertUtil.clickAt(-5, -5, Gravity.BOTTOM | Gravity.RIGHT));
+            }
 
             intended(allOf(
                     hasAction(Intent.ACTION_SENDTO),
@@ -614,6 +627,7 @@ public class HCaptchaDialogFragmentTest {
                     not(hasFlag(Intent.FLAG_ACTIVITY_NEW_TASK))
             ));
         } finally {
+            HCaptchaLog.sDiagnosticsLogEnabled = false;
             Intents.release();
         }
     }
