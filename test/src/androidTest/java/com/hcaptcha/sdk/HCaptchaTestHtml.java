@@ -45,7 +45,17 @@ class HCaptchaTestHtml implements IHCaptchaHtmlProvider {
                 + "    <input id=\"input-text\" />\n"
                 + "    <button id=\"on-error\" onclick=\"onError()\">Error</button>\n"
                 + "    <button id=\"on-pass\" onclick=\"onPass()\">Pass</button>\n"
-                + "    <a id=\"on-sms\" href=\"sms:+123-456-789?body=Hello%20World\">Send SMS</a>\n"
+                // The shape the live MFA "inbound SMS" challenge emits: a pooled hCaptcha number
+                // and a sentence carrying a hyphenated one-time code.
+                + "    <a id=\"on-sms\" href=\"sms:+46769439873?body=Return%20to%20the%20app%20and"
+                + "%20press%20Confirm%20after%20sending%20this%20message.%20Do%20not%20edit%20or"
+                + "%20share%20the%20code%3A%20gsuc-djcd-wd6z\">Send SMS</a>\n"
+                // The live challenge opens its link in a new window, which reaches the SDK
+                // through onCreateWindow rather than shouldOverrideUrlLoading. It also emits
+                // an empty leading query parameter: `?&body=`, not `?body=`.
+                + "    <a id=\"on-sms-blank\" target=\"_blank\" href=\"sms:+46769432675?&body=Return"
+                + "%20to%20the%20app%20and%20press%20Confirm%20after%20sending%20this%20message."
+                + "%20Do%20not%20edit%20or%20share%20the%20code%3A%20mcsp-u3oz-s4du\">SMS Blank</a>\n"
                 + "    <a id=\"on-target-blank\" href=\"https://example.com\" target=\"_blank\">Open in Browser</a>\n"
                 + "    <script type=\"text/javascript\">\n"
                 + "        console.assert(window.JSDI.getDebugInfo() instanceof Array);\n"
