@@ -119,6 +119,37 @@
         }
         return theme;
     }
+    /**
+     * hCaptcha renders the challenge into a fixed 400x600 overlay appended to
+     * `<body>`, positioned near the checkbox. On a short viewport (landscape,
+     * or a display size scaled up by the user) 600px does not fit, and the
+     * overlay overflows past the top edge where the prompt cannot be scrolled
+     * back into view. Scale it down so the whole challenge stays on screen.
+     */
+    function fitChallengeToViewport() {
+        var overlay = null;
+        var children = document.body.children;
+        for (var i = 0; i < children.length; i++) {
+            var el = children[i];
+            if (el.tagName === 'DIV' && el.id !== 'hcaptcha-container' &&
+                    el.querySelector('iframe')) {
+                overlay = el;
+            }
+        }
+        if (!overlay) {
+            return;
+        }
+        // offsetHeight is the untransformed layout height, so this stays
+        // correct when we are re-scaling an already scaled overlay.
+        var needed = overlay.offsetHeight;
+        if (!needed) {
+            return;
+        }
+        var scale = Math.min(1, window.innerHeight / needed);
+        overlay.style.transformOrigin = 'top center';
+        overlay.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+    }
+
     function getRenderConfig() {
         return {
             sitekey: bridgeConfig.siteKey,
@@ -153,6 +184,7 @@
                 }
             },
             'open-callback': function openCallback() {
+                fitChallengeToViewport();
                 return BridgeObject.onOpen();
             }
         };
@@ -215,6 +247,9 @@
             BridgeObject.onError(30);
         }
     });
+
+    window.addEventListener('resize', fitChallengeToViewport);
+    new MutationObserver(fitChallengeToViewport).observe(document.body, { childList: true });
 
     loadApi();
 </script>
