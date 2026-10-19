@@ -153,6 +153,41 @@ jobs:
             test/build/outputs/androidTest-results
             test/build/reports/androidTests
 
+  test-ui-legacy:
+    name: 'Test UI Legacy (API 16)'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # Non-blocking until API 16 emulator runs prove stable on GitHub-hosted runners
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5.2.0
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: adopt
+      - uses: gradle/actions/setup-gradle@4d9f0ba0025fe599b4ebab900eb7f3a1d93ef4c2 # v5.0.0
+        with:
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
+      - name: Run tests
+        uses: ./.github/actions/android-emulator-run
+        with:
+          # API 16 only ships x86 images; `settings` (used to disable animations) is missing there
+          # and the runner just logs `settings: not found`
+          api-level: '16'
+          arch: x86
+          target: default
+          script: ./gradlew test-legacy:connectedCheck
+      - if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: androidTest-legacy-results
+          path: |
+            test-legacy/build/outputs/androidTest-results
+            test-legacy/build/reports/androidTests
+
   test-minified:
     name: 'Test UI Minified'
     needs: [ test-ui ]

@@ -1,0 +1,41 @@
+apply plugin: 'com.android.application'
+
+// Instrumentation tests for the oldest supported Android versions (API 16+).
+// The main `test` module cannot go below API 23 because of Compose and modern androidx.test,
+// so this module depends on `:sdk` only and pins test libraries that still support API 14.
+android {
+    compileSdk 34
+    namespace 'com.hcaptcha.sdk.legacy'
+
+    defaultConfig {
+        applicationId "com.hcaptcha.sdk.legacy"
+        minSdkVersion 16
+        // androidx.test 1.4.0 registers receivers without RECEIVER_EXPORTED flags, which targetSdk 34 rejects
+        targetSdkVersion 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    testOptions {
+        animationsDisabled = true
+    }
+}
+
+dependencies {
+    implementation project(path: ':sdk')
+
+    // Last versions with minSdk 14: androidx.test 1.5.0+ requires API 19
+    //noinspection GradleDependency
+    androidTestImplementation 'androidx.test:core:1.4.0'
+    //noinspection GradleDependency
+    androidTestImplementation 'androidx.test:runner:1.4.0'
+    //noinspection GradleDependency
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+}

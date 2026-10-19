@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="false"
+        android:label="hCaptcha legacy test">
+        <activity
+            android:name="com.hcaptcha.sdk.legacy.LegacyTestActivity"
+            android:exported="false" />
+    </application>
+
+</manifest>
