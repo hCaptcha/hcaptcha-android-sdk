@@ -1,6 +1,7 @@
 rootProject.name = "hcaptcha-android-sdk"
 include ':sdk'
 include ':test'
+include ':test-legacy'
 include ':benchmark'
 include ':example-app'
 include ':compose-sdk'

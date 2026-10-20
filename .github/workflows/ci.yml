@@ -125,10 +125,27 @@ jobs:
             -PexampleAppcompatVersion=${{ matrix.appcompat }}
 
   test-ui:
-    name: 'Test UI'
+    name: 'Test UI (API ${{ matrix.api-level }})'
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api-level: '28'
+            arch: x86_64
+            module: test
+            experimental: false
+          # The `test` module needs API 23+, so the oldest supported API runs the minimal `test-legacy` module.
+          # API 16 only ships x86 images; `settings` (used to disable animations) is missing there
+          # and the runner just logs `settings: not found`.
+          # Non-blocking until API 16 emulator runs prove stable on GitHub-hosted runners.
+          - api-level: '16'
+            arch: x86
+            module: test-legacy
+            experimental: true
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
         with:
@@ -143,15 +160,17 @@ jobs:
       - name: Run tests
         uses: ./.github/actions/android-emulator-run
         with:
-          script: "parallel --retries 3 ::: './gradlew test:connectedCheck'"
+          api-level: ${{ matrix.api-level }}
+          arch: ${{ matrix.arch }}
+          script: "parallel --retries 3 ::: './gradlew ${{ matrix.module }}:connectedCheck'"
           fresh-avd: true
       - if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: androidTest-results
+          name: androidTest-results-api${{ matrix.api-level }}
           path: |
-            test/build/outputs/androidTest-results
-            test/build/reports/androidTests
+            ${{ matrix.module }}/build/outputs/androidTest-results
+            ${{ matrix.module }}/build/reports/androidTests
 
   test-minified:
     name: 'Test UI Minified'

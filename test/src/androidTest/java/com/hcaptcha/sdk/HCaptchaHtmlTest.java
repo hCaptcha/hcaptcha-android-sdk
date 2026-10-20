@@ -145,6 +145,49 @@ public class HCaptchaHtmlTest {
                 "hcaptcha-container", renderParams);
     }
 
+    @Test
+    public void testFitChallengeToViewportScalesAndShiftsTallOverlayOnScreen() {
+        assertOverlayFitsViewport(1.5, true);
+    }
+
+    @Test
+    public void testFitChallengeToViewportShiftsOverflowingOverlayWithoutScaling() {
+        assertOverlayFitsViewport(0.5, false);
+    }
+
+    /**
+     * Injects a fake hCaptcha overlay that starts above the viewport (top: -100px) and checks that
+     * fitChallengeToViewport() brings it fully on screen, scaling it only when it is taller than the viewport.
+     */
+    private void assertOverlayFitsViewport(double heightToViewport, boolean expectScaled) {
+        setupWebView(null);
+
+        onWebView()
+                .forceJavascriptEnabled()
+                .check(webMatches(
+                        script(
+                                "var overlay = document.createElement('div');"
+                                + "overlay.style.position = 'absolute';"
+                                + "overlay.style.top = '-100px';"
+                                + "overlay.style.left = '0';"
+                                + "var frame = document.createElement('iframe');"
+                                + "frame.style.display = 'block';"
+                                + "frame.style.border = '0';"
+                                + "var height = Math.round(window.innerHeight * " + heightToViewport + ");"
+                                + "frame.style.height = height + 'px';"
+                                + "overlay.appendChild(frame);"
+                                + "document.body.appendChild(overlay);"
+                                + "fitChallengeToViewport();"
+                                + "var rect = overlay.getBoundingClientRect();"
+                                + "var scaled = rect.height < height - 1;"
+                                + "return rect.top >= 0 && rect.bottom <= window.innerHeight + 1"
+                                + "    && scaled === " + expectScaled + ";",
+                                castOrDie(Boolean.class)
+                        ),
+                        is(true)
+                ));
+    }
+
     /**
      * Stub implementation of HCaptchaJSInterface for testing
      */
