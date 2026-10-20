@@ -124,7 +124,8 @@
      * `<body>`, positioned near the checkbox. On a short viewport (landscape,
      * or a display size scaled up by the user) 600px does not fit, and the
      * overlay overflows past the top edge where the prompt cannot be scrolled
-     * back into view. Scale it down so the whole challenge stays on screen.
+     * back into view. Scale it down and shift it inside the viewport so the
+     * whole challenge stays on screen.
      */
     function fitChallengeToViewport() {
         var overlay = null;
@@ -139,15 +140,21 @@
         if (!overlay) {
             return;
         }
-        // offsetHeight is the untransformed layout height, so this stays
-        // correct when we are re-scaling an already scaled overlay.
-        var needed = overlay.offsetHeight;
-        if (!needed) {
+        // Measure hCaptcha's own placement, without our previous transform,
+        // so repeated calls (open, resize, mutation) do not stack up.
+        overlay.style.transform = '';
+        var rect = overlay.getBoundingClientRect();
+        if (!rect.height) {
             return;
         }
-        var scale = Math.min(1, window.innerHeight / needed);
+        var viewportHeight = window.innerHeight;
+        var scale = Math.min(1, viewportHeight / rect.height);
+        // Shift the scaled overlay fully on screen, e.g. top: -100px -> 0.
+        var top = Math.max(0, Math.min(rect.top, viewportHeight - rect.height * scale));
+        var shift = top - rect.top;
         overlay.style.transformOrigin = 'top center';
-        overlay.style.transform = scale < 1 ? 'scale(' + scale + ')' : '';
+        overlay.style.transform = shift || scale < 1 ?
+            'translateY(' + shift + 'px) scale(' + scale + ')' : '';
     }
 
     function getRenderConfig() {
