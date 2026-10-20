@@ -249,7 +249,11 @@
     });
 
     window.addEventListener('resize', fitChallengeToViewport);
-    new MutationObserver(fitChallengeToViewport).observe(document.body, { childList: true });
+    // Observation is optional on older supported Android WebViews.
+    var Observer = window.MutationObserver || window.WebKitMutationObserver;
+    if (Observer) {
+        new Observer(fitChallengeToViewport).observe(document.body, { childList: true });
+    }
 
     loadApi();
 </script>
