@@ -1,7 +1,5 @@
 package com.hcaptcha.sdk.journeylitics;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 /**
  * Event kinds observed by the library
  */
@@ -18,7 +16,6 @@ enum EventKind {
         this.value = value;
     }
 
-    @JsonValue
     String getValue() {
         return value;
     }

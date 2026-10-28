@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -65,19 +64,18 @@ public class HCaptchaVerifyParamsTest {
     }
 
     @Test
-    public void test_json_serialization_annotations_not_swapped() throws Exception {
+    public void test_json_serialization_field_names() throws Exception {
         final HCaptchaVerifyParams params = HCaptchaVerifyParams.builder()
                 .phonePrefix(TEST_PHONE_PREFIX)
                 .phoneNumber(TEST_PHONE_NUMBER)
                 .rqdata(TEST_RQDATA)
                 .build();
 
-        final ObjectMapper mapper = new ObjectMapper();
-        final String json = mapper.writeValueAsString(params);
+        final String json = params.toJson();
 
         final JSONObject jsonObject = new JSONObject(json);
 
-        // Verify that the JSON field names match the @JsonProperty annotations
+        // Verify that the JSON field names match the JS API
         assertNotNull(jsonObject);
         assertEquals(TEST_PHONE_PREFIX, jsonObject.getString("mfa_phoneprefix"));
         assertEquals(TEST_PHONE_NUMBER, jsonObject.getString("mfa_phone"));

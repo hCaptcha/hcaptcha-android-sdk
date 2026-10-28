@@ -5,9 +5,8 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import androidx.annotation.Nullable;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.NonNull;
+import org.json.JSONException;
 
 import java.io.Serializable;
 
@@ -34,9 +33,8 @@ class HCaptchaJSInterface implements Serializable {
         this.captchaVerifier = captchaVerifier;
         String configJson = null;
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            configJson = objectMapper.writeValueAsString(config);
-        } catch (JsonProcessingException e) {
+            configJson = config.toJson();
+        } catch (JSONException e) {
             Log.w(JS_INTERFACE_TAG, "Cannot prepare config for passing to WebView."
                     + " A fallback config will be used");
         }

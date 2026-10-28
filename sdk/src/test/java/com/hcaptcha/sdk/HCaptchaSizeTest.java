@@ -2,8 +2,8 @@ package com.hcaptcha.sdk;
 
 import static org.junit.Assert.assertEquals;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
+import org.json.JSONStringer;
 import org.junit.Test;
 
 public class HCaptchaSizeTest {
@@ -21,10 +21,9 @@ public class HCaptchaSizeTest {
     }
 
     @Test
-    public void serializes_to_json_value() throws JsonProcessingException {
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final String serialized = objectMapper.writeValueAsString(HCaptchaSize.INVISIBLE);
-        assertEquals("\"invisible\"", serialized);
+    public void serializes_to_json_value() throws JSONException {
+        final String serialized = new JSONStringer().array().value(HCaptchaSize.INVISIBLE).endArray().toString();
+        assertEquals("[\"invisible\"]", serialized);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.hcaptcha.sdk.journeylitics;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -27,26 +26,14 @@ public class JLEvent {
     }
 
     /**
-     * UNIX timestamp (seconds).
+     * Returns the event payload with a UNIX timestamp in seconds.
      */
-    @JsonProperty("ts")
-    long getTimestamp() {
-        return timestamp;
-    }
-
-    @JsonProperty("k")
-    EventKind getKind() {
-        return kind;
-    }
-
-    @JsonProperty("v")
-    String getView() {
-        return view;
-    }
-
-    @JsonProperty("m")
-    Object getMetadata() {
-        return metadata;
+    public Map<String, Object> toMap() {
+        final Map<String, Object> event = new HashMap<>();
+        event.put("ts", timestamp);
+        event.put("k", kind == null ? null : kind.getValue());
+        event.put("v", view);
+        event.put("m", metadata);
+        return event;
     }
 }
-

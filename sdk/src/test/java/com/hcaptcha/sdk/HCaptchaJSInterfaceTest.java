@@ -105,7 +105,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("disableHardwareAcceleration", false);
         expected.put("userJourney", true);
 
-        JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
+        JSONAssert.assertEquals(expected.toString(), jsInterface.getConfig(), true);
     }
 
     @Test
@@ -149,7 +149,7 @@ public class HCaptchaJSInterfaceTest {
         expected.put("disableHardwareAcceleration", true);
         expected.put("userJourney", false);
 
-        JSONAssert.assertEquals(jsInterface.getConfig(), expected, false);
+        JSONAssert.assertEquals(expected.toString(), jsInterface.getConfig(), true);
     }
 
     @Test
