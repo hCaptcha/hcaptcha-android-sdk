@@ -1,6 +1,6 @@
 # Changelog
 
-# Unreleased
+# 5.2.0
 
 - Remove Jackson dependencies; use Android JSON APIs while preserving SDK payloads and Android API 16 support.
 
