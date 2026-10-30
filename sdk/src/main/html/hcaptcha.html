@@ -119,6 +119,12 @@
         }
         return theme;
     }
+    // Unprefixed `transform` needs Chromium 36+, the API 16-19 WebViews only know `-webkit-`
+    function setOverlayTransform(overlay, transform) {
+        overlay.style.webkitTransformOrigin = overlay.style.transformOrigin = 'top center';
+        overlay.style.webkitTransform = overlay.style.transform = transform;
+    }
+
     /**
      * hCaptcha renders the challenge into a fixed 400x600 overlay appended to
      * `<body>`, positioned near the checkbox. On a short viewport (landscape,
@@ -142,7 +148,7 @@
         }
         // Measure hCaptcha's own placement, without our previous transform,
         // so repeated calls (open, resize, mutation) do not stack up.
-        overlay.style.transform = '';
+        setOverlayTransform(overlay, '');
         var rect = overlay.getBoundingClientRect();
         if (!rect.height) {
             return;
@@ -152,9 +158,8 @@
         // Shift the scaled overlay fully on screen, e.g. top: -100px -> 0.
         var top = Math.max(0, Math.min(rect.top, viewportHeight - rect.height * scale));
         var shift = top - rect.top;
-        overlay.style.transformOrigin = 'top center';
-        overlay.style.transform = shift || scale < 1 ?
-            'translateY(' + shift + 'px) scale(' + scale + ')' : '';
+        setOverlayTransform(overlay, shift || scale < 1 ?
+            'translateY(' + shift + 'px) scale(' + scale + ')' : '');
     }
 
     function getRenderConfig() {

@@ -88,21 +88,29 @@ public class HCaptchaLegacyHtmlTest {
         assertEquals("loadApi() should append the api.js script", "true", result);
     }
 
+    // Checks the effect, not just that nothing throws: API 16-19 WebViews ignore unprefixed `transform`.
     @Test
     public void testFitChallengeToViewportScalesTallOverlay() throws InterruptedException {
         final String result = probe("try {"
                 + "  var overlay = document.createElement('div');"
+                + "  overlay.style.position = 'absolute';"
+                + "  overlay.style.top = '-100px';"
+                + "  overlay.style.left = '0';"
                 + "  var frame = document.createElement('iframe');"
-                + "  frame.style.height = '5000px';"
+                + "  frame.style.display = 'block';"
+                + "  frame.style.border = '0';"
+                + "  frame.style.height = Math.round(window.innerHeight * 1.5) + 'px';"
                 + "  overlay.appendChild(frame);"
                 + "  document.body.appendChild(overlay);"
                 + "  fitChallengeToViewport();"
-                + "  JSInterface.report('ok');"
+                + "  var rect = overlay.getBoundingClientRect();"
+                + "  JSInterface.report(rect.top >= 0 && rect.bottom <= window.innerHeight + 1"
+                + "      ? 'fits' : 'clipped: ' + rect.top + '..' + rect.bottom + ' / ' + window.innerHeight);"
                 + "} catch (e) {"
                 + "  JSInterface.report('error: ' + e);"
                 + "}");
 
-        assertEquals("fitChallengeToViewport() should not throw", "ok", result);
+        assertEquals("fitChallengeToViewport() should bring the overlay on screen", "fits", result);
         assertEquals("No uncaught JS errors expected", "[]", uncaughtErrors.toString());
     }
 
