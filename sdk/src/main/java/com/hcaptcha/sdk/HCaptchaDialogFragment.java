@@ -402,6 +402,17 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         sPreloadWebView = null;
     }
 
+    @Override
+    public void onWebViewGone(@NonNull final HCaptchaException exception) {
+        destroy();
+        if (listener != null) {
+            listener.onWebViewGone();
+            listener.onFailure(exception);
+        } else {
+            HCaptchaLog.w("Dialog wasn't created, listener == null");
+        }
+    }
+
     private View prepareRootView(@NonNull LayoutInflater inflater,
                                  @Nullable ViewGroup container,
                                  @NonNull HCaptchaConfig config) {

@@ -116,6 +116,13 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
                 HCaptchaLog.d("HCaptcha.onFailure");
                 setException(exception);
             }
+
+            @Override
+            void onWebViewGone() {
+                HCaptchaLog.d("HCaptcha.onWebViewGone");
+                // The next verifyWithHCaptcha() cold starts with a fresh WebView
+                captchaVerifier = null;
+            }
         };
         try {
             // Initialize or disable user journey tracking if enabled/disabled.
@@ -184,7 +191,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     public HCaptcha verifyWithHCaptcha() {
         if (captchaVerifier == null) {
             // Cold start at verification time.
-            setup();
+            setupWithLastConfig();
         }
 
         return startVerification();
@@ -216,7 +223,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     public HCaptcha verifyWithHCaptcha(@Nullable final HCaptchaVerifyParams verifyParams) {
         if (captchaVerifier == null) {
             // Cold start at verification time.
-            setup();
+            setupWithLastConfig();
         }
 
         return startVerification(verifyParams);
@@ -260,6 +267,16 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
             journeySink.clearEvents();
             journeySink = null;
+        }
+    }
+
+    private void setupWithLastConfig() {
+        // Keep the config from an earlier setup(config), e.g. once the WebView is gone,
+        // instead of falling back to the site key from the manifest.
+        if (config != null) {
+            setup(config);
+        } else {
+            setup();
         }
     }
 

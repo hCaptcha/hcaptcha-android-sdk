@@ -313,8 +313,7 @@ final class HCaptchaWebViewHelper {
         @RequiresApi(Build.VERSION_CODES.O)
         public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
             HCaptchaLog.w("[webview] onRenderProcessGone, didCrash: " + detail.didCrash());
-            captchaVerifier.destroy();
-            captchaVerifier.onFailure(new HCaptchaException(
+            captchaVerifier.onWebViewGone(new HCaptchaException(
                     HCaptchaError.ERROR, "WebView render process did terminate"));
             // Returning false lets the framework kill the host app (#214)
             return true;

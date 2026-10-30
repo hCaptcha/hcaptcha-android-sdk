@@ -229,8 +229,7 @@ public class HCaptchaWebViewHelperTest {
         Assume.assumeTrue("onRenderProcessGone was added in API 26",
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.O);
 
-        final CountDownLatch destroyLatch = new CountDownLatch(1);
-        final CountDownLatch failureLatch = new CountDownLatch(1);
+        final CountDownLatch goneLatch = new CountDownLatch(1);
 
         final IHCaptchaVerifier verifier = new TestIHCaptchaVerifier() {
             @Override
@@ -239,15 +238,10 @@ public class HCaptchaWebViewHelperTest {
             }
 
             @Override
-            public void destroy() {
-                destroyLatch.countDown();
-            }
-
-            @Override
-            public void onFailure(HCaptchaException e) {
+            public void onWebViewGone(HCaptchaException e) {
                 assertEquals(HCaptchaError.ERROR, e.getHCaptchaError());
                 assertEquals("WebView render process did terminate", e.getMessage());
-                failureLatch.countDown();
+                goneLatch.countDown();
             }
         };
 
@@ -262,10 +256,8 @@ public class HCaptchaWebViewHelperTest {
             webView.postDelayed(() -> webView.loadUrl("chrome://crash"), AWAIT_CRASH_MS);
         });
 
-        assertTrue("dead WebView should be torn down",
-                destroyLatch.await(AWAIT_CRASH_MS * 4, TimeUnit.MILLISECONDS));
-        assertTrue("listener should be notified",
-                failureLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+        assertTrue("verifier should be told the WebView is gone",
+                goneLatch.await(AWAIT_CRASH_MS * 4, TimeUnit.MILLISECONDS));
     }
 
     private static abstract class TestIHCaptchaVerifier implements IHCaptchaVerifier {
@@ -301,6 +293,11 @@ public class HCaptchaWebViewHelperTest {
 
         @Override
         public void onFailure(HCaptchaException e) {
+            failAsNonReachable();
+        }
+
+        @Override
+        public void onWebViewGone(HCaptchaException e) {
             failAsNonReachable();
         }
     }

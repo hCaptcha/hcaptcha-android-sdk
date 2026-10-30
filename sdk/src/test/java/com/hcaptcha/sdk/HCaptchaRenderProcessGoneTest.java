@@ -2,7 +2,9 @@ package com.hcaptcha.sdk;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -68,19 +70,14 @@ public class HCaptchaRenderProcessGoneTest {
         assertTrue(webViewClient.onRenderProcessGone(mock(WebView.class), rendererGone(false)));
     }
 
+    // Not onFailure: that path may retry on the dead WebView.
     @Test
-    public void deadWebViewIsTornDown() {
-        webViewClient.onRenderProcessGone(mock(WebView.class), rendererGone(true));
-
-        verify(captchaVerifier).destroy();
-    }
-
-    @Test
-    public void listenerGetsGenericError() {
+    public void verifierGetsGenericError() {
         webViewClient.onRenderProcessGone(mock(WebView.class), rendererGone(true));
 
         final ArgumentCaptor<HCaptchaException> captor = ArgumentCaptor.forClass(HCaptchaException.class);
-        verify(captchaVerifier).onFailure(captor.capture());
+        verify(captchaVerifier).onWebViewGone(captor.capture());
+        verify(captchaVerifier, never()).onFailure(any());
         assertEquals(HCaptchaError.ERROR, captor.getValue().getHCaptchaError());
         assertEquals("WebView render process did terminate", captor.getValue().getMessage());
     }

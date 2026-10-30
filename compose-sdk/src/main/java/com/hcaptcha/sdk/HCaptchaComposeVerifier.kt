@@ -56,4 +56,10 @@ internal class HCaptchaComposeVerifier(
     override fun destroy() {
         helperState.value?.destroy() ?: error("destroy should never be reached")
     }
+
+    override fun onWebViewGone(exception: HCaptchaException) {
+        // Never retry on the dead WebView, recomposing HCaptchaCompose builds a fresh one
+        helperState.value?.destroy()
+        onResult(HCaptchaResponse.Failure(exception.hCaptchaError))
+    }
 }
