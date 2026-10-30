@@ -3,6 +3,7 @@ package com.hcaptcha.sdk;
 import static com.hcaptcha.sdk.AssertUtil.failAsNonReachable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
@@ -48,7 +49,16 @@ public class HCaptchaWebViewHelperTest {
     @After
     public void tearDown() {
         if (scenario != null) {
-            scenario.close();
+            try {
+                scenario.onActivity(activity -> {
+                    if (helper != null) {
+                        helper.destroy();
+                        helper = null;
+                    }
+                });
+            } finally {
+                scenario.close();
+            }
         }
     }
 
@@ -241,6 +251,10 @@ public class HCaptchaWebViewHelperTest {
             public void onWebViewGone(HCaptchaException e) {
                 assertEquals(HCaptchaError.ERROR, e.getHCaptchaError());
                 assertEquals("WebView render process did terminate", e.getMessage());
+                final HCaptchaWebView deadWebView = helper.getWebView();
+                helper.destroy();
+                helper = null;
+                assertNull("The dead WebView must actually be detached", deadWebView.getParent());
                 goneLatch.countDown();
             }
         };
