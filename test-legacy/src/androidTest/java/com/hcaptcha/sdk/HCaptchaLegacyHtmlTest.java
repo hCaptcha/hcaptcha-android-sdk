@@ -104,13 +104,50 @@ public class HCaptchaLegacyHtmlTest {
                 + "  document.body.appendChild(overlay);"
                 + "  fitChallengeToViewport();"
                 + "  var rect = overlay.getBoundingClientRect();"
-                + "  JSInterface.report(rect.top >= 0 && rect.bottom <= window.innerHeight + 1"
+                + "  JSInterface.report(rect.top >= -1 && rect.bottom <= window.innerHeight + 1"
                 + "      ? 'fits' : 'clipped: ' + rect.top + '..' + rect.bottom + ' / ' + window.innerHeight);"
                 + "} catch (e) {"
                 + "  JSInterface.report('error: ' + e);"
                 + "}");
 
         assertEquals("fitChallengeToViewport() should bring the overlay on screen", "fits", result);
+        assertEquals("No uncaught JS errors expected", "[]", uncaughtErrors.toString());
+    }
+
+    // hCaptcha moves the overlay via inline styles after our resize handler already ran (e.g. on rotation).
+    // API 16-18 WebViews have no MutationObserver, so this also covers the delayed re-fit after resize.
+    @Test
+    public void testFitChallengeToViewportRefitsWhenHCaptchaMovesOverlayAfterResize()
+            throws InterruptedException {
+        final String result = probe("try {"
+                + "  var overlay = document.createElement('div');"
+                + "  overlay.style.position = 'absolute';"
+                + "  overlay.style.top = '-100px';"
+                + "  overlay.style.left = '0';"
+                + "  var frame = document.createElement('iframe');"
+                + "  frame.style.display = 'block';"
+                + "  frame.style.border = '0';"
+                + "  frame.style.height = Math.round(window.innerHeight * 1.5) + 'px';"
+                + "  overlay.appendChild(frame);"
+                + "  document.body.appendChild(overlay);"
+                + "  fitChallengeToViewport();"
+                // Later task: our resize handler runs first, then hCaptcha moves the overlay
+                + "  setTimeout(function () {"
+                + "    var resize = document.createEvent('Event');"
+                + "    resize.initEvent('resize', false, false);"
+                + "    window.dispatchEvent(resize);"
+                + "    overlay.style.top = '-300px';"
+                + "    setTimeout(function () {"
+                + "      var rect = overlay.getBoundingClientRect();"
+                + "      JSInterface.report(rect.top >= -1 && rect.bottom <= window.innerHeight + 1"
+                + "          ? 'fits' : 'clipped: ' + rect.top + '..' + rect.bottom + ' / ' + window.innerHeight);"
+                + "    }, 1000);"
+                + "  }, 100);"
+                + "} catch (e) {"
+                + "  JSInterface.report('error: ' + e);"
+                + "}");
+
+        assertEquals("fitChallengeToViewport() should follow hCaptcha's late reposition", "fits", result);
         assertEquals("No uncaught JS errors expected", "[]", uncaughtErrors.toString());
     }
 

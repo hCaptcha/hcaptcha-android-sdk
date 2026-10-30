@@ -261,10 +261,23 @@
     });
 
     window.addEventListener('resize', fitChallengeToViewport);
-    // Observation is optional on older supported Android WebViews.
+    // After our resize handler, hCaptcha repositions the overlay through inline styles
+    // (e.g. on rotation), so follow style changes too, not only the overlay being added.
     var Observer = window.MutationObserver || window.WebKitMutationObserver;
     if (Observer) {
-        new Observer(fitChallengeToViewport).observe(document.body, { childList: true });
+        var observer = new Observer(function () {
+            fitChallengeToViewport();
+            // Drop the records of our own transform writes, otherwise the fit re-triggers itself
+            observer.takeRecords();
+        });
+        observer.observe(document.body, {
+            childList: true, subtree: true, attributes: true, attributeFilter: ['style']
+        });
+    } else {
+        // API 16-18 WebViews have no observer: fit again once hCaptcha's reposition has landed
+        window.addEventListener('resize', function () {
+            setTimeout(fitChallengeToViewport, 300);
+        });
     }
 
     loadApi();

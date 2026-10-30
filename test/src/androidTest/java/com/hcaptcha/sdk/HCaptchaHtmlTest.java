@@ -156,6 +156,59 @@ public class HCaptchaHtmlTest {
     }
 
     /**
+     * hCaptcha repositions the overlay via inline styles after its own async resize (e.g. on rotation),
+     * after our resize handler already ran, so the fit must follow that style change.
+     */
+    @Test
+    public void testFitChallengeToViewportRefitsWhenHCaptchaMovesOverlay() {
+        setupWebView(null);
+
+        onWebView()
+                .forceJavascriptEnabled()
+                .check(webMatches(
+                        script(
+                                "var overlay = document.createElement('div');"
+                                + "overlay.style.position = 'absolute';"
+                                + "overlay.style.top = '-100px';"
+                                + "overlay.style.left = '0';"
+                                + "var frame = document.createElement('iframe');"
+                                + "frame.style.display = 'block';"
+                                + "frame.style.border = '0';"
+                                + "frame.style.height = Math.round(window.innerHeight * 1.5) + 'px';"
+                                + "overlay.appendChild(frame);"
+                                + "document.body.appendChild(overlay);"
+                                + "fitChallengeToViewport();"
+                                + "window.testOverlay = overlay;"
+                                + "return true;",
+                                castOrDie(Boolean.class)
+                        ),
+                        is(true)
+                ));
+
+        // Separate scripts, so the observer callbacks for the insertion and for the move run in between
+        onWebView()
+                .check(webMatches(
+                        script(
+                                "window.testOverlay.style.top = '-300px';"
+                                + "return true;",
+                                castOrDie(Boolean.class)
+                        ),
+                        is(true)
+                ));
+
+        onWebView()
+                .check(webMatches(
+                        script(
+                                "var rect = window.testOverlay.getBoundingClientRect();"
+                                + "return rect.top >= -1 && rect.bottom <= window.innerHeight + 1"
+                                + "    ? 'fits' : 'clipped: ' + rect.top + '..' + rect.bottom + ' / ' + window.innerHeight;",
+                                castOrDie(String.class)
+                        ),
+                        is("fits")
+                ));
+    }
+
+    /**
      * Injects a fake hCaptcha overlay that starts above the viewport (top: -100px) and checks that
      * fitChallengeToViewport() brings it fully on screen, scaling it only when it is taller than the viewport.
      */
