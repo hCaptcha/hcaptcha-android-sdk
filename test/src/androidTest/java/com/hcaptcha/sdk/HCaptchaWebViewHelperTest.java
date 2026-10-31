@@ -14,14 +14,16 @@ import android.webkit.WebViewClient;
 
 import androidx.test.core.app.ActivityScenario;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hcaptcha.sdk.test.TestActivity;
 
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Assume;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -173,6 +175,21 @@ public class HCaptchaWebViewHelperTest {
     }
 
     @Test
+    public void testSetVerifyParamsWithNestedJourneyAndEscaping() throws Exception {
+        final String text = "quote\"\\\n\t\u2028\u2029";
+        final HCaptchaVerifyParams params = HCaptchaVerifyParams.builder()
+                .rqdata(text)
+                .userJourney(Collections.singletonMap("events", Arrays.asList(text, null, true)))
+                .build();
+        launchWebView(() -> helper.setVerifyParams(params));
+
+        final HCaptchaVerifyParams received = testObject.waitForSetData();
+        assertEquals(text, received.getRqdata());
+        assertEquals(new JSONObject(params.toJson()).getJSONObject("userjourney").toString(),
+                received.getUserJourney().toString());
+    }
+
+    @Test
     public void testSetVerifyParamsWithRqdataFromConfig() throws Exception {
         final HCaptchaConfig configWithRqdata = baseConfig.toBuilder()
                 .rqdata("test-rqdata-from-config")
@@ -260,14 +277,19 @@ public class HCaptchaWebViewHelperTest {
 
     private static class TestObject {
         private final CountDownLatch setDataLatch = new CountDownLatch(1);
-        private final ObjectMapper objectMapper = new ObjectMapper();
         private HCaptchaVerifyParams receivedParams;
 
         @JavascriptInterface
         public void setData(String jsonParams) {
             try {
                 if (jsonParams != null && !jsonParams.equals("null")) {
-                    this.receivedParams = objectMapper.readValue(jsonParams, HCaptchaVerifyParams.class);
+                    final JSONObject params = new JSONObject(jsonParams);
+                    this.receivedParams = HCaptchaVerifyParams.builder()
+                            .phonePrefix(params.optString("mfa_phoneprefix", null))
+                            .phoneNumber(params.optString("mfa_phone", null))
+                            .rqdata(params.optString("rqdata", null))
+                            .userJourney(params.opt("userjourney"))
+                            .build();
                 } else {
                     this.receivedParams = null;
                 }

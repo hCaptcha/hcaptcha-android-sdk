@@ -2,8 +2,6 @@ package com.hcaptcha.sdk;
 
 import androidx.annotation.NonNull;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-
 import java.io.Serializable;
 
 
@@ -40,7 +38,6 @@ public enum HCaptchaSize implements Serializable {
         return this.size;
     }
 
-    @JsonValue
     @NonNull
     @Override
     public String toString() {

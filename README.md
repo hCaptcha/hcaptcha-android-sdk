@@ -513,6 +513,7 @@ Notes:
 - Events start at `setup()` (including pre-warm) and continue until the same `HCaptcha` instance is reconfigured with `userJourney(false)` or you call `stopEvents()`. `reset()` and `destroy()` also stop tracking and clear the event buffer.
 - Only the most recent 50 events are kept. Buffered events are attached to verification requests and cleared after successful verification, `reset()`, `destroy()`, or `stopEvents()`.
 - Events include component identifiers, coordinates, and text-length deltas (never full text). This should avoid collecting any personal or sensitive data, but ensure your component IDs do not include any PII.
+- Manual `HCaptchaVerifyParams.userJourney` values must be JSON primitives, `JSONObject`/`JSONArray`, maps with string keys, collections, arrays, or SDK `JLEvent` values.
 - If you set `HCaptchaVerifyParams.userJourney` manually while `userJourney` is enabled, the SDK may overwrite it with captured events.
 - Use `stopEvents()` if you need to unregister the user-journey sink, for example before reusing a client without analytics.
 

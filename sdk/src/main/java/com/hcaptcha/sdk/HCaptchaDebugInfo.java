@@ -5,11 +5,12 @@ import android.os.Build;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dalvik.system.DexFile;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NonNull;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -67,8 +68,7 @@ final class HCaptchaDebugInfo implements Serializable {
 
             try {
                 final List<String> debugInfo = debugInfo(context.getPackageName(), context.getPackageCodePath());
-                final ObjectMapper objectMapper = new ObjectMapper();
-                sDebugInfo = objectMapper.writeValueAsString(debugInfo);
+                sDebugInfo = new JSONArray(debugInfo).toString();
             } catch (IOException | NoSuchAlgorithmException e) {
                 Log.d(JS_INTERFACE_TAG, "Cannot build debugInfo");
                 return "[]";
@@ -89,8 +89,7 @@ final class HCaptchaDebugInfo implements Serializable {
 
             try {
                 final Map<String, String> props = roBuildProps();
-                final ObjectMapper objectMapper = new ObjectMapper();
-                sSysDebug = objectMapper.writeValueAsString(props);
+                sSysDebug = new JSONObject(props).toString();
             } catch (IOException e) {
                 Log.d(JS_INTERFACE_TAG, "Cannot build sysDebug");
                 return "{}";

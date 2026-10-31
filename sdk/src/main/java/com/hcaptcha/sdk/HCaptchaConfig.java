@@ -1,9 +1,10 @@
 package com.hcaptcha.sdk;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NonNull;
+import org.json.JSONException;
+import org.json.JSONStringer;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -57,7 +58,6 @@ public class HCaptchaConfig implements Serializable {
      * @deprecated use {@link #jsSrc} property instead
      */
     @Builder.Default
-    @JsonIgnore
     @Deprecated
     private String apiEndpoint = "https://js.hcaptcha.com/1/api.js"; //NOSONAR
 
@@ -121,7 +121,6 @@ public class HCaptchaConfig implements Serializable {
      * Controls where visual challenge should render.
      */
     @Builder.Default
-    @JsonIgnore
     private HCaptchaRenderMode renderMode = HCaptchaRenderMode.DIALOG;
 
     /**
@@ -148,7 +147,6 @@ public class HCaptchaConfig implements Serializable {
      * The lambda will decide should we retry or not
      */
     @Builder.Default
-    @JsonIgnore
     private IHCaptchaRetryPredicate retryPredicate = (config, exception) -> {
         if (Boolean.TRUE.equals(config.resetOnTimeout)) {
             return exception.getHCaptchaError() == HCaptchaError.SESSION_TIMEOUT;
@@ -193,7 +191,6 @@ public class HCaptchaConfig implements Serializable {
      * Returns a base URL built from the sanitized host using HTTPS scheme.
      * Example: host "example.com" -> "https://example.com". Returns null if host is not set.
      */
-    @JsonIgnore
     String getBaseUrl() {
         final String sanitizedHost = this.host;
         if (sanitizedHost == null || sanitizedHost.isEmpty()) {
@@ -205,9 +202,34 @@ public class HCaptchaConfig implements Serializable {
     /**
      * Returns true if the flow should run without visual UI.
      */
-    @JsonIgnore
     public boolean isHeadlessMode() {
         return renderMode == HCaptchaRenderMode.HEADLESS || Boolean.TRUE.equals(hideDialog);
+    }
+
+    String toJson() throws JSONException {
+        return new JSONStringer().object()
+                .key("siteKey").value(siteKey)
+                .key("sentry").value(sentry)
+                .key("loading").value(loading)
+                .key("hideDialog").value(hideDialog)
+                .key("rqdata").value(rqdata)
+                .key("jsSrc").value(jsSrc)
+                .key("endpoint").value(endpoint)
+                .key("reportapi").value(reportapi)
+                .key("assethost").value(assethost)
+                .key("imghost").value(imghost)
+                .key("locale").value(locale)
+                .key("size").value(size)
+                .key("orientation").value(orientation)
+                .key("theme").value(theme)
+                .key("host").value(host)
+                .key("customTheme").value(customTheme)
+                .key("resetOnTimeout").value(resetOnTimeout)
+                .key("tokenExpiration").value(tokenExpiration)
+                .key("diagnosticLog").value(diagnosticLog)
+                .key("disableHardwareAcceleration").value(disableHardwareAcceleration)
+                .key("userJourney").value(userJourney)
+                .endObject().toString();
     }
 
     public static class HCaptchaConfigBuilder {
