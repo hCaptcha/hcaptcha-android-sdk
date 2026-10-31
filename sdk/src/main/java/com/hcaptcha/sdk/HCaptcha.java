@@ -28,6 +28,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @Nullable
     private IHCaptchaVerifier captchaVerifier;
 
+    // Bumped on every setup, reset and destroy: callbacks from an older one are stale
+    private int setupGeneration;
+
     @Nullable
     private HCaptchaConfig config;
 
@@ -90,7 +93,11 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         HCaptchaLog.sDiagnosticsLogEnabled = inputConfig.getDiagnosticLog();
         HCaptchaLog.d("HCaptcha.setup");
 
+        final int generation = ++setupGeneration;
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
+            // A WebView of an older setup is gone (renderers are shared): drop the failure that follows
+            private boolean staleWebViewGone;
+
             @Override
             void onLoaded() {
                 captchaLoaded();
@@ -113,12 +120,22 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
             @Override
             void onFailure(final HCaptchaException exception) {
+                if (staleWebViewGone) {
+                    staleWebViewGone = false;
+                    HCaptchaLog.d("HCaptcha.onFailure: stale WebView gone, ignored");
+                    return;
+                }
                 HCaptchaLog.d("HCaptcha.onFailure");
                 setException(exception);
             }
 
             @Override
             void onWebViewGone() {
+                if (generation != setupGeneration) {
+                    // Leave the current verifier alone, it isn't the one that is gone
+                    staleWebViewGone = true;
+                    return;
+                }
                 HCaptchaLog.d("HCaptcha.onWebViewGone");
                 // The next verifyWithHCaptcha() cold starts with a fresh WebView
                 captchaVerifier = null;
@@ -243,6 +260,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @Override
     public void reset() {
+        setupGeneration++;
         if (captchaVerifier != null) {
             captchaVerifier.reset();
             captchaVerifier = null;
@@ -252,6 +270,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @Override
     public void destroy() {
+        setupGeneration++;
         if (captchaVerifier != null) {
             captchaVerifier.destroy();
             captchaVerifier = null;

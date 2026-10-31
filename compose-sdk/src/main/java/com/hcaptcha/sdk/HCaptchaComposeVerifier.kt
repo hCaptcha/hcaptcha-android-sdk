@@ -13,6 +13,8 @@ internal class HCaptchaComposeVerifier(
 
     private var verifyParams: HCaptchaVerifyParams? = null
 
+    var webViewGoneListener: (() -> Unit)? = null
+
     override fun onLoaded() {
         onResult(HCaptchaResponse.Event(HCaptchaEvent.Loaded))
 
@@ -58,8 +60,9 @@ internal class HCaptchaComposeVerifier(
     }
 
     override fun onWebViewGone(exception: HCaptchaException) {
-        // Never retry on the dead WebView, recomposing HCaptchaCompose builds a fresh one
+        // Never retry on the dead WebView, HCaptchaCompose builds a fresh one on its next recomposition
         helperState.value?.destroy()
+        webViewGoneListener?.invoke()
         onResult(HCaptchaResponse.Failure(exception.hCaptchaError))
     }
 }

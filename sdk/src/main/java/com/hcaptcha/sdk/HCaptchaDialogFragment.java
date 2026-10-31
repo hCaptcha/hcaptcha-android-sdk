@@ -77,6 +77,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @Nullable
     private HCaptchaVerifyParams verifyParams;
 
+    @Nullable
+    private FragmentManager fragmentManager;
+
     /**
      * Creates a new instance
      *
@@ -349,20 +352,24 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             webViewHelper.setVerifyParams(params);
         }
 
-        final FragmentManager fragmentManager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
-        final Fragment oldFragment = fragmentManager.findFragmentByTag(HCaptchaDialogFragment.TAG);
+        final FragmentManager manager = ((FragmentActivity) fragmentActivity).getSupportFragmentManager();
+        fragmentManager = manager;
+        // A dismiss is only queued, e.g. when verifying again from the failure listener:
+        // let it land, otherwise the dialog below looks shown while it's on its way out.
+        executePendingTransactions();
+        final Fragment oldFragment = manager.findFragmentByTag(HCaptchaDialogFragment.TAG);
         if (oldFragment != null && oldFragment.isAdded()) {
             HCaptchaLog.w("DialogFragment was already added.");
             return;
         }
 
-        if (fragmentManager.isStateSaved()) {
+        if (manager.isStateSaved()) {
             HCaptchaLog.w("FragmentActivity is in state saved");
             return;
         }
 
         try {
-            show(fragmentManager, HCaptchaDialogFragment.TAG);
+            show(manager, HCaptchaDialogFragment.TAG);
         } catch (IllegalStateException e) {
             HCaptchaLog.w("DialogFragment.startVerification " + e.getMessage());
             // https://stackoverflow.com/q/14262312/902217
@@ -404,12 +411,28 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onWebViewGone(@NonNull final HCaptchaException exception) {
+        // Land a pending show first, so the dismiss in destroy() has something to remove
+        executePendingTransactions();
         destroy();
+        // Remove the dialog now: a verify from the failure listener shows a fresh one
+        executePendingTransactions();
         if (listener != null) {
             listener.onWebViewGone();
             listener.onFailure(exception);
         } else {
             HCaptchaLog.w("Dialog wasn't created, listener == null");
+        }
+    }
+
+    private void executePendingTransactions() {
+        if (fragmentManager == null) {
+            return;
+        }
+        try {
+            fragmentManager.executePendingTransactions();
+        } catch (IllegalStateException e) {
+            // E.g. called while the FragmentManager is already executing transactions
+            HCaptchaLog.w("DialogFragment.executePendingTransactions " + e.getMessage());
         }
     }
 
