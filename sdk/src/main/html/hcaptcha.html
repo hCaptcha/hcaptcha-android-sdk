@@ -119,6 +119,49 @@
         }
         return theme;
     }
+    // Unprefixed `transform` needs Chromium 36+, the API 16-19 WebViews only know `-webkit-`
+    function setOverlayTransform(overlay, transform) {
+        overlay.style.webkitTransformOrigin = overlay.style.transformOrigin = 'top center';
+        overlay.style.webkitTransform = overlay.style.transform = transform;
+    }
+
+    /**
+     * hCaptcha renders the challenge into a fixed 400x600 overlay appended to
+     * `<body>`, positioned near the checkbox. On a short viewport (landscape,
+     * or a display size scaled up by the user) 600px does not fit, and the
+     * overlay overflows past the top edge where the prompt cannot be scrolled
+     * back into view. Scale it down and shift it inside the viewport so the
+     * whole challenge stays on screen.
+     */
+    function fitChallengeToViewport() {
+        var overlay = null;
+        var children = document.body.children;
+        for (var i = 0; i < children.length; i++) {
+            var el = children[i];
+            if (el.tagName === 'DIV' && el.id !== 'hcaptcha-container' &&
+                    el.querySelector('iframe')) {
+                overlay = el;
+            }
+        }
+        if (!overlay) {
+            return;
+        }
+        // Measure hCaptcha's own placement, without our previous transform,
+        // so repeated calls (open, resize, mutation) do not stack up.
+        setOverlayTransform(overlay, '');
+        var rect = overlay.getBoundingClientRect();
+        if (!rect.height) {
+            return;
+        }
+        var viewportHeight = window.innerHeight;
+        var scale = Math.min(1, viewportHeight / rect.height);
+        // Shift the scaled overlay fully on screen, e.g. top: -100px -> 0.
+        var top = Math.max(0, Math.min(rect.top, viewportHeight - rect.height * scale));
+        var shift = top - rect.top;
+        setOverlayTransform(overlay, shift || scale < 1 ?
+            'translateY(' + shift + 'px) scale(' + scale + ')' : '');
+    }
+
     function getRenderConfig() {
         return {
             sitekey: bridgeConfig.siteKey,
@@ -153,6 +196,7 @@
                 }
             },
             'open-callback': function openCallback() {
+                fitChallengeToViewport();
                 return BridgeObject.onOpen();
             }
         };
@@ -215,6 +259,26 @@
             BridgeObject.onError(30);
         }
     });
+
+    window.addEventListener('resize', fitChallengeToViewport);
+    // After our resize handler, hCaptcha repositions the overlay through inline styles
+    // (e.g. on rotation), so follow style changes too, not only the overlay being added.
+    var Observer = window.MutationObserver || window.WebKitMutationObserver;
+    if (Observer) {
+        var observer = new Observer(function () {
+            fitChallengeToViewport();
+            // Drop the records of our own transform writes, otherwise the fit re-triggers itself
+            observer.takeRecords();
+        });
+        observer.observe(document.body, {
+            childList: true, subtree: true, attributes: true, attributeFilter: ['style']
+        });
+    } else {
+        // API 16-18 WebViews have no observer: fit again once hCaptcha's reposition has landed
+        window.addEventListener('resize', function () {
+            setTimeout(fitChallengeToViewport, 300);
+        });
+    }
 
     loadApi();
 </script>

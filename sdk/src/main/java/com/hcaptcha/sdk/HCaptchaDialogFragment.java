@@ -215,6 +215,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         if (dialog != null && webViewHelper != null) {
             final Window window = dialog.getWindow();
             window.setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+            // Dialog theme wraps the window to its content; pin it so the page viewport
+            // doesn't track what hCaptcha renders (#227)
+            window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             defaultDimAmount = window.getAttributes().dimAmount;
             if (!readyForInteraction && Boolean.FALSE.equals(webViewHelper.getConfig().getLoading())) {
                 window.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
@@ -439,7 +442,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             if (sPreloadWebView.getParent() != null) {
                 ((ViewGroup) sPreloadWebView.getParent()).removeView(sPreloadWebView);
             }
-            parent.addView(sPreloadWebView, index);
+            // Keep the stub's match_parent, otherwise the WebView is wrap_content (#227)
+            parent.addView(sPreloadWebView, index, stub.getLayoutParams());
             if (Boolean.FALSE.equals(config.getLoading())) {
                 sPreloadWebView.setOnTouchListener((view, event) -> {
                     if (!readyForInteraction && isAdded()) {
