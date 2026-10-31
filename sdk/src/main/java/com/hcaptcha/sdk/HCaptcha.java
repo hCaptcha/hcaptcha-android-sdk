@@ -271,6 +271,8 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @Override
     public void destroy() {
         setupGeneration++;
+        // A destroyed client must not report its last token expired later
+        handler.removeCallbacksAndMessages(null);
         if (captchaVerifier != null) {
             captchaVerifier.destroy();
             captchaVerifier = null;

@@ -80,6 +80,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     @Nullable
     private FragmentManager fragmentManager;
 
+    private boolean webViewDestroyed = false;
+
     /**
      * Creates a new instance
      *
@@ -205,7 +207,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         super.onDestroy();
         readyForInteraction = false;
         replayLoadedOnStart = webViewLoaded;
-        if (webViewHelper != null) {
+        // Nothing to reset once destroy() released the WebView
+        if (webViewHelper != null && !webViewDestroyed) {
             webViewHelper.reset();
         }
     }
@@ -401,6 +404,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
     public void destroy() {
         if (webViewHelper != null) {
             webViewHelper.destroy();
+            webViewDestroyed = true;
         }
         if (isAdded()) {
             dismissAllowingStateLoss();

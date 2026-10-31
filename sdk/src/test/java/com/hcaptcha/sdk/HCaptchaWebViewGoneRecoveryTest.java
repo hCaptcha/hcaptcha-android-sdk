@@ -6,6 +6,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.mockConstruction;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.os.Build;
@@ -16,11 +20,13 @@ import androidx.fragment.app.FragmentManager;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.MockedConstruction;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
 import java.lang.reflect.Field;
+import java.time.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 
 // Recovery once the WebView is gone, with a real FragmentManager instead of mocks (#214).
@@ -107,6 +113,42 @@ public class HCaptchaWebViewGoneRecoveryTest {
         commitPending();
 
         assertTrue("the dialog should be shown again", dialog.isAdded());
+    }
+
+    @Test
+    public void dialogGoneDoesNotResetDestroyedWebView() {
+        try (MockedConstruction<HCaptchaWebViewHelper> helperMock = mockConstruction(HCaptchaWebViewHelper.class,
+                (helper, context) -> when(helper.getConfig()).thenReturn(config))) {
+            final HCaptcha hCaptcha = HCaptcha.getClient(activity).setup(config);
+            hCaptcha.verifyWithHCaptcha();
+            commitPending();
+            final HCaptchaDialogFragment dialog = (HCaptchaDialogFragment) verifierOf(hCaptcha);
+            assertTrue(dialog.isAdded());
+
+            dialog.onWebViewGone(exception);
+            commitPending();
+
+            final HCaptchaWebViewHelper helper = helperMock.constructed().get(0);
+            verify(helper).destroy();
+            verify(helper, never()).reset();
+        }
+    }
+
+    @Test
+    public void destroyCancelsTokenExpiration() {
+        final HCaptchaConfig headless = config.toBuilder()
+                .renderMode(HCaptchaRenderMode.HEADLESS)
+                .tokenExpiration(1)
+                .build();
+        final HCaptcha hCaptcha = HCaptcha.getClient(activity).setup(headless);
+        final AtomicInteger failures = new AtomicInteger();
+        hCaptcha.addOnFailureListener(e -> failures.incrementAndGet());
+        verifierOf(hCaptcha).onSuccess("token");
+
+        hCaptcha.destroy();
+        shadowOf(Looper.getMainLooper()).idleFor(Duration.ofSeconds(2));
+
+        assertEquals("a destroyed client should not report its token expired", 0, failures.get());
     }
 
     private AtomicInteger retryOnceFromFailureListener(final HCaptcha client) {
