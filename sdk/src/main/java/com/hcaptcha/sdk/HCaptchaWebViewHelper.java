@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.webkit.ConsoleMessage;
 import android.webkit.PermissionRequest;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
@@ -306,6 +307,16 @@ final class HCaptchaWebViewHelper {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
             super.onReceivedError(view, errorCode, description, failingUrl);
             HCaptchaLog.d("[webview] onReceivedError \"%s\" (%d)", description, errorCode);
+        }
+
+        @Override
+        @RequiresApi(Build.VERSION_CODES.O)
+        public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+            HCaptchaLog.w("[webview] onRenderProcessGone, didCrash: " + detail.didCrash());
+            captchaVerifier.onWebViewGone(new HCaptchaException(
+                    HCaptchaError.ERROR, "WebView render process did terminate"));
+            // Returning false lets the framework kill the host app (#214)
+            return true;
         }
     }
 

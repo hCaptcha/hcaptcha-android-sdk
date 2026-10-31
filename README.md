@@ -320,6 +320,8 @@ HCaptchaCompose(
 - `renderMode=EMBEDDED`: SDK renders the challenge `WebView` embedded, so you can place it inside your own Compose modal/container.
 - `renderMode=HEADLESS`: SDK runs headless (no visual UI), intended for passive sitekeys.
 
+`HCaptchaCompose` verifies once when it enters composition. To verify again, take it out of composition and back, e.g. with `key(attempt) { HCaptchaCompose(config) { ... } }`. If the `WebView` render process is gone, `HCaptchaCompose` reports `HCaptchaError.ERROR` and also verifies again with a fresh `WebView` on its next recomposition.
+
 ### Memory usage (fragment lifecycle)
 
 We cache the fragment instance inside the SDK to speed up the next HCaptcha.verifyWithHCaptcha calls.

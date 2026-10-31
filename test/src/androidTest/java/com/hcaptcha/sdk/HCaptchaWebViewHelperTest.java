@@ -6,6 +6,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import android.app.Activity;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.webkit.JavascriptInterface;
@@ -27,6 +28,7 @@ import java.util.concurrent.TimeUnit;
 
 public class HCaptchaWebViewHelperTest {
     private static final long AWAIT_CALLBACK_MS = 5000;
+    private static final long AWAIT_CRASH_MS = 3000;
 
     private ActivityScenario<TestActivity> scenario;
     private final Handler handler = new Handler(Looper.getMainLooper());
@@ -221,6 +223,43 @@ public class HCaptchaWebViewHelperTest {
         assertEquals("test-rqdata-from-params", receivedParams.getRqdata());
     }
 
+    // A dead renderer must reach the listener instead of killing the host app (#214).
+    @Test
+    public void testRenderProcessGoneHandling() throws Exception {
+        Assume.assumeTrue("onRenderProcessGone was added in API 26",
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.O);
+
+        final CountDownLatch goneLatch = new CountDownLatch(1);
+
+        final IHCaptchaVerifier verifier = new TestIHCaptchaVerifier() {
+            @Override
+            public void onLoaded() {
+                // Allow onLoaded to be called
+            }
+
+            @Override
+            public void onWebViewGone(HCaptchaException e) {
+                assertEquals(HCaptchaError.ERROR, e.getHCaptchaError());
+                assertEquals("WebView render process did terminate", e.getMessage());
+                goneLatch.countDown();
+            }
+        };
+
+        scenario = ActivityScenario.launch(TestActivity.class);
+        scenario.onActivity(activity -> {
+            final HCaptchaWebView webView = new HCaptchaWebView(activity);
+            helper = new HCaptchaWebViewHelper(
+                    handler, activity, baseConfig, internalConfig, verifier, webView);
+            activity.setContentView(webView);
+            // Chromium debug URL: crashes the renderer on purpose. Let the initial
+            // loadDataWithBaseURL settle first, otherwise the navigation is dropped.
+            webView.postDelayed(() -> webView.loadUrl("chrome://crash"), AWAIT_CRASH_MS);
+        });
+
+        assertTrue("verifier should be told the WebView is gone",
+                goneLatch.await(AWAIT_CRASH_MS * 4, TimeUnit.MILLISECONDS));
+    }
+
     private static abstract class TestIHCaptchaVerifier implements IHCaptchaVerifier {
         @Override
         public void onOpen() {
@@ -254,6 +293,11 @@ public class HCaptchaWebViewHelperTest {
 
         @Override
         public void onFailure(HCaptchaException e) {
+            failAsNonReachable();
+        }
+
+        @Override
+        public void onWebViewGone(HCaptchaException e) {
             failAsNonReachable();
         }
     }

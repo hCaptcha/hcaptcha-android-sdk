@@ -69,6 +69,9 @@ public class HCaptchaTest {
     @Captor
     ArgumentCaptor<HCaptchaConfig> hCaptchaConfigCaptor;
 
+    @Captor
+    ArgumentCaptor<HCaptchaStateListener> stateListenerCaptor;
+
     MockedStatic<HCaptchaDialogFragment> dialogFragmentMock;
 
     final HCaptchaConfig config = HCaptchaConfig.builder()
@@ -251,6 +254,71 @@ public class HCaptchaTest {
     }
 
     @Test
+    public void test_verify_after_webview_gone_rebuilds_with_setup_config() throws Exception {
+        final HCaptcha hCaptcha = HCaptcha.getClient(fragmentActivity).setup(config);
+        dialogFragmentMock.verify(() ->
+                HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
+                        any(HCaptchaConfig.class),
+                        any(HCaptchaInternalConfig.class),
+                        stateListenerCaptor.capture()));
+
+        stateListenerCaptor.getValue().onWebViewGone();
+        hCaptcha.verifyWithHCaptcha();
+
+        verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
+        dialogFragmentMock.verify(() ->
+                HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
+                        hCaptchaConfigCaptor.capture(),
+                        any(HCaptchaInternalConfig.class),
+                        any(HCaptchaStateListener.class)), times(2));
+        assertEquals(config, hCaptchaConfigCaptor.getValue());
+        verify(fragment).startVerification(fragmentActivity, null);
+    }
+
+    @Test
+    public void test_verify_params_after_webview_gone_rebuilds_with_setup_config() throws Exception {
+        final HCaptchaVerifyParams params = HCaptchaVerifyParams.builder().phoneNumber("+1234567890").build();
+        final HCaptcha hCaptcha = HCaptcha.getClient(fragmentActivity).setup(config);
+        dialogFragmentMock.verify(() ->
+                HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
+                        any(HCaptchaConfig.class),
+                        any(HCaptchaInternalConfig.class),
+                        stateListenerCaptor.capture()));
+
+        stateListenerCaptor.getValue().onWebViewGone();
+        hCaptcha.verifyWithHCaptcha(params);
+
+        verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
+        dialogFragmentMock.verify(() ->
+                HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
+                        hCaptchaConfigCaptor.capture(),
+                        any(HCaptchaInternalConfig.class),
+                        any(HCaptchaStateListener.class)), times(2));
+        assertEquals(config, hCaptchaConfigCaptor.getValue());
+        verify(fragment).startVerification(fragmentActivity, params);
+    }
+
+    @Test
+    public void test_verify_after_reset_rebuilds_with_setup_config() throws Exception {
+        final HCaptcha hCaptcha = HCaptcha.getClient(fragmentActivity).setup(config);
+        hCaptcha.reset();
+        hCaptcha.verifyWithHCaptcha();
+
+        verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
+        dialogFragmentMock.verify(() ->
+                HCaptchaDialogFragment.newInstance(
+                        any(Context.class),
+                        hCaptchaConfigCaptor.capture(),
+                        any(HCaptchaInternalConfig.class),
+                        any(HCaptchaStateListener.class)), times(2));
+        assertEquals(config, hCaptchaConfigCaptor.getValue());
+    }
+
+    @Test
     @SuppressWarnings("java:S2699") // expect no exception thrown for public API call
     public void test_reset() {
         HCaptcha.getClient(fragmentActivity).setup(config).reset();
@@ -387,17 +455,6 @@ public class HCaptchaTest {
 
     @Test
     public void test_webview_not_installed() throws Exception {
-        final ApplicationInfo applicationInfo = mock(ApplicationInfo.class);
-        final Bundle bundle = mock(Bundle.class);
-        when(bundle.getString(META_SITE_KEY)).thenReturn(HCaptchaConfigTest.MOCK_SITE_KEY);
-        bundle.putString(META_SITE_KEY, HCaptchaConfigTest.MOCK_SITE_KEY);
-        applicationInfo.metaData = bundle;
-
-        when(fragmentActivity.getPackageName()).thenReturn(TEST_PACKAGE_NAME);
-        when(fragmentActivity.getPackageManager()).thenReturn(packageManager);
-        when(packageManager.getApplicationInfo(TEST_PACKAGE_NAME, PackageManager.GET_META_DATA))
-                .thenReturn(applicationInfo);
-
         try (MockedConstruction<HCaptchaWebView> mock = mockConstruction(HCaptchaWebView.class,
                 withSettings().defaultAnswer(invocation -> {
                     throw new AndroidRuntimeException(
