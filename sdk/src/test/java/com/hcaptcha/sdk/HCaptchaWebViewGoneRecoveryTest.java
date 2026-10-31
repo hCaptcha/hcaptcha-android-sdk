@@ -13,6 +13,7 @@ import static org.mockito.Mockito.when;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.os.Build;
+import android.os.Handler;
 import android.os.Looper;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
@@ -98,6 +99,48 @@ public class HCaptchaWebViewGoneRecoveryTest {
 
         assertSame("a stale callback should keep the replacement", replacement, verifierOf(hCaptcha));
         assertEquals("the crash should be reported once", 1, failures.get());
+    }
+
+    @Test
+    public void staleDialogDoesNotClearReplacementWebView() throws ReflectiveOperationException {
+        final HCaptcha hCaptcha = HCaptcha.getClient(activity).setup(config);
+        final IHCaptchaVerifier stale = verifierOf(hCaptcha);
+        hCaptcha.setup(config).verifyWithHCaptcha();
+        commitPending();
+        final IHCaptchaVerifier current = verifierOf(hCaptcha);
+        retryOnceFromFailureListener(hCaptcha);
+
+        current.onWebViewGone(exception);
+        stale.onWebViewGone(exception);
+        commitPending();
+
+        final HCaptchaDialogFragment replacement = (HCaptchaDialogFragment) verifierOf(hCaptcha);
+        final Field helperField = HCaptchaDialogFragment.class.getDeclaredField("webViewHelper");
+        helperField.setAccessible(true);
+        final HCaptchaWebViewHelper helper = (HCaptchaWebViewHelper) helperField.get(replacement);
+        assertSame(helper.getWebView(), replacement.requireView().findViewById(R.id.webView));
+    }
+
+    @Test
+    public void queuedCallbacksFromDeadVerifierAreIgnored() {
+        final HCaptchaConfig headless = config.toBuilder().renderMode(HCaptchaRenderMode.HEADLESS).build();
+        final HCaptcha hCaptcha = HCaptcha.getClient(activity).setup(headless);
+        final IHCaptchaVerifier dead = verifierOf(hCaptcha);
+        final AtomicInteger successes = new AtomicInteger();
+        final AtomicInteger loads = new AtomicInteger();
+        hCaptcha.addOnSuccessListener(result -> successes.incrementAndGet());
+        hCaptcha.addOnLoadedListener(loads::incrementAndGet);
+        retryOnceFromFailureListener(hCaptcha);
+        final HCaptchaJSInterface bridge = new HCaptchaJSInterface(
+                new Handler(Looper.getMainLooper()), headless, dead);
+
+        bridge.onPass("old-token");
+        bridge.onLoaded();
+        dead.onWebViewGone(exception);
+        shadowOf(Looper.getMainLooper()).idle();
+
+        assertEquals(0, successes.get());
+        assertEquals(0, loads.get());
     }
 
     @Test

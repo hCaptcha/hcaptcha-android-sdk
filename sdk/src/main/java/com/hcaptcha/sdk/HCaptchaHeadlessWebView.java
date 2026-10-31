@@ -112,7 +112,6 @@ final class HCaptchaHeadlessWebView implements IHCaptchaVerifier {
     @Override
     public void onWebViewGone(@NonNull final HCaptchaException exception) {
         destroy();
-        listener.onWebViewGone();
-        listener.onFailure(exception);
+        listener.onWebViewGone(exception);
     }
 }

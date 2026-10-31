@@ -1,6 +1,7 @@
 package com.hcaptcha.sdk;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockConstruction;
@@ -30,7 +31,7 @@ public class HCaptchaWebViewGoneTest {
             .siteKey(HCaptchaConfigTest.MOCK_SITE_KEY)
             .build();
     private final HCaptchaInternalConfig internalConfig = HCaptchaInternalConfig.builder().build();
-    private final HCaptchaStateListener listener = mock(HCaptchaStateListener.class);
+    private final HCaptchaStateListener listener = mock(HCaptchaStateListener.class, CALLS_REAL_METHODS);
     private final HCaptchaException exception = new HCaptchaException(HCaptchaError.ERROR);
 
     private Activity activity;
@@ -57,7 +58,7 @@ public class HCaptchaWebViewGoneTest {
         verify(helper, never()).resetAndExecute(any());
         // Released before the failure, so a verify from the failure listener starts fresh
         final InOrder order = inOrder(listener);
-        order.verify(listener).onWebViewGone();
+        order.verify(listener).onWebViewGone(exception);
         order.verify(listener).onFailure(exception);
     }
 

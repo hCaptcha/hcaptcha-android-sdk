@@ -394,7 +394,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             dismissAllowingStateLoss();
         }
         // Clear the static WebView reference to prevent memory leaks
-        sPreloadWebView = null;
+        if (webViewHelper != null && sPreloadWebView == webViewHelper.getWebView()) {
+            sPreloadWebView = null;
+        }
     }
 
     /**
@@ -410,7 +412,9 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
             dismissAllowingStateLoss();
         }
         // Clear the static WebView reference to prevent memory leaks
-        sPreloadWebView = null;
+        if (webViewHelper != null && sPreloadWebView == webViewHelper.getWebView()) {
+            sPreloadWebView = null;
+        }
     }
 
     @Override
@@ -421,8 +425,7 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
         // Remove the dialog now: a verify from the failure listener shows a fresh one
         executePendingTransactions();
         if (listener != null) {
-            listener.onWebViewGone();
-            listener.onFailure(exception);
+            listener.onWebViewGone(exception);
         } else {
             HCaptchaLog.w("Dialog wasn't created, listener == null");
         }
