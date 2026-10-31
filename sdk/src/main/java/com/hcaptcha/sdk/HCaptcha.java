@@ -144,6 +144,10 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
         };
         try {
+            if (captchaVerifier != null) {
+                captchaVerifier.destroy();
+                captchaVerifier = null;
+            }
             // Initialize or disable user journey tracking if enabled/disabled.
             if (Boolean.TRUE.equals(inputConfig.getUserJourney())) {
                 if (journeySink == null) {

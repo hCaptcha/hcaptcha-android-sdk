@@ -404,6 +404,8 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
      */
     @Override
     public void destroy() {
+        // Land a pending show so the dismiss below also removes a dialog queued for display.
+        executePendingTransactions();
         if (webViewHelper != null) {
             webViewHelper.destroy();
             webViewDestroyed = true;
@@ -419,8 +421,6 @@ public final class HCaptchaDialogFragment extends DialogFragment implements IHCa
 
     @Override
     public void onWebViewGone(@NonNull final HCaptchaException exception) {
-        // Land a pending show first, so the dismiss in destroy() has something to remove
-        executePendingTransactions();
         destroy();
         // Remove the dialog now: a verify from the failure listener shows a fresh one
         executePendingTransactions();

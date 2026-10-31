@@ -138,6 +138,39 @@ public class HCaptchaTest {
     }
 
     @Test
+    public void dialogConfigChangeReplacesVisibleChallenge() throws Exception {
+        final CountDownLatch loadedLatch = new CountDownLatch(1);
+        final CountDownLatch replacementLoadedLatch = new CountDownLatch(1);
+        final CountDownLatch successLatch = new CountDownLatch(1);
+        final AtomicReference<HCaptcha> client = new AtomicReference<>();
+        final AtomicReference<WebView> oldWebView = new AtomicReference<>();
+        final HCaptchaConfig dialogConfig = config.toBuilder().hideDialog(false).size(HCaptchaSize.NORMAL).build();
+        final ActivityScenario<TestActivity> scenario = rule.getScenario();
+        scenario.onActivity(activity -> {
+            final HCaptcha hCaptcha = HCaptcha.getClient(activity, internalConfig);
+            client.set(hCaptcha);
+            hCaptcha.addOnLoadedListener(loadedLatch::countDown);
+            hCaptcha.addOnSuccessListener(response -> {
+                response.markUsed();
+                successLatch.countDown();
+            });
+            hCaptcha.verifyWithHCaptcha(dialogConfig);
+            oldWebView.set(webViewOf(hCaptcha));
+        });
+        assertTrue("initial challenge should load", loadedLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+
+        scenario.onActivity(activity -> {
+            client.get().addOnLoadedListener(replacementLoadedLatch::countDown);
+            client.get().verifyWithHCaptcha(dialogConfig.toBuilder().theme(HCaptchaTheme.DARK).build());
+            assertNotSame(oldWebView.get(), webViewOf(client.get()));
+        });
+
+        assertTrue("replacement should load", replacementLoadedLatch.await(AWAIT_CALLBACK_MS, TimeUnit.MILLISECONDS));
+        waitHCaptchaWebViewToken(successLatch, AWAIT_CALLBACK_MS);
+        scenario.onActivity(activity -> client.get().destroy());
+    }
+
+    @Test
     public void dialogVerifierReplaysLoadedAfterReset() throws Exception {
         final CountDownLatch firstSuccessLatch = new CountDownLatch(1);
         final CountDownLatch secondFailureLatch = new CountDownLatch(1);
