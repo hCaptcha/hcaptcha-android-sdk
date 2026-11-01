@@ -263,7 +263,7 @@ public class HCaptchaTest {
                         any(HCaptchaInternalConfig.class),
                         stateListenerCaptor.capture()));
 
-        stateListenerCaptor.getValue().onWebViewGone();
+        stateListenerCaptor.getValue().onWebViewGone(new HCaptchaException(HCaptchaError.ERROR));
         hCaptcha.verifyWithHCaptcha();
 
         verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());
@@ -288,7 +288,7 @@ public class HCaptchaTest {
                         any(HCaptchaInternalConfig.class),
                         stateListenerCaptor.capture()));
 
-        stateListenerCaptor.getValue().onWebViewGone();
+        stateListenerCaptor.getValue().onWebViewGone(new HCaptchaException(HCaptchaError.ERROR));
         hCaptcha.verifyWithHCaptcha(params);
 
         verify(packageManager, never()).getApplicationInfo(any(String.class), anyInt());

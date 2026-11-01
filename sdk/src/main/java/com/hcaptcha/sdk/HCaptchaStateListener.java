@@ -15,8 +15,8 @@ abstract class HCaptchaStateListener implements Parcelable {
 
     abstract void onOpen();
 
-    void onWebViewGone() {
-        // Optional callback: the verifier can't be reused anymore.
+    void onWebViewGone(HCaptchaException exception) {
+        onFailure(exception);
     }
 
     @Override

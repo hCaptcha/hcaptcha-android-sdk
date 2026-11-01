@@ -95,21 +95,25 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
         final int generation = ++setupGeneration;
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
-            // A WebView of an older setup is gone (renderers are shared): drop the failure that follows
-            private boolean staleWebViewGone;
-
             @Override
             void onLoaded() {
-                captchaLoaded();
+                if (generation == setupGeneration) {
+                    captchaLoaded();
+                }
             }
 
             @Override
             void onOpen() {
-                captchaOpened();
+                if (generation == setupGeneration) {
+                    captchaOpened();
+                }
             }
 
             @Override
             void onSuccess(final String token) {
+                if (generation != setupGeneration) {
+                    return;
+                }
                 HCaptchaLog.d("HCaptcha.onSuccess");
                 if (journeySink != null) {
                     journeySink.clearEvents();
@@ -120,9 +124,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
             @Override
             void onFailure(final HCaptchaException exception) {
-                if (staleWebViewGone) {
-                    staleWebViewGone = false;
-                    HCaptchaLog.d("HCaptcha.onFailure: stale WebView gone, ignored");
+                if (generation != setupGeneration) {
                     return;
                 }
                 HCaptchaLog.d("HCaptcha.onFailure");
@@ -130,18 +132,22 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
 
             @Override
-            void onWebViewGone() {
+            void onWebViewGone(final HCaptchaException exception) {
                 if (generation != setupGeneration) {
-                    // Leave the current verifier alone, it isn't the one that is gone
-                    staleWebViewGone = true;
                     return;
                 }
                 HCaptchaLog.d("HCaptcha.onWebViewGone");
-                // The next verifyWithHCaptcha() cold starts with a fresh WebView
+                // Invalidate queued callbacks before the failure listener can start a new attempt.
+                setupGeneration++;
                 captchaVerifier = null;
+                setException(exception);
             }
         };
         try {
+            if (captchaVerifier != null) {
+                captchaVerifier.destroy();
+                captchaVerifier = null;
+            }
             // Initialize or disable user journey tracking if enabled/disabled.
             if (Boolean.TRUE.equals(inputConfig.getUserJourney())) {
                 if (journeySink == null) {

@@ -124,7 +124,6 @@ final class HCaptchaEmbeddedView implements IHCaptchaVerifier {
     @Override
     public void onWebViewGone(@NonNull HCaptchaException exception) {
         destroy();
-        listener.onWebViewGone();
-        listener.onFailure(exception);
+        listener.onWebViewGone(exception);
     }
 }
