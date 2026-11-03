@@ -21,6 +21,8 @@ public final class SerializationCases {
     private static final int RQDATA = 4;
     private static final int JOURNEY = 8;
     private static final int PARAM_COMBINATIONS = 16;
+    private static final byte[] BYTES = {1, 2, 3};
+    private static final byte[] SIGNED_BYTES = {-1, 0, 127};
     private static final String TEXT = "quote\"\\\n\r\t\b\f\u0000\u2028\u2029😀</script>";
 
     private SerializationCases() {
@@ -67,6 +69,15 @@ public final class SerializationCases {
                     .userJourney((mask & JOURNEY) == 0 ? null : events).build());
         }
         cases.put("verify-string-journey", HCaptchaVerifyParams.builder().userJourney(TEXT).build());
+        cases.put("verify-byte-journey", HCaptchaVerifyParams.builder().userJourney(BYTES).build());
+        cases.put("verify-empty-byte-journey", HCaptchaVerifyParams.builder().userJourney(new byte[0]).build());
+        cases.put("verify-char-journey", HCaptchaVerifyParams.builder().userJourney(TEXT.toCharArray()).build());
+        cases.put("verify-empty-char-journey", HCaptchaVerifyParams.builder().userJourney(new char[0]).build());
+        final Map<String, Object> arrays = new LinkedHashMap<>();
+        arrays.put("bytes", SIGNED_BYTES);
+        arrays.put("chars", new char[] {'a', 'b'});
+        arrays.put("boxedChars", new Character[] {'a', null});
+        cases.put("verify-nested-arrays", HCaptchaVerifyParams.builder().userJourney(arrays).build());
         return cases;
     }
 }

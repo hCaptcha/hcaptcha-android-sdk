@@ -1,11 +1,14 @@
 package com.hcaptcha.sdk;
 
+import android.util.Base64;
+
 import com.hcaptcha.sdk.journeylitics.JLEvent;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Array;
+import java.util.Iterator;
 import java.util.Map;
 
 /** JSON conversion for the supported user journey values, without reflective POJO serialization. */
@@ -26,9 +29,11 @@ final class HCaptchaJson {
         if (value == null) {
             return JSONObject.NULL;
         }
-        if (value instanceof JSONObject || value instanceof JSONArray || value == JSONObject.NULL
-                || value instanceof String || value instanceof Boolean) {
+        if (value == JSONObject.NULL || value instanceof String || value instanceof Boolean) {
             return value;
+        }
+        if (value instanceof Character) {
+            return value.toString();
         }
         if (value instanceof Number) {
             JSONObject.numberToString((Number) value);
@@ -36,6 +41,24 @@ final class HCaptchaJson {
         }
         if (value instanceof JLEvent) {
             return wrap(((JLEvent) value).toMap(), depth + 1);
+        }
+        if (value instanceof JSONObject) {
+            final JSONObject source = (JSONObject) value;
+            final JSONObject object = new JSONObject();
+            final Iterator<String> keys = source.keys();
+            while (keys.hasNext()) {
+                final String key = keys.next();
+                object.put(key, wrap(source.get(key), depth + 1));
+            }
+            return object;
+        }
+        if (value instanceof JSONArray) {
+            final JSONArray source = (JSONArray) value;
+            final JSONArray array = new JSONArray();
+            for (int i = 0; i < source.length(); i++) {
+                array.put(wrap(source.opt(i), depth + 1));
+            }
+            return array;
         }
         if (value instanceof Map) {
             final JSONObject object = new JSONObject();
@@ -53,6 +76,12 @@ final class HCaptchaJson {
                 array.put(wrap(item, depth + 1));
             }
             return array;
+        }
+        if (value instanceof byte[]) {
+            return Base64.encodeToString((byte[]) value, Base64.NO_WRAP);
+        }
+        if (value instanceof char[]) {
+            return new String((char[]) value);
         }
         if (value.getClass().isArray()) {
             final JSONArray array = new JSONArray();

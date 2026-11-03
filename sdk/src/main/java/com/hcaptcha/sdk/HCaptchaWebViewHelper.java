@@ -129,13 +129,11 @@ final class HCaptchaWebViewHelper {
             }
         }
 
-        if (verifyParams.equals(new HCaptchaVerifyParams())) {
-            return;
-        }
-
         try {
             final String data = verifyParams.toJson();
-            webView.loadUrl("javascript:setData(" + data + ");");
+            if (!"{}".equals(data)) {
+                webView.loadUrl("javascript:setData(" + data + ");");
+            }
         } catch (Exception e) {
             HCaptchaLog.w("Failed to call javascript:setData(): " + e.getMessage());
         }
