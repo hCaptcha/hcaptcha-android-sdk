@@ -1,9 +1,9 @@
 package com.hcaptcha.sdk;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
 import android.os.Build;
@@ -16,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.ParameterizedRobolectricTestRunner;
 import org.robolectric.Robolectric;
 import org.robolectric.annotation.Config;
+import org.robolectric.shadows.ShadowLog;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -25,7 +26,7 @@ import java.util.UUID;
 
 @RunWith(ParameterizedRobolectricTestRunner.class)
 @Config(sdk = Build.VERSION_CODES.S_V2)
-public class HCaptchaVerifyParamsFailureTest {
+public class HCaptchaVerifyParamsFallbackTest {
     private final HCaptchaRenderMode mode;
     private final boolean loaded;
     private final HCaptchaSize size;
@@ -40,7 +41,7 @@ public class HCaptchaVerifyParamsFailureTest {
                     if (mode == HCaptchaRenderMode.HEADLESS && size != HCaptchaSize.INVISIBLE) {
                         continue;
                     }
-                    for (String kind : new String[] {"POJO", "enum", "UUID", "cycle", "NaN"}) {
+                    for (String kind : new String[] {"POJO", "enum", "UUID", "cycle", "NaN", "iterator"}) {
                         cases.add(new Object[] {mode, loaded, size, kind});
                     }
                 }
@@ -49,7 +50,7 @@ public class HCaptchaVerifyParamsFailureTest {
         return cases;
     }
 
-    public HCaptchaVerifyParamsFailureTest(HCaptchaRenderMode mode, boolean loaded,
+    public HCaptchaVerifyParamsFallbackTest(HCaptchaRenderMode mode, boolean loaded,
                                           HCaptchaSize size, String valueKind) {
         this.mode = mode;
         this.loaded = loaded;
@@ -58,7 +59,7 @@ public class HCaptchaVerifyParamsFailureTest {
     }
 
     @Test
-    public void invalidParamsFailWithoutExecutingOrRetrying() throws Exception {
+    public void invalidJourneyIsOmittedWithoutFailingVerification() throws Exception {
         final FragmentActivity activity = Robolectric.buildActivity(FragmentActivity.class).setup().get();
         final FrameLayout container = new FrameLayout(activity);
         activity.setContentView(container);
@@ -97,6 +98,11 @@ public class HCaptchaVerifyParamsFailureTest {
             case "NaN":
                 value = new JSONArray().put((Object) Double.NaN);
                 break;
+            case "iterator":
+                value = (Iterable<Object>) () -> {
+                    throw new IllegalStateException();
+                };
+                break;
             default:
                 value = new Object();
                 break;
@@ -108,27 +114,22 @@ public class HCaptchaVerifyParamsFailureTest {
             verifier.onLoaded();
         }
 
-        assertEquals(1, errors.size());
-        assertEquals(HCaptchaError.VERIFY_PARAMS_ERROR, errors.get(0).getHCaptchaError());
-        assertNotNull(errors.get(0).getMessage());
-        assertNotEquals("javascript:execute();", shadowOf(helper.getWebView()).getLastLoadedUrl());
-        assertNotEquals("javascript:setData(null);", shadowOf(helper.getWebView()).getLastLoadedUrl());
+        assertTrue(errors.isEmpty());
         assertEquals("request-data", params.getRqdata());
+        assertSame(value, params.getUserJourney());
         if (mode == HCaptchaRenderMode.EMBEDDED) {
-            assertNull(helper.getWebView().getParent());
+            assertNotNull(helper.getWebView().getParent());
         }
-
-        final HCaptchaVerifyParams corrected = params.toBuilder().userJourney("corrected").build();
-        client.verifyWithHCaptcha(corrected);
-        activity.getSupportFragmentManager().executePendingTransactions();
-        verifier.onLoaded();
-        assertEquals(1, errors.size());
-        if (mode == HCaptchaRenderMode.HEADLESS || size == HCaptchaSize.INVISIBLE) {
+        if (mode == HCaptchaRenderMode.HEADLESS || (!loaded && size == HCaptchaSize.INVISIBLE)) {
             assertEquals("javascript:execute();", shadowOf(helper.getWebView()).getLastLoadedUrl());
         } else {
-            assertEquals("javascript:setData(" + corrected.toJson() + ");",
+            assertEquals("javascript:setData({\"mfa_phoneprefix\":\"44\",\"mfa_phone\":\"+44123456789\","
+                            + "\"rqdata\":\"request-data\"});",
                     shadowOf(helper.getWebView()).getLastLoadedUrl());
         }
+        assertTrue(helper.shouldRetry(new HCaptchaException(HCaptchaError.VERIFY_PARAMS_ERROR)));
+        assertTrue(ShadowLog.getLogsForTag("hcaptcha").stream()
+                .anyMatch(item -> "Ignoring invalid user journey".equals(item.msg)));
         client.destroy();
         activity.finish();
     }

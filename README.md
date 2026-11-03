@@ -517,7 +517,7 @@ Notes:
 - Events include component identifiers, coordinates, and text-length deltas (never full text). This should avoid collecting any personal or sensitive data, but ensure your component IDs do not include any PII.
 - Manual `HCaptchaVerifyParams.userJourney` values must be JSON primitives, `JSONObject`/`JSONArray`, maps with string keys, collections, arrays, or SDK `JLEvent` values.
 - Migration from Jackson: convert POJOs to string-keyed maps, enums to their intended wire strings, and UUIDs via `toString()`, including values nested in maps or arrays. `byte[]` retains Base64 string encoding; `char[]` retains string encoding. Cyclic containers, nesting beyond 100 levels, and non-finite numbers are rejected.
-- Invalid verification parameters invoke failure listeners with `HCaptchaError.VERIFY_PARAMS_ERROR` and stop that attempt before submitting partial parameters. This error bypasses `retryPredicate`; correct the parameters before retrying.
+- Invalid manual journey values are omitted with a warning in logcat (`hcaptcha` tag). Valid MFA/`rqdata` parameters are preserved, and verification continues without invoking failure listeners.
 - If you set `HCaptchaVerifyParams.userJourney` manually while `userJourney` is enabled, the SDK may overwrite it with captured events.
 - Use `stopEvents()` if you need to unregister the user-journey sink, for example before reusing a client without analytics.
 

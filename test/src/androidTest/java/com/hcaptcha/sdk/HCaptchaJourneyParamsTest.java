@@ -1,7 +1,7 @@
 package com.hcaptcha.sdk;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
@@ -42,6 +42,9 @@ public class HCaptchaJourneyParamsTest {
     @Parameterized.Parameter(2)
     public String expected;
 
+    @Parameterized.Parameter(3)
+    public boolean includeOtherParams;
+
     @Parameterized.Parameters(name = "{0}")
     public static List<Object[]> cases() throws JSONException {
         final JSONArray arrayCycle = new JSONArray();
@@ -49,24 +52,29 @@ public class HCaptchaJourneyParamsTest {
         final JSONObject objectCycle = new JSONObject();
         objectCycle.put("self", objectCycle);
         return Arrays.asList(new Object[][] {
-                {"bytes", new byte[] {1, 2, 3}, "AQID"},
-                {"characters", new char[] {'a', 'b'}, "ab"},
-                {"explicit null", JSONObject.NULL, "null"},
-                {"array cycle", arrayCycle, null},
-                {"object cycle", objectCycle, null},
-                {"NaN", new JSONArray().put((Object) Double.NaN), null},
-                {"POJO", new Object(), null},
-                {"enum", Collections.singletonMap("theme", HCaptchaTheme.LIGHT), null},
-                {"UUID", Collections.singletonMap("id", new UUID(0, 1)), null}
+                {"bytes", new byte[] {1, 2, 3}, "AQID", true},
+                {"characters", new char[] {'a', 'b'}, "ab", true},
+                {"explicit null", JSONObject.NULL, "null", false},
+                {"array cycle", arrayCycle, null, true},
+                {"object cycle", objectCycle, null, true},
+                {"NaN", new JSONArray().put((Object) Double.NaN), null, true},
+                {"POJO", new Object(), null, true},
+                {"enum", Collections.singletonMap("theme", HCaptchaTheme.LIGHT), null, true},
+                {"UUID", Collections.singletonMap("id", new UUID(0, 1)), null, true},
+                {"invalid iterator", (Iterable<Object>) () -> {
+                    throw new IllegalStateException();
+                }, null, true},
+                {"cycle only", arrayCycle, null, false},
+                {"NaN only", new JSONArray().put((Object) Double.NaN), null, false}
         });
     }
 
     @Test
-    public void paramsReachJavascriptOrFailBeforeExecute() throws Exception {
+    public void paramsReachJavascriptWithInvalidJourneyOmitted() throws Exception {
         final Capture capture = new Capture();
         final AtomicReference<HCaptchaException> failure = new AtomicReference<>();
         final HCaptchaVerifyParams params = HCaptchaVerifyParams.builder().userJourney(journey).build();
-        if (journey != JSONObject.NULL) {
+        if (includeOtherParams) {
             params.setPhonePrefix("44");
             params.setPhoneNumber("+44123456789");
             params.setRqdata("request-data");
@@ -123,25 +131,23 @@ public class HCaptchaJourneyParamsTest {
             try {
                 assertTrue("WebView should report the final state", capture.done.await(5, TimeUnit.SECONDS));
                 final JSONObject result = new JSONObject(capture.json);
-                if (expected == null) {
-                    assertNotNull(failure.get());
-                    assertEquals(HCaptchaError.VERIFY_PARAMS_ERROR, failure.get().getHCaptchaError());
-                    assertEquals(0, result.getInt("executions"));
+                assertNull(failure.get());
+                assertEquals(1, result.getInt("executions"));
+                if (!includeOtherParams && expected == null) {
                     assertTrue(result.isNull("params"));
                 } else {
-                    assertNull(failure.get());
-                    assertEquals(1, result.getInt("executions"));
                     final JSONObject received = result.getJSONObject("params");
-                    if (journey == JSONObject.NULL) {
-                        assertEquals(1, received.length());
-                        assertTrue(received.isNull("userjourney"));
-                    } else {
-                        assertEquals(4, received.length());
+                    if (includeOtherParams) {
                         assertEquals("44", received.getString("mfa_phoneprefix"));
                         assertEquals("+44123456789", received.getString("mfa_phone"));
                         assertEquals("request-data", received.getString("rqdata"));
                     }
-                    assertEquals(expected, received.getString("userjourney"));
+                    if (expected == null) {
+                        assertEquals(3, received.length());
+                        assertFalse(received.has("userjourney"));
+                    } else {
+                        assertEquals(expected, received.getString("userjourney"));
+                    }
                 }
             } finally {
                 scenario.onActivity(activity -> helper.destroy());

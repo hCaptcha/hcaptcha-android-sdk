@@ -91,7 +91,8 @@ public class HCaptchaJsonTest {
     public void serializes_supported_values() throws JSONException {
         final HCaptchaVerifyParams params = HCaptchaVerifyParams.builder().userJourney(value).build();
         if (expected == null) {
-            assertThrows(JSONException.class, params::toJson);
+            assertThrows(JSONException.class, () -> HCaptchaJson.wrap(value));
+            JSONAssert.assertEquals("{}", params.toJson(), true);
         } else {
             JSONAssert.assertEquals(expected, params.toJson(), true);
         }

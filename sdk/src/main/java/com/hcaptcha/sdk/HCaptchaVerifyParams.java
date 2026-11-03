@@ -1,5 +1,7 @@
 package com.hcaptcha.sdk;
 
+import android.util.Log;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -41,16 +43,24 @@ public class HCaptchaVerifyParams implements Serializable {
      * JSONObject/JSONArray, maps with string keys, collections, arrays, and SDK JLEvent values.
      * Byte arrays serialize as Base64 strings; character arrays serialize as strings.
      * Convert POJOs to maps and enums/UUIDs to strings before passing them, including nested values.
-     * Invalid values fail verification with VERIFY_PARAMS_ERROR instead of submitting partial parameters.
+     * Invalid journey values are omitted with a warning; other parameters and verification are preserved.
      */
     private Object userJourney;
 
     String toJson() throws JSONException {
+        Object journey = null;
+        if (userJourney != null) {
+            try {
+                journey = HCaptchaJson.wrap(userJourney);
+            } catch (JSONException | RuntimeException e) {
+                Log.w("hcaptcha", "Ignoring invalid user journey");
+            }
+        }
         return new JSONObject()
                 .put("mfa_phoneprefix", phonePrefix)
                 .put("mfa_phone", phoneNumber)
                 .put("rqdata", rqdata)
-                .put("userjourney", userJourney == null ? null : HCaptchaJson.wrap(userJourney))
+                .put("userjourney", journey)
                 .toString();
     }
 }
