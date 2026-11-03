@@ -2,6 +2,9 @@
 
 # 5.2.0
 
+- Prevent host app crashes when the WebView renderer terminates; report `HCaptchaError.ERROR` and allow subsequent verification with a fresh WebView while retaining the configured options.
+- Ignore stale callbacks after reconfiguration, reset, or destruction, and cancel pending token-expiration callbacks when the client is destroyed.
+- Keep challenges fully visible on short viewports, including landscape orientation, increased display scaling, and rotation, with support for older Android WebViews.
 - Remove Jackson dependencies; use Android JSON APIs while preserving SDK payloads and Android API 16 support.
 - Validate native JSON journey containers, preserve byte/character-array payloads, and omit invalid journey data with a warning while preserving other parameters and continuing verification.
 
