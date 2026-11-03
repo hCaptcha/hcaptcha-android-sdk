@@ -17,6 +17,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import com.hcaptcha.sdk.journeylitics.InMemorySink;
 import com.hcaptcha.sdk.journeylitics.Journeylitics;
+import org.json.JSONObject;
 import org.junit.Test;
 import org.mockito.MockedStatic;
 
@@ -30,6 +31,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class HCaptchaJourneyLifecycleTest {
     private static final int LISTENER_ARG_INDEX = 3;
+    private static final int EVENT_FIELD_COUNT = 4;
 
     private static void resetJourneyliticsState() throws Exception {
         final Field startedField = Journeylitics.class.getDeclaredField("STARTED");
@@ -122,6 +124,13 @@ public class HCaptchaJourneyLifecycleTest {
         final InMemorySink sink = getJourneySink(hCaptcha);
         assertNotNull(sink);
         assertEquals(1, sink.getEvents().size());
+        final String params = HCaptchaVerifyParams.builder().userJourney(sink.getEvents()).build().toJson();
+        final JSONObject event = new JSONObject(params).getJSONArray("userjourney").getJSONObject(0);
+        assertEquals(EVENT_FIELD_COUNT, event.length());
+        assertTrue(event.getLong("ts") > 0);
+        assertEquals("click", event.getString("k"));
+        assertEquals("Button", event.getString("v"));
+        assertEquals(0, event.getJSONObject("m").length());
 
         hCaptcha.verifyWithHCaptcha();
         assertTrue(sink.getEvents().isEmpty());

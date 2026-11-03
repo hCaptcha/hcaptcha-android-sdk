@@ -26,7 +26,6 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -135,8 +134,7 @@ final class HCaptchaWebViewHelper {
         }
 
         try {
-            final ObjectMapper objectMapper = new ObjectMapper();
-            final String data = objectMapper.writeValueAsString(verifyParams);
+            final String data = verifyParams.toJson();
             webView.loadUrl("javascript:setData(" + data + ");");
         } catch (Exception e) {
             HCaptchaLog.w("Failed to call javascript:setData(): " + e.getMessage());

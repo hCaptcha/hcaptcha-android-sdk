@@ -1,11 +1,11 @@
 package com.hcaptcha.sdk;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.Serializable;
 
@@ -16,33 +16,38 @@ import java.io.Serializable;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class HCaptchaVerifyParams implements Serializable {
 
     /**
      * Optional phone country calling code (without '+'), e.g., "44".
      * Used in MFA flows.
      */
-    @JsonProperty("mfa_phoneprefix")
     private String phonePrefix;
 
     /**
      * Optional full phone number in E.164 format ("+44123..."), for use in MFA.
      */
-    @JsonProperty("mfa_phone")
     private String phoneNumber;
 
     /**
      * Optional request data string to be passed to hCaptcha.
      * When provided, JS will call hcaptcha.setData({rqdata: value}) if available.
      */
-    @JsonProperty("rqdata")
     private String rqdata;
 
     /**
      * Optional user journey events to be passed to hCaptcha.
-     * Contains user interaction events for analytics.
+     * Contains user interaction events for analytics. Accepts JSON primitives,
+     * JSONObject/JSONArray, maps with string keys, collections, arrays, and SDK JLEvent values.
      */
-    @JsonProperty("userjourney")
     private Object userJourney;
+
+    String toJson() throws JSONException {
+        return new JSONObject()
+                .put("mfa_phoneprefix", phonePrefix)
+                .put("mfa_phone", phoneNumber)
+                .put("rqdata", rqdata)
+                .put("userjourney", userJourney == null ? null : HCaptchaJson.wrap(userJourney))
+                .toString();
+    }
 }
