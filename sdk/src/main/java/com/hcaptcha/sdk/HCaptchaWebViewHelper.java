@@ -117,7 +117,7 @@ final class HCaptchaWebViewHelper {
         webView.destroy();
     }
 
-    public void setVerifyParams(@Nullable HCaptchaVerifyParams params) {
+    public boolean setVerifyParams(@Nullable HCaptchaVerifyParams params) {
         final HCaptchaVerifyParams verifyParams = params != null ? params :  new HCaptchaVerifyParams();
 
         // This allows backwards compatibility for deprecated config.rqdata.
@@ -129,22 +129,27 @@ final class HCaptchaWebViewHelper {
             }
         }
 
-        if (verifyParams.equals(new HCaptchaVerifyParams())) {
-            return;
+        if (verifyParams.getPhonePrefix() == null && verifyParams.getPhoneNumber() == null
+                && verifyParams.getRqdata() == null && verifyParams.getUserJourney() == null) {
+            return true;
         }
 
         try {
             final String data = verifyParams.toJson();
             webView.loadUrl("javascript:setData(" + data + ");");
+            return true;
         } catch (Exception e) {
             HCaptchaLog.w("Failed to call javascript:setData(): " + e.getMessage());
+            captchaVerifier.onFailure(new HCaptchaException(HCaptchaError.VERIFY_PARAMS_ERROR, e.getMessage()));
+            return false;
         }
     }
 
     void resetAndExecute(@Nullable HCaptchaVerifyParams verifyParams) {
         this.reset();
-        this.setVerifyParams(verifyParams);
-        this.execute();
+        if (this.setVerifyParams(verifyParams)) {
+            this.execute();
+        }
     }
 
     void execute() {
@@ -164,7 +169,8 @@ final class HCaptchaWebViewHelper {
     }
 
     public boolean shouldRetry(HCaptchaException exception) {
-        return config.getRetryPredicate().shouldRetry(config, exception);
+        return exception.getHCaptchaError() != HCaptchaError.VERIFY_PARAMS_ERROR
+                && config.getRetryPredicate().shouldRetry(config, exception);
     }
 
     /**

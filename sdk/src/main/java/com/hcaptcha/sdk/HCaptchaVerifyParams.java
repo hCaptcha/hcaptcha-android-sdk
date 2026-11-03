@@ -39,6 +39,9 @@ public class HCaptchaVerifyParams implements Serializable {
      * Optional user journey events to be passed to hCaptcha.
      * Contains user interaction events for analytics. Accepts JSON primitives,
      * JSONObject/JSONArray, maps with string keys, collections, arrays, and SDK JLEvent values.
+     * Byte arrays serialize as Base64 strings; character arrays serialize as strings.
+     * Convert POJOs to maps and enums/UUIDs to strings before passing them, including nested values.
+     * Invalid values fail verification with VERIFY_PARAMS_ERROR instead of submitting partial parameters.
      */
     private Object userJourney;
 

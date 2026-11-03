@@ -14,9 +14,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @RunWith(Parameterized.class)
 public class HCaptchaJsonTest {
+    private static final int MAX_JSON_DEPTH = 100;
+
     @Parameterized.Parameter
     public String name;
 
@@ -34,6 +37,16 @@ public class HCaptchaJsonTest {
         nested.put("values", Arrays.asList(true, 2, new int[] {1, 2}));
         final Map<String, Object> cyclic = new HashMap<>();
         cyclic.put("self", cyclic);
+        final JSONArray cyclicArray = new JSONArray();
+        cyclicArray.put(cyclicArray);
+        final JSONObject cyclicObject = new JSONObject();
+        cyclicObject.put("self", cyclicObject);
+        final JSONArray mixedCycle = new JSONArray();
+        mixedCycle.put(Collections.singletonMap("self", mixedCycle));
+        Object atDepthLimit = "leaf";
+        for (int i = 0; i < MAX_JSON_DEPTH; i++) {
+            atDepthLimit = new JSONArray().put(atDepthLimit);
+        }
         return Arrays.asList(new Object[][] {
                 {"null omitted", null, "{}"},
                 {"explicit null", JSONObject.NULL, "{\"userjourney\":null}"},
@@ -43,17 +56,34 @@ public class HCaptchaJsonTest {
                 {"object", new JSONObject("{\"id\":\"button\"}"),
                         "{\"userjourney\":{\"id\":\"button\"}}"},
                 {"array", new JSONArray("[1,null,true]"), "{\"userjourney\":[1,null,true]}"},
+                {"native Java null", new JSONArray().put((Object) null), "{\"userjourney\":[null]}"},
                 {"primitive array", new int[] {1, 2}, "{\"userjourney\":[1,2]}"},
                 {"object array", new Object[] {"click", null}, "{\"userjourney\":[\"click\",null]}"},
+                {"character array", new char[] {'a', 'b'}, "{\"userjourney\":\"ab\"}"},
+                {"boxed characters", new Character[] {'a', null}, "{\"userjourney\":[\"a\",null]}"},
+                {"native nested values", new JSONObject().put("events", new JSONArray().put(nested)),
+                        "{\"userjourney\":{\"events\":[{\"text\":\"quote\\\"\\\\\\n\\t\u2028\u2029\","
+                                + "\"empty\":null,\"values\":[true,2,[1,2]]}]}}"},
                 {"nested map", nested,
                         "{\"userjourney\":{\"text\":\"quote\\\"\\\\\\n\\t\u2028\u2029\","
                                 + "\"empty\":null,\"values\":[true,2,[1,2]]}}"},
                 {"POJO", new Object(), null},
+                {"enum", HCaptchaTheme.LIGHT, null},
+                {"UUID in map", Collections.singletonMap("id", new UUID(0, 1)), null},
                 {"non-string key", Collections.singletonMap(1, "value"), null},
                 {"NaN", Double.NaN, null},
                 {"infinity", Double.POSITIVE_INFINITY, null},
                 {"nested NaN", Arrays.asList(Double.NaN), null},
-                {"cycle", cyclic, null}
+                {"cycle", cyclic, null},
+                {"native array cycle", cyclicArray, null},
+                {"native object cycle", cyclicObject, null},
+                {"mixed cycle", mixedCycle, null},
+                {"native NaN", new JSONArray().put((Object) Double.NaN), null},
+                {"native nested infinity", new JSONObject().put("values",
+                        new JSONArray().put((Object) Double.POSITIVE_INFINITY)), null},
+                {"native unsupported value", new JSONArray().put(new Object()), null},
+                {"depth limit", atDepthLimit, "{\"userjourney\":" + atDepthLimit + "}"},
+                {"depth exceeded", new JSONArray().put(atDepthLimit), null}
         });
     }
 

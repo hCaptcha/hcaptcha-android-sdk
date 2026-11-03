@@ -92,6 +92,9 @@ final class HCaptchaEmbeddedView implements IHCaptchaVerifier {
             webViewHelper.resetAndExecute(verifyParams);
             return;
         }
+        if (exception.getHCaptchaError() == HCaptchaError.VERIFY_PARAMS_ERROR) {
+            reset();
+        }
         listener.onFailure(exception);
     }
 
@@ -99,8 +102,8 @@ final class HCaptchaEmbeddedView implements IHCaptchaVerifier {
     public void startVerification(@NonNull Activity activity, @Nullable HCaptchaVerifyParams params) {
         this.verifyParams = params;
 
-        if (readyForInteraction) {
-            webViewHelper.setVerifyParams(params);
+        if (readyForInteraction && !webViewHelper.setVerifyParams(params)) {
+            return;
         }
 
         attachWebView();

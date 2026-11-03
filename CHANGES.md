@@ -3,6 +3,7 @@
 # 5.2.0
 
 - Remove Jackson dependencies; use Android JSON APIs while preserving SDK payloads and Android API 16 support.
+- Validate native JSON journey containers, preserve byte/character-array payloads, and report invalid verification parameters through `VERIFY_PARAMS_ERROR` without continuing the attempt.
 
 # 5.1.0
 

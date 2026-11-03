@@ -1,10 +1,13 @@
 package com.hcaptcha.sdk;
 
+import android.os.Build;
+
 import com.hcaptcha.sdk.journeylitics.SerializationCases;
 import org.json.JSONObject;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
+import org.robolectric.ParameterizedRobolectricTestRunner;
+import org.robolectric.annotation.Config;
 import org.skyscreamer.jsonassert.JSONAssert;
 
 import java.io.InputStream;
@@ -13,15 +16,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-@RunWith(Parameterized.class)
+@RunWith(ParameterizedRobolectricTestRunner.class)
+@Config(sdk = Build.VERSION_CODES.S_V2)
 public class HCaptchaSerializationTest {
-    @Parameterized.Parameter
+    @ParameterizedRobolectricTestRunner.Parameter
     public String name;
 
-    @Parameterized.Parameter(1)
+    @ParameterizedRobolectricTestRunner.Parameter(1)
     public Object value;
 
-    @Parameterized.Parameters(name = "{0}")
+    @ParameterizedRobolectricTestRunner.Parameters(name = "{0}")
     public static List<Object[]> cases() {
         final List<Object[]> cases = new ArrayList<>();
         for (Map.Entry<String, Object> entry : SerializationCases.values().entrySet()) {
