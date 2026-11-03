@@ -28,6 +28,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     @Nullable
     private IHCaptchaVerifier captchaVerifier;
 
+    // Bumped on every setup, reset and destroy: callbacks from an older one are stale
+    private int setupGeneration;
+
     @Nullable
     private HCaptchaConfig config;
 
@@ -90,19 +93,27 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
         HCaptchaLog.sDiagnosticsLogEnabled = inputConfig.getDiagnosticLog();
         HCaptchaLog.d("HCaptcha.setup");
 
+        final int generation = ++setupGeneration;
         final HCaptchaStateListener listener = new HCaptchaStateListener() {
             @Override
             void onLoaded() {
-                captchaLoaded();
+                if (generation == setupGeneration) {
+                    captchaLoaded();
+                }
             }
 
             @Override
             void onOpen() {
-                captchaOpened();
+                if (generation == setupGeneration) {
+                    captchaOpened();
+                }
             }
 
             @Override
             void onSuccess(final String token) {
+                if (generation != setupGeneration) {
+                    return;
+                }
                 HCaptchaLog.d("HCaptcha.onSuccess");
                 if (journeySink != null) {
                     journeySink.clearEvents();
@@ -113,11 +124,30 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
             @Override
             void onFailure(final HCaptchaException exception) {
+                if (generation != setupGeneration) {
+                    return;
+                }
                 HCaptchaLog.d("HCaptcha.onFailure");
+                setException(exception);
+            }
+
+            @Override
+            void onWebViewGone(final HCaptchaException exception) {
+                if (generation != setupGeneration) {
+                    return;
+                }
+                HCaptchaLog.d("HCaptcha.onWebViewGone");
+                // Invalidate queued callbacks before the failure listener can start a new attempt.
+                setupGeneration++;
+                captchaVerifier = null;
                 setException(exception);
             }
         };
         try {
+            if (captchaVerifier != null) {
+                captchaVerifier.destroy();
+                captchaVerifier = null;
+            }
             // Initialize or disable user journey tracking if enabled/disabled.
             if (Boolean.TRUE.equals(inputConfig.getUserJourney())) {
                 if (journeySink == null) {
@@ -184,7 +214,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     public HCaptcha verifyWithHCaptcha() {
         if (captchaVerifier == null) {
             // Cold start at verification time.
-            setup();
+            setupWithLastConfig();
         }
 
         return startVerification();
@@ -216,7 +246,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
     public HCaptcha verifyWithHCaptcha(@Nullable final HCaptchaVerifyParams verifyParams) {
         if (captchaVerifier == null) {
             // Cold start at verification time.
-            setup();
+            setupWithLastConfig();
         }
 
         return startVerification(verifyParams);
@@ -236,6 +266,7 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @Override
     public void reset() {
+        setupGeneration++;
         if (captchaVerifier != null) {
             captchaVerifier.reset();
             captchaVerifier = null;
@@ -245,6 +276,9 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
 
     @Override
     public void destroy() {
+        setupGeneration++;
+        // A destroyed client must not report its last token expired later
+        handler.removeCallbacksAndMessages(null);
         if (captchaVerifier != null) {
             captchaVerifier.destroy();
             captchaVerifier = null;
@@ -260,6 +294,16 @@ public final class HCaptcha extends Task<HCaptchaTokenResponse> implements IHCap
             }
             journeySink.clearEvents();
             journeySink = null;
+        }
+    }
+
+    private void setupWithLastConfig() {
+        // Keep the config from an earlier setup(config), e.g. once the WebView is gone,
+        // instead of falling back to the site key from the manifest.
+        if (config != null) {
+            setup(config);
+        } else {
+            setup();
         }
     }
 

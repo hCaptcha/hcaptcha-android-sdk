@@ -41,4 +41,9 @@ public class TestHCaptchaVerifier implements IHCaptchaVerifier {
     public void destroy() {
         // no implementation need for performance measurement
     }
+
+    @Override
+    public void onWebViewGone(@NonNull HCaptchaException exception) {
+        // no implementation need for performance measurement
+    }
 }

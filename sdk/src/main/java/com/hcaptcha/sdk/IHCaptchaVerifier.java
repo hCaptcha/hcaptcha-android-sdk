@@ -33,4 +33,12 @@ interface IHCaptchaVerifier extends
      * Unlike {@link #reset()}, this tears down preloaded state as well.
      */
     void destroy();
+
+    /**
+     * The WebView is unusable (e.g. its render process is gone): release it and
+     * report the failure without retrying.
+     *
+     * @param exception the failure to report
+     */
+    void onWebViewGone(@NonNull HCaptchaException exception);
 }

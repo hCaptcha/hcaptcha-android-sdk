@@ -15,6 +15,10 @@ abstract class HCaptchaStateListener implements Parcelable {
 
     abstract void onOpen();
 
+    void onWebViewGone(HCaptchaException exception) {
+        onFailure(exception);
+    }
+
     @Override
     public int describeContents() {
         return 0;

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -34,6 +35,30 @@ import androidx.compose.ui.window.DialogWindowProvider
 
 @Composable
 public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) -> Unit) {
+    // A WebView whose renderer is gone can't verify again: the next recomposition starts over
+    val recovery = remember { WebViewRecovery() }
+    key(recovery.attempt) {
+        HCaptchaComposeContent(config, onResult, recovery::onWebViewGone)
+    }
+}
+
+private class WebViewRecovery {
+    // Not snapshot state on purpose: only a recomposition from the caller starts over,
+    // not the failure HCaptchaCompose reports itself.
+    var attempt = 0
+        private set
+
+    fun onWebViewGone() {
+        attempt++
+    }
+}
+
+@Composable
+private fun HCaptchaComposeContent(
+    config: HCaptchaConfig,
+    onResult: (HCaptchaResponse) -> Unit,
+    onWebViewGone: () -> Unit
+) {
     HCaptchaLog.sDiagnosticsLogEnabled = config.diagnosticLog
     val headlessMode = config.isHeadlessMode()
 
@@ -70,7 +95,7 @@ public fun HCaptchaCompose(config: HCaptchaConfig, onResult: (HCaptchaResponse) 
                 }
             }
             onResultState.value(result)
-        }, helper)
+        }, helper).apply { webViewGoneListener = onWebViewGone }
     }
     val preloadedWebView = remember {
         HCaptchaWebView(context).apply {

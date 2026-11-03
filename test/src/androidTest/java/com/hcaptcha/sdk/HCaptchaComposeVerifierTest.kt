@@ -78,4 +78,26 @@ class HCaptchaComposeVerifierTest {
 
         assert(onFailureCalled)
     }
+
+    @Test
+    @UiThreadTest
+    fun noRetryWhenWebViewGone() {
+        var onFailureCalled = false
+
+        val subject = createVerifier { result ->
+            when (result) {
+                is HCaptchaResponse.Failure -> {
+                    onFailureCalled = true
+                }
+
+                is HCaptchaResponse.Event -> {}
+                is HCaptchaResponse.Success -> error("unreachable")
+            }
+        }
+
+        // NETWORK_ERROR would be retried through onFailure
+        subject.onWebViewGone(HCaptchaException(HCaptchaError.NETWORK_ERROR))
+
+        assert(onFailureCalled)
+    }
 }
